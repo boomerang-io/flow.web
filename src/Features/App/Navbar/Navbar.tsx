@@ -57,7 +57,7 @@ export default function Navbar({ handleOnTutorialClick, flowNavigationData, cont
             type="link"
             kind="app"
             href={APP_ROOT + appLink.profile()}
-            text="Settings"
+            text="Account Settings"
           />,
         ]}
         rightPanel={{

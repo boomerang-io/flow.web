@@ -143,10 +143,10 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
           <p className={styles.detailedListParagraph}>There are no special features to be enabled at this time.</p>
         </div>
       </SettingSection>
-      <SettingSection title="Close Account">
+      <SettingSection title="Delete Account">
         <div className={styles.detailedListContainer}>
           <p className={styles.detailedListParagraph}>
-            Done with your work here? Closing your account means you will no longer be able to access any items you have
+            Done with your work here? Deleting your account means you will no longer be able to access any items you have
             created. You will also no longer receive any notifications from the platform.
           </p>
           <p className={styles.detailedListParagraph}>
@@ -155,9 +155,9 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
           <ConfirmModal
             affirmativeAction={() => removeTeam()}
             affirmativeButtonProps={{ kind: "danger", "data-testid": "confirm-close-account" }}
-            title="Close Account?"
+            title="Delete Account?"
             negativeText="Cancel"
-            affirmativeText="Close"
+            affirmativeText="Delete"
             modalTrigger={({ openModal }) => (
               <Button
                 disabled={!canEdit}
@@ -168,11 +168,11 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
                 size="md"
                 data-testid="close-team"
               >
-                Close Account
+                Delete Account
               </Button>
             )}
           >
-            Closing your account will submit a request but will not immediatly become inactive. This action cannot be
+            Permanently remove your account and all of its contents. Deleting your account cannot be
             undone. Are you sure you want to do this?
           </ConfirmModal>
         </div>
