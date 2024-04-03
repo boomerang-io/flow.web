@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { ConfirmModal, ComposedModal, notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import { useMutation } from "react-query";
 import { Edit, CopyFile, Close } from "@carbon/react/icons";
-import { Tag, Button } from "@carbon/react";
+import { Tag, Button, InlineNotification } from "@carbon/react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import type { FlowUser } from "Types";
 import { resolver } from "Config/servicesConfig";
@@ -22,6 +22,8 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
   const canEdit = userManagementEnabled;
 
   const removeUserMutator = useMutation(resolver.deleteUser);
+
+  const teamCount = user.teams.length;
 
   const removeTeam = async () => {
     try {
@@ -154,7 +156,7 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
           </p>
           <ConfirmModal
             affirmativeAction={() => removeTeam()}
-            affirmativeButtonProps={{ kind: "danger", "data-testid": "confirm-close-account" }}
+            affirmativeButtonProps={{ disabled: teamCount > 0, kind: "danger", "data-testid": "confirm-close-account" }}
             title="Delete Account?"
             negativeText="Cancel"
             affirmativeText="Delete"
@@ -162,7 +164,7 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
               <Button
                 disabled={!canEdit}
                 iconDescription="Close"
-                kind="danger--ghost"
+                kind="danger"
                 onClick={openModal}
                 renderIcon={Close}
                 size="md"
@@ -174,6 +176,15 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
           >
             Permanently remove your account and all of its contents. Deleting your account cannot be
             undone. Are you sure you want to do this?
+            {" "}
+            { teamCount > 0 && (
+              <InlineNotification
+                className={styles.inlineDelete}
+                lowContrast
+                kind="error"
+                subtitle={`You still have access to ${teamCount} teams. You must leave or delete all of your teams before you can delete your account.`}
+              />
+            )}
           </ConfirmModal>
         </div>
       </SettingSection>
