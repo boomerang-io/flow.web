@@ -176,7 +176,6 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
           >
             Permanently remove your account and all of its contents. Deleting your account cannot be
             undone. Are you sure you want to do this?
-            {" "}
             { teamCount > 0 && (
               <InlineNotification
                 className={styles.inlineDelete}
