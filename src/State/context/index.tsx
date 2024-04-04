@@ -5,7 +5,6 @@ import {
   PaginatedWorkflowResponse,
   Task,
   Workflow,
-  WorkflowEditor,
   WorkflowEngineModeType,
   WorkflowRun,
 } from "Types";
@@ -35,19 +34,10 @@ type AppContext = {
   name: string;
 };
 
-interface TaskProvider {
-  category: string;
-  id: string;
-  icon: any;
-  name: string;
+interface RunContext {
+  workflowRun: WorkflowRun;
 }
-
-interface ExecutionContext {
-  tasks: Array<TaskProvider>;
-  workflowExecution?: WorkflowRun;
-  workflow: WorkflowEditor;
-}
-export const [useExecutionContext, ExecutionContextProvider] = createContext<ExecutionContext>();
+export const [useRunContext, RunContextProvider] = createContext<RunContext>();
 
 interface EditorContext {
   mode: WorkflowEngineModeType;

@@ -1,19 +1,19 @@
-import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
 import { Button, ModalBody } from "@carbon/react";
+import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
+import moment from "moment";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
-import moment from "moment";
 import { useTeamContext } from "Hooks";
 import dateHelper from "Utils/dateHelper";
+import { ExecutionStatusCopy, NodeType, executionStatusIcon } from "Constants";
+import { appLink } from "Config/appConfig";
+import { RunPhase, RunStatus, TaskRun, WorkflowRun } from "Types";
 import ManualTaskModal from "./ManualTaskModal";
 import PropertiesTable from "./PropertiesTable";
 import ResultsTable from "./ResultsTable";
 import TaskApprovalModal from "./TaskApprovalModal";
 import TaskExecutionLog from "./TaskRunLog";
 import styles from "./runTaskItem.module.scss";
-import { appLink } from "Config/appConfig";
-import { ExecutionStatusCopy, NodeType, executionStatusIcon } from "Constants";
-import { RunPhase, RunStatus, TaskRun, WorkflowRun } from "Types";
 
 const logTaskTypes = ["customtask", "template", "script"];
 const logStatusTypes = [RunStatus.Succeeded, RunStatus.Failed, RunStatus.Running];
@@ -34,7 +34,7 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-    <li key={taskRun.id} id={`task-${taskRun.id}`} tabIndex={0} className={`${styles.taskitem} ${statusClassName}`}>
+    <li key={taskRun.name} id={`task-${taskRun.name}`} tabIndex={0} className={`${styles.taskitem} ${statusClassName}`}>
       <div className={styles.progressBar} />
       <section className={styles.header}>
         <div className={styles.title}>

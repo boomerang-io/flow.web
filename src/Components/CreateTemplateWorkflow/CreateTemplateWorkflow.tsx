@@ -1,17 +1,17 @@
 //@ts-nocheck
 import React from "react";
+import { Button } from "@carbon/react";
+import { Template, Add } from "@carbon/react/icons";
+import { ModalFlow, notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import { useFeature } from "flagged";
 import { useMutation, useQueryClient, useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
-import { Button } from "@carbon/react";
-import { ModalFlow, notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
+import { appLink } from "Config/appConfig";
+import { FeatureFlag } from "Config/appConfig";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import { FlowTeam, ModalTriggerProps, Workflow } from "Types";
 import CreateWorkflowContent from "./CreateWorkflowContent";
 import CreateWorkflowTemplates from "./CreateWorkflowTemplates";
-import { appLink } from "Config/appConfig";
-import { serviceUrl, resolver } from "Config/servicesConfig";
-import { Template, Add } from "@carbon/react/icons";
-import { FlowTeam, ModalTriggerProps, Workflow } from "Types";
-import { FeatureFlag } from "Config/appConfig";
 import styles from "./createWorkflow.module.scss";
 
 interface CreateTemplateWorkflowProps {
@@ -66,7 +66,7 @@ function CreateTemplateWorkflow({ team, workflowList }: CreateTemplateWorkflowPr
           kind="success"
           title="Create Workflow"
           subtitle="Successfully created workflow from template"
-        />
+        />,
       );
       queryClient.invalidateQueries(serviceUrl.getMyTeams());
       return;

@@ -11,8 +11,8 @@ patchedDependencies:
 
 dependencies:
   '@boomerang-io/carbon-addons-boomerang-react':
-    specifier: 4.0.3-beta.0
-    version: 4.0.3-beta.0(@carbon/react@1.40.0)(axios@0.27.2)(formik@2.4.5)(react-dom@17.0.1)(react-query@3.34.12)(react-router-dom@5.3.0)(react@17.0.1)(yup@0.32.11)
+    specifier: 4.1.2-beta.0
+    version: 4.1.2-beta.0(@carbon/react@1.53.0)(axios@0.27.2)(formik@2.4.5)(react-dom@17.0.1)(react-query@3.34.12)(react-router-dom@5.3.0)(react@17.0.1)(yup@0.32.11)
   '@boomerang-io/styles':
     specifier: 1.1.0
     version: 1.1.0
@@ -29,8 +29,8 @@ dependencies:
     specifier: ^11.50.0
     version: 11.50.0(react@17.0.1)
   '@carbon/react':
-    specifier: 1.40.0
-    version: 1.40.0(react-dom@17.0.1)(react@17.0.1)(sass@1.68.0)
+    specifier: 1.53.0
+    version: 1.53.0(react-dom@17.0.1)(react@17.0.1)(sass@1.68.0)
   '@dagrejs/dagre':
     specifier: ^1.0.4
     version: 1.0.4
@@ -1799,10 +1799,10 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@boomerang-io/carbon-addons-boomerang-react@4.0.3-beta.0(@carbon/react@1.40.0)(axios@0.27.2)(formik@2.4.5)(react-dom@17.0.1)(react-query@3.34.12)(react-router-dom@5.3.0)(react@17.0.1)(yup@0.32.11):
-    resolution: {integrity: sha512-ITPJTrZhequMuN7ZNxcMRDMk47Ma/B33989WS46ml+zsUGzp6mf2tmPww+dFKn7DQMiXsYj6PuDQRhtIgFfoXQ==}
+  /@boomerang-io/carbon-addons-boomerang-react@4.1.2-beta.0(@carbon/react@1.53.0)(axios@0.27.2)(formik@2.4.5)(react-dom@17.0.1)(react-query@3.34.12)(react-router-dom@5.3.0)(react@17.0.1)(yup@0.32.11):
+    resolution: {integrity: sha512-aucy5Y1ebjZFmS9q82tJnes3tR3xvJhfGB7d91D+32vhD8pWVqhhOZftqAyNfOzLe8AVox708PUCbu97XgJuvw==}
     peerDependencies:
-      '@carbon/react': ^1.14.0
+      '@carbon/react': ^1.53.0
       axios: '>= 0.26.0 < 1'
       formik: ^2.1.5
       react: ^17.0.0 || ^16.14.0
@@ -1811,7 +1811,7 @@ packages:
       react-router-dom: ^5.3.0
       yup: '>=0.32.11'
     dependencies:
-      '@carbon/react': 1.40.0(react-dom@17.0.1)(react@17.0.1)(sass@1.68.0)
+      '@carbon/react': 1.53.0(react-dom@17.0.1)(react@17.0.1)(sass@1.68.0)
       '@stomp/stompjs': 6.1.2
       '@tippyjs/react': 4.2.6(react-dom@17.0.1)(react@17.0.1)
       axios: 0.27.2
@@ -1916,18 +1916,44 @@ packages:
     resolution: {integrity: sha512-cRDnv9GfktZo+p/t/Lsy2B3yvMbDI1Ht2ECU0rAikClQHVnOffz791Q4m2gy2STPdISnzjFSPmoRxGKLfYhLRA==}
     dev: false
 
-  /@carbon/feature-flags@0.16.0:
-    resolution: {integrity: sha512-hCrfVZ6oVnPjjupelbvQX4D0i6GlZuKVverAf0LkOydXHrPjSyuEmg+czsylyCBg4r/hxtSTu91Tq6aqz/DsHg==}
+  /@carbon/colors@11.21.0:
+    resolution: {integrity: sha512-qvVcguNL+rOfdOv7NsJPLh6uVvRycO0e3HDl3SD5B/QhviUu76tAHpm23xwe0BDqVHGnmC71xQsUKXL5rOsMPg==}
+    requiresBuild: true
+    dependencies:
+      '@ibm/telemetry-js': 1.3.0
     dev: false
 
-  /@carbon/grid@11.20.0:
-    resolution: {integrity: sha512-YzF6NY6BNbiMI4wwF1oz0XAoiYFt5YoLovHwsHJBb/RFc1qPp94WFL1NoAprKX7I2c7V+ypAjmoTuXFACeL4Dg==}
+  /@carbon/feature-flags@0.18.0:
+    resolution: {integrity: sha512-gOM2WSQamTJMZXGsLUYYgVGLVsC8Y/CNIDkivW6VDESg+T68yBAzphqsarOkqRxs1hf/Re8r+EzwKyLuHf6PQA==}
+    requiresBuild: true
     dependencies:
-      '@carbon/layout': 11.19.0
+      '@ibm/telemetry-js': 1.3.0
+    dev: false
+
+  /@carbon/feature-flags@0.19.0:
+    resolution: {integrity: sha512-DXpe8rQOh7UCz/iB866CDI2yLUr8I2IHL1NY/y0+vKGs3ALo2fQMWEm5sgdPAXyDbJEKW7NyvVHB+9W00Zpcow==}
+    requiresBuild: true
+    dependencies:
+      '@ibm/telemetry-js': 1.3.0
+    dev: false
+
+  /@carbon/grid@11.22.0:
+    resolution: {integrity: sha512-b5R4LMRatZ0ZmRh+outCkPIFIF+gvM3sPjC0NAuAc2CQ6lAZP07/m5f8TOX9YAo10kE1j63hU+unEzs6lAHPRA==}
+    requiresBuild: true
+    dependencies:
+      '@carbon/layout': 11.21.0
+      '@ibm/telemetry-js': 1.3.0
     dev: false
 
   /@carbon/icon-helpers@10.44.0:
     resolution: {integrity: sha512-8gvP8Qr2pNspIUPiQRQQUB9gdklLxfs7JDIz4a/PUzon7IcVielpl08blh2IjpbDr/cZSje5fwn3CAInCKNb1g==}
+    dev: false
+
+  /@carbon/icon-helpers@10.47.0:
+    resolution: {integrity: sha512-vv2Wkuw7lYkYVKrn5ABzlZD+6ioAYwMuyKi2XPqYY3hrHYoL4CQUnuSFDhlj0DR2HHCB0L5MGRLxHLucx5cc7g==}
+    requiresBuild: true
+    dependencies:
+      '@ibm/telemetry-js': 1.3.0
     dev: false
 
   /@carbon/icons-react@11.28.0(react@17.0.1):
@@ -1942,12 +1968,30 @@ packages:
       react: 17.0.1
     dev: false
 
-  /@carbon/layout@11.19.0:
-    resolution: {integrity: sha512-BI9ct+yVKrgL90l4nijMhj8dokXGBJu1Xtve9fz/lcveTyxxn7YvRu8mosGhCyw77KSU6vN2yRLJnQwqwqrLJQ==}
+  /@carbon/icons-react@11.39.0(react@17.0.1):
+    resolution: {integrity: sha512-tKWAo62mAMi5YE0B+LUPlD1dQFgOz+4Z5LMSgQUAoJuDnTw32uXl0BQrSCDP2fXGolIsun280rBTbmPKok/aow==}
+    requiresBuild: true
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      '@carbon/icon-helpers': 10.47.0
+      '@ibm/telemetry-js': 1.3.0
+      prop-types: 15.8.1
+      react: 17.0.1
     dev: false
 
-  /@carbon/motion@11.15.0:
-    resolution: {integrity: sha512-l7SIZMwTmv8BHPvDsQ26Y/dBLKnLGZUvD5bGcDppoUInUcKv2Dg4J0r5JONUsB2OagpBmbj/a5skcahzlaL1JQ==}
+  /@carbon/layout@11.21.0:
+    resolution: {integrity: sha512-R0EEMIzdsWzF2rphzTwDJ6ywnSvDxvZwffBKn7+7bBcTWu0cp/XFeG1UzRL0LoZ25Ixv/aEQYCkoDebgUMfrfQ==}
+    requiresBuild: true
+    dependencies:
+      '@ibm/telemetry-js': 1.3.0
+    dev: false
+
+  /@carbon/motion@11.17.0:
+    resolution: {integrity: sha512-/EXBzFU5hbVxO7yqf/VREesjy8Z6GxhfXjV9etBtj84Z4H460e0CN1z+5KDLpKyq6zVmRnLlFmxVmZgyHwMTfA==}
+    requiresBuild: true
+    dependencies:
+      '@ibm/telemetry-js': 1.3.0
     dev: false
 
   /@carbon/pictograms-react@11.50.0(react@17.0.1):
@@ -1962,8 +2006,8 @@ packages:
       react: 17.0.1
     dev: false
 
-  /@carbon/react@1.40.0(react-dom@17.0.1)(react@17.0.1)(sass@1.68.0):
-    resolution: {integrity: sha512-08ry2eP0J+BVsM8M8nCTV1QxGIosI0ocHUjIPyY0ok6oa7fmlZc2LCIUJSXmn+8X3ep8MXLFTSWpEep+ezzwhA==}
+  /@carbon/react@1.53.0(react-dom@17.0.1)(react@17.0.1)(sass@1.68.0):
+    resolution: {integrity: sha512-i0GDFjDBUj3++sIGOs2lQ/aZZiWraekZw9kwc3iVLW4zh+0dJHJAjHkKskv7f3QvNOPOuXRgmOVQFaNnL5fQww==}
     requiresBuild: true
     peerDependencies:
       react: ^16.8.6 || ^17.0.1 || ^18.2.0
@@ -1971,15 +2015,15 @@ packages:
       sass: ^1.33.0
     dependencies:
       '@babel/runtime': 7.23.1
-      '@carbon/feature-flags': 0.16.0
-      '@carbon/icons-react': 11.28.0(react@17.0.1)
-      '@carbon/layout': 11.19.0
-      '@carbon/styles': 1.40.0(sass@1.68.0)
-      '@carbon/telemetry': 0.1.0
-      classnames: 2.3.2
+      '@carbon/feature-flags': 0.18.0
+      '@carbon/icons-react': 11.39.0(react@17.0.1)
+      '@carbon/layout': 11.21.0
+      '@carbon/styles': 1.54.0(sass@1.68.0)
+      '@ibm/telemetry-js': 1.3.0
+      classnames: 2.5.1
       copy-to-clipboard: 3.3.1
-      downshift: 8.2.1(react@17.0.1)
-      flatpickr: 4.6.9
+      downshift: 8.4.0(react@17.0.1)
+      flatpickr: 4.6.13
       invariant: 2.2.4
       lodash.debounce: 4.0.8
       lodash.findlast: 4.6.0
@@ -1996,22 +2040,24 @@ packages:
       window-or-global: 1.0.1
     dev: false
 
-  /@carbon/styles@1.40.0(sass@1.68.0):
-    resolution: {integrity: sha512-fCzgFUaakU5f9ArIFk5hEeSIpmlj/zJfwJl5cyA8yrltm4jznc4AdoEmS3Lp5hZwaIP9BEO6Oso81J+DRKggNQ==}
+  /@carbon/styles@1.54.0(sass@1.68.0):
+    resolution: {integrity: sha512-VXcx+o6q2ol2kcm3cfE8PaV2+EgbwVaSlZ9gH6VYorBN2MT4I9xypQAYzoyrNN0oV/Q92Xiyb3WejKuy74xFEg==}
+    requiresBuild: true
     peerDependencies:
       sass: ^1.33.0
     peerDependenciesMeta:
       sass:
         optional: true
     dependencies:
-      '@carbon/colors': 11.19.0
-      '@carbon/feature-flags': 0.16.0
-      '@carbon/grid': 11.20.0
-      '@carbon/layout': 11.19.0
-      '@carbon/motion': 11.15.0
-      '@carbon/themes': 11.25.0
-      '@carbon/type': 11.24.0
+      '@carbon/colors': 11.21.0
+      '@carbon/feature-flags': 0.19.0
+      '@carbon/grid': 11.22.0
+      '@carbon/layout': 11.21.0
+      '@carbon/motion': 11.17.0
+      '@carbon/themes': 11.34.0
+      '@carbon/type': 11.26.0
       '@ibm/plex': 6.0.0-next.6
+      '@ibm/telemetry-js': 1.3.0
       sass: 1.68.0
     dev: false
 
@@ -2020,20 +2066,24 @@ packages:
     hasBin: true
     dev: false
 
-  /@carbon/themes@11.25.0:
-    resolution: {integrity: sha512-SQ4RLJhjheE0eq9gL4TNmYMQAsVmwveZpAMHPB9bVARC3pRfUDy+s0+j57/vWtVlEs4j3f7HxVvNazW6ohTl8A==}
+  /@carbon/themes@11.34.0:
+    resolution: {integrity: sha512-Dxf5zgk3iuV/MmD4lu2hyScbQmesjE6fol04HPYJeAGtHud2mN+/Ti7H4W3mEcDukIosFNDXKNR39is9+lDTxA==}
+    requiresBuild: true
     dependencies:
-      '@carbon/colors': 11.19.0
-      '@carbon/layout': 11.19.0
-      '@carbon/type': 11.24.0
+      '@carbon/colors': 11.21.0
+      '@carbon/layout': 11.21.0
+      '@carbon/type': 11.26.0
+      '@ibm/telemetry-js': 1.3.0
       color: 4.2.3
     dev: false
 
-  /@carbon/type@11.24.0:
-    resolution: {integrity: sha512-X/UN/leNbwis5NdDzLPyy5AZXvgqSCM8uH/FOomCf5KTxAcpDOsY7jx5rax+zHE6HqgJWuFDfQPwnVMRBS4LfQ==}
+  /@carbon/type@11.26.0:
+    resolution: {integrity: sha512-Q9ehK/Q68UZjlLE4L+8AfhkNObCksCoGvPb2IMe1IkVoCjJI6QbG3yugGm4D8nfTbs3fGTGAKs4+6HkbkW8Lyw==}
+    requiresBuild: true
     dependencies:
-      '@carbon/grid': 11.20.0
-      '@carbon/layout': 11.19.0
+      '@carbon/grid': 11.22.0
+      '@carbon/layout': 11.21.0
+      '@ibm/telemetry-js': 1.3.0
     dev: false
 
   /@carbon/utils-position@1.1.4:
@@ -2748,6 +2798,11 @@ packages:
   /@ibm/plex@6.0.0-next.6:
     resolution: {integrity: sha512-B3uGruTn2rS5gweynLmfSe7yCawSRsJguJJQHVQiqf4rh2RNgJFu8YLE2Zd/JHV0ZXoVMOslcXP2k3hMkxKEyA==}
     engines: {node: '>=14'}
+    dev: false
+
+  /@ibm/telemetry-js@1.3.0:
+    resolution: {integrity: sha512-9gIkyF2B9RizWN6rsdQN76DN6D+/Xbr4HGTwm6EUujfXvEVtWbf4jzxDFwKvZkeTC2tjHpkUNJQKdivbMKt8yg==}
+    hasBin: true
     dev: false
 
   /@istanbuljs/schema@0.1.3:
@@ -4861,6 +4916,10 @@ packages:
     resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
     dev: false
 
+  /classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+    dev: false
+
   /clean-stack@2.2.0:
     resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
     engines: {node: '>=6'}
@@ -5889,8 +5948,8 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /downshift@8.2.1(react@17.0.1):
-    resolution: {integrity: sha512-mHQUQMWCliXkoWvhxlRyEyKcdlbs8rZjZ+nSqGi8dKIv26gWtbQ8yVTPuYSHT7X8ff+FkEcskT9ktLuNKNoEHA==}
+  /downshift@8.4.0(react@17.0.1):
+    resolution: {integrity: sha512-feeqAR0s53NTIKaHxyFhdLo9UCHUwge4q/j+heIz7X8AaURgdcANOnMGLWffWQCoX9l4Vpw87nOrlX6uJceqjA==}
     peerDependencies:
       react: '>=16.12.0'
     dependencies:
@@ -6776,8 +6835,8 @@ packages:
     resolution: {integrity: sha512-3ULSxbXmcMIRzer/2jLNweoqHpwDvsjEawO2FUd9UFR8uPwLM+LruZcPDpuZStcEgbQKhuFOfXo4nYdGladSNw==}
     dev: false
 
-  /flatpickr@4.6.9:
-    resolution: {integrity: sha512-F0azNNi8foVWKSF+8X+ZJzz8r9sE1G4hl06RyceIaLvyltKvDl6vqk9Lm/6AUUCi5HWaIjiUbk7UpeE/fOXOpw==}
+  /flatpickr@4.6.13:
+    resolution: {integrity: sha512-97PMG/aywoYpB4IvbvUJi0RQi8vearvU0oov1WW3k0WZPBMrTQVqekSX5CjSG/M4Q3i6A/0FKXC7RyAoAUUSPw==}
     dev: false
 
   /flatted@3.2.9:
@@ -8303,7 +8362,7 @@ packages:
     dev: true
 
   /lodash.sortby@4.7.0:
-    resolution: {integrity: sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=}
+    resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
     dev: false
 
   /lodash.startcase@4.4.0:
@@ -9384,6 +9443,7 @@ packages:
   /pify@4.0.1:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -9549,6 +9609,7 @@ packages:
 
   /prr@1.0.1:
     resolution: {integrity: sha512-yPw4Sng1gWghHQWj0B3ZggWUm4qVbPwPFcRG8KyxiU7J2OHFSoEHKS+EZ3fv5l1t9CyCiop6l/ZYeWbrgoQejw==}
+    requiresBuild: true
     dev: true
     optional: true
 

@@ -1,12 +1,12 @@
 import React, { useRef } from "react";
-import classNames from "classnames/bind";
-import { Loading, TextArea, TextInput } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import capitalize from "lodash/capitalize";
 import { Button, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
+import { Loading, TextArea, TextInput } from "@boomerang-io/carbon-addons-boomerang-react";
 import { ModalFlowForm, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import workflowIcons from "Assets/workflowIcons";
+import classNames from "classnames/bind";
+import { Formik } from "formik";
+import capitalize from "lodash/capitalize";
+import * as Yup from "yup";
 import { FlowTeam, Workflow } from "Types";
 import styles from "./createWorkflow.module.scss";
 

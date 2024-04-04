@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import cx from "classnames";
-import ReactMde from "react-mde";
-import ReactMarkdown from "react-markdown";
 import { ChevronRight, DragHorizontal, RequestQuote } from "@carbon/react/icons";
-import styles from "./Notes.module.scss";
-import "react-mde/lib/styles/css/react-mde-all.css";
 import "Styles/markdown.css";
+import cx from "classnames";
+import ReactMarkdown from "react-markdown";
+import ReactMde from "react-mde";
+import "react-mde/lib/styles/css/react-mde-all.css";
+import { ObjectValues } from "Types";
+import styles from "./Notes.module.scss";
 
 interface NotesProps {
   markdown?: string;
@@ -18,10 +19,10 @@ const mdeToolbarCommands = [
   ["unordered-list", "ordered-list", "checked-list"],
 ];
 
-const mdeTabs = {
+const MDETabs = {
   Preview: "preview",
   Write: "write",
-};
+} as const;
 
 // window resize values
 const defaultWidth = 640;
@@ -29,7 +30,7 @@ const maxWidth = window.innerWidth - 300;
 const minWidth = 400;
 
 function Notes({ markdown, updateNotes }: NotesProps) {
-  const [selectedTab, setSelectedTab] = useState<any>(mdeTabs.Preview);
+  const [selectedTab, setSelectedTab] = useState<ObjectValues<typeof MDETabs>>(MDETabs.Preview);
   const [isSidenavOpen, setIsSidenavOpen] = useState(false);
 
   // controls for window resize
@@ -77,15 +78,15 @@ function Notes({ markdown, updateNotes }: NotesProps) {
       className={cx(styles.container, { [styles.collapsed]: !isSidenavOpen })}
       style={{ width: `${totalWidth / 16}rem` }}
     >
+      <button className={styles.collapseButton} onClick={resetNotesContainer}>
+        <ChevronRight className={styles.chevron} />
+        <RequestQuote className={styles.notesIcon} />
+      </button>
       <button
         disabled={!isSidenavOpen}
         className={styles.resizerContainer}
         onMouseDown={isSidenavOpen ? startResize : () => false}
       >
-        <button className={styles.collapseButton} onClick={resetNotesContainer}>
-          <ChevronRight className={styles.chevron} />
-          <RequestQuote className={styles.notesIcon} />
-        </button>
         {isSidenavOpen && <DragHorizontal className={styles.dragIcon} />}
       </button>
       <div className={styles.notesContainer}>
@@ -103,10 +104,10 @@ function Notes({ markdown, updateNotes }: NotesProps) {
           }}
           childProps={{
             writeButton: {
-              className: cx(styles.tabButton, { [styles.selected]: selectedTab === mdeTabs.Write }),
+              className: cx(styles.tabButton, { [styles.selected]: selectedTab === MDETabs.Write }),
             },
             previewButton: {
-              className: cx(styles.tabButton, { [styles.selected]: selectedTab === mdeTabs.Preview }),
+              className: cx(styles.tabButton, { [styles.selected]: selectedTab === MDETabs.Preview }),
             },
           }}
           generateMarkdownPreview={(markdown: string) =>

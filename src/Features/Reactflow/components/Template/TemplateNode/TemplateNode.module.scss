@@ -1,3 +1,5 @@
+@import "Styles/mixins";
+
 .closeButton {
   position: absolute;
   right: -0.75rem;
@@ -19,6 +21,32 @@
 .updateTaskModalContainer {
   max-height: 62.5rem !important;
   max-width: 60rem !important;
+}
+
+.badgeContainer {
+  background-color: var(--cds-ui-01);
+  border: 1px solid var(--cds-text-02);
+  border-radius: 0.25rem;
+  left: -1.5rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+  position: absolute;
+  top: -0.75rem;
+}
+
+.badgeText {
+  color: var(--cds-text-primary);
+  font-size: 0.625rem;
+  line-height: 0.8125rem;
+}
+
+:global .c-workflow-diagram-execution {
+  .node.srd-node {
+    cursor: initial;
+  }
+}
+
+.normal {
+  border: none;
 }
 
 .badgeContainer {

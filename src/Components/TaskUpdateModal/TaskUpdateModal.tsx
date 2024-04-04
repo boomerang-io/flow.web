@@ -1,15 +1,15 @@
-import { DataDrivenInput, DynamicFormik, Loading, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
+import React from "react";
 import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import { WarningFilled, WarningAlt, Checkmark } from "@carbon/react/icons";
-import React from "react";
-import { useQuery } from "react-query";
+import { DataDrivenInput, DynamicFormik, Loading, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import cx from "classnames";
+import { useQuery } from "react-query";
 import EmptyState from "Components/EmptyState";
 import TextEditorModal from "Components/TextEditorModal";
-import styles from "./taskUpdateModal.module.scss";
-import { serviceUrl, resolver } from "Config/servicesConfig";
 import { TEXT_AREA_TYPES } from "Constants/formInputTypes";
-import { ObjectValuesToType, TaskTemplate, WorkflowNode } from "Types";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import { ObjectValues, TaskTemplate, WorkflowNode } from "Types";
+import styles from "./taskUpdateModal.module.scss";
 
 interface TaskUpdateModalProps {
   availableParameters?: Array<string>;
@@ -199,7 +199,7 @@ function VersionSection({ children, latest = false, subtitle, version }: Version
 }
 
 const ChangeToAppearanceMap: Record<
-  ObjectValuesToType<typeof UpdateType>,
+  ObjectValues<typeof UpdateType>,
   { icon: React.ReactNode; className: string; text: string }
 > = {
   [UpdateType.Add]: {
@@ -222,7 +222,7 @@ const ChangeToAppearanceMap: Record<
 interface StateHighlighterProps {
   children: React.ReactNode;
   hidden?: boolean;
-  type: ObjectValuesToType<typeof UpdateType>;
+  type: ObjectValues<typeof UpdateType>;
 }
 function StateHighlighter({ children, hidden = false, type }: StateHighlighterProps) {
   const { className, icon, text } = ChangeToAppearanceMap[type] ?? {};

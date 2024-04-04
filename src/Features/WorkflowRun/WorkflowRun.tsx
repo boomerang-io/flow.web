@@ -7,26 +7,27 @@ import type { ReactFlowInstance } from "reactflow";
 import { Box } from "reflexbox";
 import ReactFlow from "Features/Reactflow";
 import { useQuery } from "Hooks";
-import { EditorContextProvider } from "State/context";
+import { EditorContextProvider, useTeamContext, RunContextProvider } from "State/context";
 import { groupTasksByName } from "Utils";
 import { WorkflowEngineMode } from "Constants";
 import { serviceUrl } from "Config/servicesConfig";
-import { PaginatedTaskResponse, RunStatus, Task, WorkflowEditor, WorkflowRun } from "Types";
+import { FlowTeam, PaginatedTaskResponse, RunStatus, Task, WorkflowEditor, WorkflowRun } from "Types";
 import RunHeader from "./RunHeader";
 import RunTaskLog from "./TaskRunList";
 import WorkflowActions from "./WorkflowActions";
 import styles from "./WorkflowRun.module.scss";
 
 export default function WorkflowRunContainer() {
-  const { team, workflowId, runId }: { team: string; workflowId: string; runId: string } = useParams();
+  const { team } = useTeamContext();
+  const { workflowId, runId }: { team: string; workflowId: string; runId: string } = useParams();
   const getTasksUrl = serviceUrl.task.queryTasks({
     query: queryString.stringify({ statuses: "active" }),
   });
   const getTeamTasksUrl = serviceUrl.team.task.queryTasks({
     query: queryString.stringify({ statuses: "active" }),
-    team: team,
+    team: team.name,
   });
-  const getExecutionUrl = serviceUrl.team.workflowrun.getWorkflowRun({ team: team, id: runId });
+  const getExecutionUrl = serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id: runId });
 
   /**
    * Queries
@@ -63,9 +64,9 @@ export default function WorkflowRunContainer() {
   if (tasksQuery.data && teamTasksQuery.data && executionQuery.data) {
     return (
       <RevisionContainer
-        team={team}
+        team={team.name}
         workflowRun={executionQuery.data}
-        tasksData={[...tasksQuery.data.content, ...teamTasksQuery.data.content]}
+        tasksData={[...tasksQuery.data.content, ...prefixTeamTask(teamTasksQuery.data.content, team)]}
         workflowId={workflowId}
       />
     );
@@ -122,7 +123,9 @@ function RevisionContainer({ team, workflowRun, tasksData, workflowId }: Revisio
           tasksData: groupedTasks,
         }}
       >
-        <Main workflow={workflowQuery.data} workflowRun={workflowRun} version={version} />
+        <RunContextProvider value={{ workflowRun: workflowRun }}>
+          <Main workflow={workflowQuery.data} workflowRun={workflowRun} version={version} />
+        </RunContextProvider>
       </EditorContextProvider>
     );
   }
@@ -182,4 +185,14 @@ function Main(props: MainProps) {
       </section>
     </div>
   );
+}
+
+function prefixTeamTask(taskList: Array<Task>, team: FlowTeam) {
+  return taskList.map((task) => {
+    return {
+      ...task,
+      name: `${team.name}/${task.name}`,
+      displayName: `${team.displayName} - ${task.displayName}`,
+    };
+  });
 }

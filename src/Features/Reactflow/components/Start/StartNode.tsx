@@ -1,13 +1,18 @@
 import React from "react";
+import cx from "classnames";
 import { Connection, Handle, Position, NodeProps } from "reactflow";
+import { useEditorContext } from "Hooks";
+import { WorkflowEngineMode } from "Constants";
+import styles from "./StartNode.module.scss";
 
 export function StartNode(props: NodeProps) {
+  const { mode } = useEditorContext();
   const { isConnectable } = props;
   return (
-    <div className="b-startEnd-node">
+    <div className={cx(styles.node, { [styles.locked]: mode !== WorkflowEngineMode.Editor })}>
       <h2>Start</h2>
       <Handle
-        className="b-startEnd-node__port --right"
+        className={cx(styles.port)}
         position={Position.Right}
         isConnectable={isConnectable}
         isValidConnection={isValidHandle}

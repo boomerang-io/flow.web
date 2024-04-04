@@ -33,13 +33,13 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "@boomerang-io/carbon-addons-boomerang-react": "4.0.3-beta.0",
+    "@boomerang-io/carbon-addons-boomerang-react": "4.1.2-beta.0",
     "@boomerang-io/styles": "1.1.0",
     "@boomerang-io/utils": "1.1.0",
     "@carbon/charts": "^1.13.6",
     "@carbon/charts-react": "^1.13.6",
     "@carbon/pictograms-react": "^11.50.0",
-    "@carbon/react": "1.40.0",
+    "@carbon/react": "1.53.0",
     "@dagrejs/dagre": "^1.0.4",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "axios": "^0.27.2",

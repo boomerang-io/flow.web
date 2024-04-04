@@ -1,5 +1,12 @@
 @import "Styles/mixins";
 
+// Override pointer events so in Runner mode
+// we can click on the tile to scroll the corresponding
+// task card into view and focus on it
+.react-flow__node {
+  pointer-events: all !important;
+}
+
 .cds--modal-footer .cds--btn:last-child:first-child {
   border-bottom-left-radius: 0;
 }
@@ -38,49 +45,4 @@
       }
     }
   }
-}
-
-.b-startEnd-node__port {
-  position: absolute;
-  height: 2.25rem;
-  width: 2rem;
-
-  &.--right {
-    background-color: var(--cds-interactive-01);
-    border: 0.0625rem solid var(--cds-interactive-01);
-    right: -2rem;
-    top: 2.5rem;
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-    border-bottom-right-radius: 50%;
-    border-top-right-radius: 50%;
-    background-image: url("../../Assets/icons/chevron_white.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  &.--left {
-    background-color: #b3e6ff;
-    border: 0.0625rem solid var(--cds-interactive-01);
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 50%;
-    border-top-left-radius: 50%;
-    left: -2rem;
-    top: 2.5rem;
-    background-image: url("../../Assets/icons/chevron.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  &:hover {
-    filter: brightness(110%);
-  }
-
-  &.--locked:hover {
-    filter: brightness(100%);
-  }
-}
-
-.dndnode {
-  border: 1px solid black;
-  width: 10rem;
 }

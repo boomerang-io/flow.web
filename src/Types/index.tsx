@@ -19,10 +19,10 @@ import {
  *    "Manual": "manual"
  * } as const
  *
- * ActionKindType = ObjectValuesToType<typeof ActionKind>
+ * ActionKindType = ObjectValues<typeof ActionKind>
  * ^? "approval" | "manual"
  */
-export type ObjectValuesToType<T> = T[keyof T];
+export type ObjectValues<T> = T[keyof T];
 
 declare global {
   interface Window {
@@ -232,8 +232,8 @@ export enum WorkflowTriggerConditionOperation {
   In = "in",
 }
 
-export type WorkflowViewType = ObjectValuesToType<typeof WorkflowView>;
-export type EdgeExecutionConditionType = ObjectValuesToType<typeof EdgeExecutionCondition>;
+export type WorkflowViewType = ObjectValues<typeof WorkflowView>;
+export type EdgeExecutionConditionType = ObjectValues<typeof EdgeExecutionCondition>;
 
 type PageableSort = {
   sorted: boolean;
@@ -336,7 +336,7 @@ export interface TaskSpec {
   workingDir?: string;
 }
 
-export type FlowTeamStatusType = ObjectValuesToType<typeof FlowTeamStatus>;
+export type FlowTeamStatusType = ObjectValues<typeof FlowTeamStatus>;
 
 export interface FlowTeam {
   name: string;
@@ -359,7 +359,7 @@ export interface FlowTeamSummary {
   displayName: string;
   description?: string;
   creationDate: string;
-  status: ObjectValuesToType<typeof FlowTeamStatus>;
+  status: ObjectValues<typeof FlowTeamStatus>;
   externalRef?: string;
   labels?: Record<string, string>;
   insights: {
@@ -436,7 +436,7 @@ export interface PatchProperty {
   type?: string;
 }
 
-export type TokenScopeType = ObjectValuesToType<typeof TokenType>;
+export type TokenScopeType = ObjectValues<typeof TokenType>;
 
 export interface Token {
   id: string;
@@ -670,10 +670,10 @@ export interface MultiSelectItems<Type = MultiSelectItem> {
 }
 
 export type WorkflowEditorState = WorkflowEditor & { hasUnsavedUpdates?: boolean };
-export type WorkflowEngineModeType = ObjectValuesToType<typeof WorkflowEngineMode>;
-export type WorkflowPropertyActionType = ObjectValuesToType<typeof WorkflowPropertyAction>;
-export type UserRoleType = ObjectValuesToType<typeof UserRole>;
-export type NodeTypeType = ObjectValuesToType<typeof NodeType>;
+export type WorkflowEngineModeType = ObjectValues<typeof WorkflowEngineMode>;
+export type WorkflowPropertyActionType = ObjectValues<typeof WorkflowPropertyAction>;
+export type UserRoleType = ObjectValues<typeof UserRole>;
+export type NodeTypeType = ObjectValues<typeof NodeType>;
 
 export interface ConfigureWorkflowFormValues {
   config: Workflow["config"];
