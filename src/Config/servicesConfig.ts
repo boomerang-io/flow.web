@@ -84,7 +84,6 @@ export const serviceUrl = {
   // postImportWorkflow: ({ query }) => `${BASE_URL}/workflow/import?${query}`,
   putActivationApp: () => `${BASE_URL}/activate`,
   resourceSettings: () => `${BASE_URL}/settings`,
-  getWorkflowTemplates: () => `${BASE_URL}/workflowtemplate/query`,
   resourceTrigger: () => `${BASE_URL}/trigger`,
   getGitHubAppInstallation: ({ id }: IdArg) => `${BASE_URL}/integration/github/installation${id ? "?id=" + id : ""}`,
   getGitHubAppInstallationForTeam: ({ team }: TeamArg) => `${BASE_URL}/integration/github/installation${team ? "?team=" + team : ""}`,
@@ -102,6 +101,10 @@ export const serviceUrl = {
       `${BASE_URL}/task/${name}/changelog`,
     putTask: ({ name, replace }: NameArg & Partial<ReplaceArg>) => `${BASE_URL}/task/${name}/?replace=${replace ? replace : false}`,
     postValidateYaml: () => `${BASE_URL}/task/validate`,
+  },
+  "template": {
+    getWorkflowTemplates: () => `${BASE_URL}/workflowtemplate/query`,
+    postWorkflowTemplate: () => `${BASE_URL}/workflowtemplate`,
   },
   "team": {
     deleteTeamMembers: ({ team }: TeamArg) => `${BASE_URL}/team/${team}/members`,
@@ -209,9 +212,9 @@ export const resolver = {
       data: body,
       method: HttpMethod.Post,
     }),
-  postCreateTemplate: ({ body }) => axios.post(serviceUrl.getWorkflowTemplates(), body),
+  postCreateTemplate: ({ body }) => axios.post(serviceUrl.workflowtemplate.postWorkflowTemplate(), body),
   postCreateWorkflow: ({ team, body }) => axios.post(serviceUrl.team.workflow.postCreateWorkflow({ team }), body),
-  postDuplicateWorkflow: ({ team, workflowId }) => axios.post(serviceUrl.postDuplicateWorkflow({ team, workflowId })),
+  postDuplicateWorkflow: ({ team, workflowId }) => axios.post(serviceUrl.team.workflow.postDuplicateWorkflow({ team, workflowId })),
   postTemplateWorkflow: ({ workflowId, body }) => axios.post(serviceUrl.postDuplicateWorkflow({ workflowId }), body),
   postToken: ({ body }) => axios({ url: serviceUrl.postToken(), data: body, method: HttpMethod.Post }),
   putApplyTaskTemplate: ({ name, replace, body }) =>

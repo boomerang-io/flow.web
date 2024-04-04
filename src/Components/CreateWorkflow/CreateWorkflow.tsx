@@ -39,7 +39,7 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
         <ToastNotification kind="success" title={`Create ${viewType}`} subtitle={`${viewType} successfully created`} />,
       );
       if (viewType === WorkflowView.Template) {
-        queryClient.invalidateQueries(serviceUrl.getWorkflowTemplates());
+        queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
       } else {
         queryClient.invalidateQueries(serviceUrl.team.workflow.getWorkflows({ team: team?.name }));
       }
@@ -63,7 +63,7 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
         <ToastNotification kind="success" title={`Update ${viewType}`} subtitle={`${viewType} successfully updated`} />,
       );
       if (viewType === WorkflowView.Template) {
-        queryClient.invalidateQueries(serviceUrl.getWorkflowTemplates());
+        queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
       } else {
         queryClient.invalidateQueries(serviceUrl.team.workflow.getWorkflows({ team: team?.name }));
       }

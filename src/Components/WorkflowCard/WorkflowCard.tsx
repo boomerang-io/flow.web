@@ -80,7 +80,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
         <ToastNotification kind="success" title={`Delete ${viewType}`} subtitle={`${viewType} successfully deleted`} />,
       );
       if (viewType === WorkflowView.Template) {
-        queryClient.invalidateQueries(serviceUrl.getWorkflowTemplates());
+        queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
       } else {
         queryClient.invalidateQueries(getWorkflowsUrl);
       }
@@ -106,7 +106,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
         />,
       );
       if (viewType === WorkflowView.Template) {
-        queryClient.invalidateQueries(serviceUrl.getWorkflowTemplates());
+        queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
       } else {
         queryClient.invalidateQueries(getWorkflowsUrl);
       }

@@ -22,7 +22,7 @@ export default function TemplateWorkflows() {
     data: templatesWorkflowData,
     error: errorTemplatesWorkflow,
     isLoading: isLoadingTemplatesWorkflow,
-  } = useQuery(serviceUrl.getWorkflowTemplates());
+  } = useQuery(serviceUrl.template.getWorkflowTemplates());
 
   let safeQuery = "";
   if (Array.isArray(searchQuery)) {
