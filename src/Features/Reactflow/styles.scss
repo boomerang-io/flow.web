@@ -10,39 +10,3 @@
 .cds--modal-footer .cds--btn:last-child:first-child {
   border-bottom-left-radius: 0;
 }
-
-.b-startEnd-node {
-  background: #002b50;
-  border: 0.125rem solid #161616;
-  color: white;
-  width: 9rem;
-  height: 5rem;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  @include border-radius();
-
-  &.--locked {
-    background: #697077;
-    border: 0.0625rem solid #50565b;
-    .b-startEnd-node__port {
-      &.--right {
-        background-color: #50565b;
-        border: 0.0625rem solid #50565b;
-      }
-      &.--left {
-        background-color: #d5d9e0;
-        border: 0.0625rem solid #50565b;
-      }
-    }
-
-    &.--executionInProgress {
-      .b-startEnd-node__port {
-        &.--left {
-          opacity: 0.5;
-        }
-      }
-    }
-  }
-}

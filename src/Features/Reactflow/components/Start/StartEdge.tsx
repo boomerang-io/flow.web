@@ -1,14 +1,27 @@
 import React from "react";
+import cx from "classnames";
 import { getBezierPath, useReactFlow, EdgeLabelRenderer } from "reactflow";
-import WorkflowCloseButton from "Components/WorkflowCloseButton";
 import { markerTypes } from "Features/Reactflow/Reactflow";
+import WorkflowCloseButton from "Components/WorkflowCloseButton";
+import { useWorkflowContext } from "Hooks";
+import { WorkflowEngineMode } from "Constants";
 import { WorkflowEdgeProps } from "Types";
-import { useEditorContext } from "Hooks";
+import styles from "./StartNode.module.scss";
+
+export function StartEdge(props: WorkflowEdgeProps) {
+  const { mode } = useWorkflowContext();
+
+  if (mode === WorkflowEngineMode.Runner) {
+    return <StartEdgeRun {...props} />;
+  }
+
+  return <StartEdgeEditor {...props} />;
+}
 
 // There is a base link component that we are going to want simliar functionality from
-export function StartEdge(props: WorkflowEdgeProps) {
+function StartEdgeEditor(props: WorkflowEdgeProps) {
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style } = props;
-  const { mode } = useEditorContext();
+  const { mode } = useWorkflowContext();
   const reactFlowInstance = useReactFlow();
 
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -22,15 +35,16 @@ export function StartEdge(props: WorkflowEdgeProps) {
 
   const mergedStyles = {
     ...style,
-    stroke: "#0072c3",
     strokeWidth: "2",
   };
+
+  const isEditor = mode === WorkflowEngineMode.Editor;
 
   return (
     <>
       <path
         id={id}
-        className="react-flow__edge-path"
+        className={cx("react-flow__edge-path", styles.edge, { [styles.locked]: !isEditor })}
         d={edgePath}
         markerEnd={`url(#${markerTypes.template}`}
         style={mergedStyles}
@@ -38,20 +52,52 @@ export function StartEdge(props: WorkflowEdgeProps) {
       <EdgeLabelRenderer>
         <div
           style={{
-            display: "flex",
-            gap: "0.5rem",
-            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            fontSize: 12,
-            fontWeight: 700,
-            pointerEvents: "all",
           }}
-          className="nodrag nopan"
+          className={cx("nodrag nopan", styles.edgeLabel)}
         >
-          {mode === "editor" ? (
+          {isEditor ? (
             <WorkflowCloseButton className="" onClick={() => reactFlowInstance.deleteElements({ edges: [props] })} />
           ) : null}
         </div>
+      </EdgeLabelRenderer>
+    </>
+  );
+}
+
+function StartEdgeRun(props: WorkflowEdgeProps) {
+  const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style } = props;
+
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  const mergedStyles = {
+    ...style,
+    strokeWidth: "2",
+  };
+
+  return (
+    <>
+      <path
+        id={id}
+        className={cx("react-flow__edge-path", styles.edge, styles.locked)}
+        d={edgePath}
+        markerEnd={`url(#${markerTypes.template}`}
+        style={mergedStyles}
+      />
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+          }}
+          className={cx("nodrag nopan", styles.edgeLabel)}
+        />
       </EdgeLabelRenderer>
     </>
   );

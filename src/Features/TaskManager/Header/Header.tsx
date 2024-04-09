@@ -1,3 +1,6 @@
+import React from "react";
+import { Button, Tag, ModalBody, ModalFooter, InlineNotification } from "@carbon/react";
+import { Bee, Download, Save, Archive, Copy, Reset, ViewOff, Recommend, Identification } from "@carbon/react/icons";
 import {
   ComposedModal,
   ConfirmModal,
@@ -9,19 +12,16 @@ import {
   TextArea,
   TooltipHover,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, Tag, ModalBody, ModalFooter, InlineNotification } from "@carbon/react";
-import { Bee, Download, Save, Archive, Copy, Reset, ViewOff, Recommend, Identification } from "@carbon/react/icons";
-import React from "react";
-import { useParams } from "react-router-dom";
 import { FormikProps } from "formik";
 import moment from "moment";
+import { useParams } from "react-router-dom";
 import VersionHistory from "Components/VersionHistory";
 import { taskIcons } from "Utils/taskIcons";
+import { appLink } from "Config/appConfig";
+import { ModalTriggerProps, Task, ChangeLog } from "Types";
 import { TemplateRequestType, FormProps } from "../constants";
 import VersionSwitcher from "./VersionSwitcher";
 import styles from "./header.module.scss";
-import { appLink } from "Config/appConfig";
-import { ModalTriggerProps, TaskTemplate, ChangeLog } from "Types";
 
 const ArchiveText: React.FC = () => (
   <>
@@ -37,10 +37,10 @@ const ArchiveText: React.FC = () => (
 );
 
 interface SaveModalProps {
-  name: string, 
+  name: string;
   formikProps: FormikProps<FormProps>;
   handleSubmit: (
-    name: string, 
+    name: string,
     values: any,
     resetForm: () => void,
     requestType: string,
@@ -145,7 +145,7 @@ const SaveModal: React.FC<SaveModalProps> = ({ name, formikProps, handleSubmit, 
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.preventDefault();
                   handleSubmit(
-                    name, 
+                    name,
                     formikProps.values,
                     formikProps.resetForm,
                     TemplateRequestType.New,
@@ -182,7 +182,7 @@ interface HeaderProps {
   isActive: boolean;
   isLoading: boolean;
   isOldVersion: boolean;
-  selectedTaskTemplate: TaskTemplate;
+  selectedTaskTemplate: Task;
   changelog: ChangeLog;
 }
 
@@ -313,7 +313,12 @@ const Header: React.FC<HeaderProps> = ({
           {isOldVersion ? (
             <ConfirmModal
               affirmativeAction={() =>
-                handleSaveTaskTemplate(selectedTaskTemplate.name, formikProps.values, formikProps.resetForm, TemplateRequestType.Copy)
+                handleSaveTaskTemplate(
+                  selectedTaskTemplate.name,
+                  formikProps.values,
+                  formikProps.resetForm,
+                  TemplateRequestType.Copy,
+                )
               }
               children={
                 <>

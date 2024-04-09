@@ -1,22 +1,22 @@
 import React from "react";
-import { useEditorContext } from "Hooks";
+import { useWorkflowContext } from "Hooks";
 import { WorkflowEngineMode } from "Constants";
 import { WorkflowNodeProps } from "Types";
 import { TemplateNode } from "../../Template";
 import styles from "./DecisionNode.module.scss";
 
 export default function DecisionsNode(props: WorkflowNodeProps) {
-  const { mode } = useEditorContext();
+  const { mode } = useWorkflowContext();
   if (mode === WorkflowEngineMode.Runner) {
-    return <DecisionNodeExecution {...props} />;
+    return <DecisionNodeRun {...props} />;
   }
-  return <DecisionNodeDesigner {...props} />;
+  return <DecisionNodeEditor {...props} />;
 }
 
-function DecisionNodeDesigner(props: WorkflowNodeProps) {
+function DecisionNodeEditor(props: WorkflowNodeProps) {
   return <TemplateNode {...props} className={styles.node} />;
 }
 
-function DecisionNodeExecution(props: any) {
+function DecisionNodeRun(props: any) {
   return <TemplateNode {...props} className={styles.node} />;
 }

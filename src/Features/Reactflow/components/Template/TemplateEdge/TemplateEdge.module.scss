@@ -1,0 +1,26 @@
+.editorEdge {
+  stroke: var(--cds-interactive-01);
+  &.locked {
+    stroke: #50565b;
+  }
+}
+
+.runEdge {
+  &.succeeded {
+    stroke: #50565b;
+  }
+  &.waiting,
+  &.notstarted,
+  &.ready {
+    opacity: 0.5;
+  }
+}
+
+.edgeLabel {
+  display: flex;
+  gap: 0.5rem;
+  position: absolute;
+  font-size: 0.75rem;
+  font-weight: 700;
+  pointer-events: all;
+}

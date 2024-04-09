@@ -1,12 +1,12 @@
 import React from "react";
-import { useEditorContext } from "Hooks";
+import { useWorkflowContext } from "Hooks";
 import { WorkflowEngineMode } from "Constants";
 import { WorkflowNodeProps } from "Types";
 import { TemplateNode } from "../Template";
 import { RunWorkflowForm } from "./RunWorkflowForm";
 
 export default function RunWorkFlowNode(props: WorkflowNodeProps) {
-  const { mode } = useEditorContext();
+  const { mode } = useWorkflowContext();
   if (mode === WorkflowEngineMode.Runner) {
     return <RunWorkflowExecution {...props} />;
   }

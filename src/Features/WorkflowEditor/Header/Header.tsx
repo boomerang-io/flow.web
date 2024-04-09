@@ -1,3 +1,6 @@
+import React from "react";
+import { Breadcrumb, BreadcrumbItem, Button } from "@carbon/react";
+import { Add, DocumentExport } from "@carbon/react/icons";
 import {
   ConfirmModal,
   ComposedModal,
@@ -6,28 +9,31 @@ import {
   FeatureNavTab as Tab,
   FeatureNavTabs as Tabs,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Breadcrumb, BreadcrumbItem, Button } from "@carbon/react";
-import { Add, DocumentExport } from "@carbon/react/icons";
-import React from "react";
+import { AxiosResponse } from "axios";
 import { UseMutationResult } from "react-query";
 import { Link, useRouteMatch } from "react-router-dom";
-import { AxiosResponse } from "axios";
+import { WorkflowView } from "Constants";
+import { appLink } from "Config/appConfig";
+import { ModalTriggerProps, WorkflowEditor, WorkflowViewType, ChangeLog } from "Types";
 import VersionCommentForm from "./VersionCommentForm";
 import VersionSwitcher from "./VersionSwitcher";
 import styles from "./header.module.scss";
-import { appLink } from "Config/appConfig";
-import { WorkflowView } from "Constants";
-import { ModalTriggerProps, Workflow, WorkflowViewType, ChangeLog } from "Types";
 
 interface DesignerHeaderProps {
   changeLog: ChangeLog;
   createRevision: (reason: string, callback?: () => any) => void;
   changeRevision: (revisionNumber: string) => void;
   canCreateNewVersion: boolean;
-  revisionMutator: UseMutationResult<AxiosResponse<any, any>, unknown, { team: any; workflowId: any; body: any }, unknown>;
-  revisionState: Workflow;
-  viewType: WorkflowViewType;
   revisionCount: number;
+  revisionMutator: UseMutationResult<
+    AxiosResponse<any, any>,
+    unknown,
+    { team: any; workflowId: any; body: any },
+    unknown
+  >;
+  revisionState: WorkflowEditor;
+
+  viewType: WorkflowViewType;
 }
 
 const DesignerHeader: React.FC<DesignerHeaderProps> = ({

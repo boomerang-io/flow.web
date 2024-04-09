@@ -1,3 +1,7 @@
+import React, { useState } from "react";
+//@ts-ignore
+import { Button, InlineLoading, OverflowMenu, OverflowMenuItem } from "@carbon/react";
+import { Run, Bee, CircleFill, InformationFilled } from "@carbon/react/icons";
 import {
   ConfirmModal,
   ComposedModal,
@@ -5,29 +9,26 @@ import {
   notify,
   TooltipHover,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, InlineLoading, OverflowMenu, OverflowMenuItem } from "@carbon/react";
-import { Run, Bee, CircleFill, InformationFilled } from "@carbon/react/icons";
-import React, { useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
-import { Link, useHistory } from "react-router-dom";
 import { formatErrorMessage } from "@boomerang-io/utils";
 import workflowIcons from "Assets/workflowIcons";
 import axios from "axios";
 import { useFeature } from "flagged";
 import fileDownload from "js-file-download";
 import cloneDeep from "lodash/cloneDeep";
+import { useMutation, useQueryClient } from "react-query";
+import { Link, useHistory } from "react-router-dom";
 import WorkflowWarningButton from "Components/WorkflowWarningButton";
 // @ts-ignore:next-line
 import { swapValue } from "Utils";
+import { WorkflowView } from "Constants";
+import { appLink, FeatureFlag } from "Config/appConfig";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import { BASE_URL } from "Config/servicesConfig";
+import { FlowTeamQuotas, ModalTriggerProps, Workflow, WorkflowViewType, DataDrivenInput } from "Types";
 import UpdateWorkflow from "./UpdateWorkflow";
 import WorkflowInputModalContent from "./WorkflowInputModalContent";
 import WorkflowRunModalContent from "./WorkflowRunModalContent";
 import styles from "./workflowCard.module.scss";
-import { appLink, FeatureFlag } from "Config/appConfig";
-import { serviceUrl, resolver } from "Config/servicesConfig";
-import { BASE_URL } from "Config/servicesConfig";
-import { WorkflowView } from "Constants";
-import { FlowTeamQuotas, ModalTriggerProps, Workflow, WorkflowViewType, DataDrivenInput } from "Types";
 
 interface WorkflowCardProps {
   teamName: string;
@@ -153,7 +154,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
     }
     const params = Object.entries(newProperties).map(([name, value]) => ({ name, value }));
     const body = { params: params, trigger: "manual" };
-    console.log(body);
     try {
       // @ts-ignore:next-line
       const { data: execution } = await executeWorkflowMutator({

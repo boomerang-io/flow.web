@@ -25,6 +25,7 @@ import * as Yup from "yup";
 import SelectIcon from "Components/SelectIcon";
 import { taskIcons } from "Utils/taskIcons";
 import { resolver } from "Config/servicesConfig";
+import { Task } from "Types";
 import styles from "./addTaskTemplateForm.module.scss";
 
 interface AddTaskTemplateFormProps {
@@ -112,7 +113,7 @@ function AddTaskTemplateForm({
       script: values.script,
       workingDir: values.workingDir,
     };
-    const body: TaskTemplate = {
+    const body: Task = {
       name: values.name,
       displayName: values.displayName,
       description: values.description,

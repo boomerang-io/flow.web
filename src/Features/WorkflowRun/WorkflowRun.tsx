@@ -7,7 +7,7 @@ import type { ReactFlowInstance } from "reactflow";
 import { Box } from "reflexbox";
 import ReactFlow from "Features/Reactflow";
 import { useQuery } from "Hooks";
-import { EditorContextProvider, useTeamContext, RunContextProvider } from "State/context";
+import { useTeamContext, RunContextProvider } from "State/context";
 import { groupTasksByName } from "Utils";
 import { WorkflowEngineMode } from "Constants";
 import { serviceUrl } from "Config/servicesConfig";
@@ -17,7 +17,7 @@ import RunTaskLog from "./TaskRunList";
 import WorkflowActions from "./WorkflowActions";
 import styles from "./WorkflowRun.module.scss";
 
-export default function WorkflowRunContainer() {
+export default function WorkflowRunFeature() {
   const { team } = useTeamContext();
   const { workflowId, runId }: { team: string; workflowId: string; runId: string } = useParams();
   const getTasksUrl = serviceUrl.task.queryTasks({
@@ -84,7 +84,7 @@ type RevisionProps = {
 
 function RevisionContainer({ team, workflowRun, tasksData, workflowId }: RevisionProps) {
   const version = workflowRun.workflowVersion;
-  const getWorkflowUrl = serviceUrl.team.workflow.getWorkflowCompose({
+  const getWorkflowUrl = serviceUrl.team.workflow.getWorkflowComposeRun({
     team: team,
     id: workflowId,
     version,
@@ -117,16 +117,14 @@ function RevisionContainer({ team, workflowRun, tasksData, workflowId }: Revisio
 
   if (workflowQuery.data) {
     return (
-      <EditorContextProvider
+      <RunContextProvider
         value={{
-          mode: WorkflowEngineMode.Runner,
-          tasksData: groupedTasks,
+          workflow: workflowQuery.data,
+          workflowRun: workflowRun,
         }}
       >
-        <RunContextProvider value={{ workflowRun: workflowRun }}>
-          <Main workflow={workflowQuery.data} workflowRun={workflowRun} version={version} />
-        </RunContextProvider>
-      </EditorContextProvider>
+        <Main tasks={groupedTasks} workflow={workflowQuery.data} workflowRun={workflowRun} version={version} />
+      </RunContextProvider>
     );
   }
 
@@ -134,6 +132,7 @@ function RevisionContainer({ team, workflowRun, tasksData, workflowId }: Revisio
 }
 
 type MainProps = {
+  tasks: Record<string, Array<Task>>;
   workflow: WorkflowEditor;
   workflowRun: WorkflowRun;
   version: number;
@@ -145,7 +144,7 @@ function Main(props: MainProps) {
   let hasFinished = false;
   let hasStarted = false;
 
-  const { status, tasks } = workflowRun;
+  const { status, tasks: runTasks } = workflowRun;
   hasFinished = [
     RunStatus.Invalid,
     RunStatus.Failed,
@@ -153,7 +152,7 @@ function Main(props: MainProps) {
     RunStatus.Skipped,
     RunStatus.Succeeded,
   ].includes(status);
-  hasStarted = tasks ? Boolean(tasks.find((step) => step.status !== RunStatus.NotStarted)) : false;
+  hasStarted = runTasks ? Boolean(runTasks.find((step) => step.status !== RunStatus.NotStarted)) : false;
 
   const isDiagramLoaded = hasStarted || hasFinished;
 
@@ -175,6 +174,7 @@ function Main(props: MainProps) {
             edges={workflow.edges}
             reactFlowInstance={reactFlowInstance}
             setReactFlowInstance={setReactFlowInstance}
+            tasks={props.tasks}
           />
           {!isDiagramLoaded && (
             <div className={styles.diagramLoading}>

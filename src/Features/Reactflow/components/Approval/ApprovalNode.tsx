@@ -1,20 +1,20 @@
 import React from "react";
-import { useEditorContext } from "Hooks";
+import { useWorkflowContext } from "Hooks";
 import { useTeamContext } from "Hooks";
 import { WorkflowEngineMode } from "Constants";
 import { WorkflowNodeProps } from "Types";
 import { TemplateNode } from "../Template";
 
 export default function ApprovalNode(props: WorkflowNodeProps) {
-  const { mode } = useEditorContext();
+  const { mode } = useWorkflowContext();
   if (mode === WorkflowEngineMode.Runner) {
-    return <ApprovalNodeExecution {...props} />;
+    return <ApprovalNodeRun {...props} />;
   }
 
-  return <ApprovalNodeDesigner {...props} />;
+  return <ApprovalNodeEditor {...props} />;
 }
 
-function ApprovalNodeDesigner(props: WorkflowNodeProps) {
+function ApprovalNodeEditor(props: WorkflowNodeProps) {
   const { team } = useTeamContext();
 
   const options = team.approverGroups.map((approverGroup) => ({
@@ -30,6 +30,6 @@ function ApprovalNodeDesigner(props: WorkflowNodeProps) {
   return <TemplateNode {...props} formInputsToMerge={formInputsToMerge} />;
 }
 
-function ApprovalNodeExecution(props: any) {
+function ApprovalNodeRun(props: any) {
   return <TemplateNode {...props} />;
 }

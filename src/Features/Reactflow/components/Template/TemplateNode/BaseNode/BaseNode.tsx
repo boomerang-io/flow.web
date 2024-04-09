@@ -17,7 +17,7 @@ interface BaseNodeProps {
   className?: string;
   icon?: string;
   isConnectable: boolean;
-  kind: WorkflowEngineModeType;
+  mode: WorkflowEngineModeType;
   nodeProps: WorkflowNodeProps;
   onClick?: () => void;
   subtitle?: string;
@@ -31,12 +31,11 @@ export default function BaseNode(props: BaseNodeProps) {
   let Icon = () => <Bee style={{ willChange: "auto" }} />;
 
   if (icon) {
+    //@ts-ignore
     Icon = taskIcons.find((taskIcon) => taskIcon.name === icon)?.Icon ?? Icon;
   }
 
-  console.log(status);
-
-  const isEditor = props.kind === WorkflowEngineMode.Editor;
+  const isEditor = props.mode === WorkflowEngineMode.Editor;
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className={cx(styles.node, className, styles[status ?? ""], { [styles.locked]: !isEditor })} onClick={onClick}>

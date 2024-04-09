@@ -12,6 +12,15 @@
     }
   }
 
+  &.disabled {
+    circle {
+      stroke: var(--cds-text-primary);
+    }
+    path {
+      fill: var(--cds-text-primary);
+    }
+  }
+
   &.execution {
     circle {
       stroke: var(--cds-text-primary);

@@ -1,9 +1,9 @@
 import React from "react";
-import cx from "classnames";
 import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
-import styles from "./ExecutionConditionButton.module.scss";
-import { WorkflowEngineModeType } from "Types";
+import cx from "classnames";
 import { WorkflowEngineMode } from "Constants";
+import { WorkflowEngineModeType } from "Types";
+import styles from "./ExecutionConditionButton.module.scss";
 
 interface ConditionButtonProps {
   alt?: string;
@@ -43,6 +43,15 @@ const ConditionButton = ({ displayText, ...rest }: ConditionButtonProps) => (
   </svg>
 );
 
+interface ExecutionConditionButtonProps {
+  alt?: string;
+  className?: string;
+  disabled?: boolean;
+  inputText?: string;
+  kind?: WorkflowEngineModeType;
+  onClick?: () => void;
+}
+
 function ExecutionConditionButton({
   alt = "Switch edit button",
   className,
@@ -70,21 +79,12 @@ function ExecutionConditionButton({
       className={cx(styles.container, className, styles[kind])}
       displayText={displayText}
       onClick={onClick}
-      onKeyDown={(e: any) => isAccessibleKeyboardEvent(e) && onClick()}
+      onKeyDown={(e: any) => isAccessibleKeyboardEvent(e) && onClick && onClick()}
       role="button"
       tabIndex={0}
       {...rest}
     />
   );
-}
-
-interface ExecutionConditionButtonProps {
-  alt?: string;
-  className?: string;
-  disabled?: boolean;
-  inputText?: string;
-  kind?: WorkflowEngineModeType;
-  onClick: () => void;
 }
 
 export default ExecutionConditionButton;

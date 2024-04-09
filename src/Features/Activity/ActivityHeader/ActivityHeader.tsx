@@ -1,13 +1,13 @@
 import React from "react";
-import HeaderWidget from "Components/HeaderWidget";
+import { SkeletonPlaceholder, Breadcrumb, BreadcrumbItem } from "@carbon/react";
+import { ArrowDownRight, ArrowUpRight } from "@carbon/react/icons";
 import {
   FeatureHeader as Header,
   FeatureHeaderTitle as HeaderTitle,
   FeatureHeaderSubtitle as HeaderSubtitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { SkeletonPlaceholder, Breadcrumb, BreadcrumbItem } from "@carbon/react";
-import { ArrowDownRight, ArrowUpRight } from "@carbon/react/icons";
 import { Link } from "react-router-dom";
+import HeaderWidget from "Components/HeaderWidget";
 import { appLink } from "Config/appConfig";
 import styles from "./activityHeader.module.scss";
 

@@ -33,8 +33,7 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
     : dateHelper.durationFromThenToNow(taskRun.startTime) || "---";
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-    <li key={taskRun.name} id={`task-${taskRun.name}`} tabIndex={0} className={`${styles.taskitem} ${statusClassName}`}>
+    <li key={taskRun.name} id={`task-${taskRun.name}`} className={`${styles.taskitem} ${statusClassName}`}>
       <div className={styles.progressBar} />
       <section className={styles.header}>
         <div className={styles.title}>
@@ -59,12 +58,6 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
           <p className={styles.timeTitle}>Duration</p>
           <time className={styles.timeValue}>{calculatedDuration}</time>
         </div>
-        {taskRun.type === NodeType.Decision && (
-          <div className={styles.time}>
-            <p className={styles.timeTitle}>Value</p>
-            <time className={styles.timeValue}>{taskRun.params ?? ""}</time>
-          </div>
-        )}
       </section>
       <section className={styles.data}>
         <ComposedModal

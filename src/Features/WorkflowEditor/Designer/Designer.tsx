@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import { useLocation, useParams } from "react-router-dom";
 import type { ReactFlowInstance } from "reactflow";
 import ReactFlow from "Features/Reactflow";
+import { groupTasksByName } from "Utils";
 import { TaskTemplateStatus, WorkflowEngineMode } from "Constants";
 import { appLink } from "Config/appConfig";
 import { Task, WorkflowEditorState } from "Types";
@@ -20,14 +21,9 @@ interface DesignerContainerProps {
   workflow: WorkflowEditorState;
 }
 
-const DesignerContainer: React.FC<DesignerContainerProps> = ({
-  notes,
-  reactFlowInstance,
-  setReactFlowInstance,
-  tasks,
-  updateNotes,
-  workflow,
-}) => {
+function DesignerContainer(props: DesignerContainerProps) {
+  const { notes, reactFlowInstance, setReactFlowInstance, tasks, updateNotes, workflow } = props;
+
   const params = useParams<{ team: string; workflowId: string }>();
 
   const location = useLocation();
@@ -48,12 +44,13 @@ const DesignerContainer: React.FC<DesignerContainerProps> = ({
             edges={workflow.edges}
             reactFlowInstance={reactFlowInstance!}
             setReactFlowInstance={setReactFlowInstance}
+            tasks={groupTasksByName(tasks)}
           />
         </div>
         <Notes markdown={notes} updateNotes={updateNotes} />
       </>
     </div>
   );
-};
+}
 
 export default DesignerContainer;

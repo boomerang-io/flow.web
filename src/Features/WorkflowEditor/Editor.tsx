@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Loading, Error, notify, ToastNotification, Team } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Loading, Error, notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import { AxiosResponse } from "axios";
-import { FormikProps } from "formik";
+import type { FormikProps } from "formik";
 import queryString from "query-string";
 import { useMutation, useQueryClient, UseMutationResult } from "react-query";
 import { Prompt, Route, Switch, useLocation, useParams } from "react-router-dom";
@@ -10,7 +10,6 @@ import { useImmerReducer } from "use-immer";
 import { useAppContext, useTeamContext, useQuery } from "Hooks";
 import { EditorContextProvider } from "State/context";
 import { RevisionActionTypes, revisionReducer, initRevisionReducerState } from "State/reducers/workflowRevision";
-import { groupTasksByName } from "Utils";
 import { WorkflowEngineMode, WorkspaceConfigType } from "Constants";
 import { WorkflowView } from "Constants";
 import { AppPath } from "Config/appConfig";
@@ -310,18 +309,15 @@ const EditorStateContainer: React.FC<EditorStateContainerProps> = ({
   const revisionCount = changeLogData.length;
   const { markdown, version } = revisionState;
   const mode = version === revisionCount ? WorkflowEngineMode.Editor : WorkflowEngineMode.Viewer;
-
   const store = useMemo(() => {
-    const tasksData = groupTasksByName(taskList);
     return {
       availableParameters,
       mode,
       revisionDispatch,
       revisionState,
-      tasksData,
       workflowsQueryData,
     };
-  }, [availableParameters, mode, revisionDispatch, revisionState, taskList, workflowsQueryData]);
+  }, [availableParameters, mode, revisionDispatch, revisionState, workflowsQueryData]);
 
   return (
     // Must create context to share state w/ nodes that are created by the DAG engine

@@ -294,7 +294,7 @@ export function TaskTemplateOverview({
       script: values.script,
       workingDir: values.workingDir,
     };
-    const body: TaskTemplate = {
+    const body: Task = {
       name: values.name,
       displayName: values.displayName,
       description: values.description,

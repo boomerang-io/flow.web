@@ -1,12 +1,12 @@
 import React from "react";
 import cx from "classnames";
 import { Connection, Handle, Position, NodeProps } from "reactflow";
-import { useEditorContext } from "Hooks";
+import { useWorkflowContext } from "Hooks";
 import { WorkflowEngineMode } from "Constants";
 import styles from "./EndNode.module.scss";
 
 export default function EndNode(props: NodeProps) {
-  const { mode } = useEditorContext();
+  const { mode } = useWorkflowContext();
   const { isConnectable } = props;
   return (
     <div className={cx(styles.node, { [styles.locked]: mode !== WorkflowEngineMode.Editor })}>

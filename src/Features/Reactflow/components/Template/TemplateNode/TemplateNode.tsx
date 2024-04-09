@@ -4,10 +4,10 @@ import { useReactFlow, Node } from "reactflow";
 import TaskUpdateModal from "Components/TaskUpdateModal";
 import WorkflowEditButton from "Components/WorkflowEditButton";
 import WorkflowWarningButton from "Components/WorkflowWarningButton";
-import { useEditorContext, useRunContext } from "Hooks";
+import { useEditorContext, useRunContext, useWorkflowContext } from "Hooks";
 import { WorkflowEngineMode } from "Constants";
 import type { DataDrivenInput, Task, WorkflowNode, WorkflowNodeProps } from "Types";
-import BaseNode from "../../Base/BaseNode";
+import BaseNode from "./BaseNode";
 import { TaskForm as DefaultTaskForm } from "./TaskForm";
 import styles from "./TemplateNode.module.scss";
 
@@ -19,22 +19,22 @@ interface TaskTemplateNodeProps extends WorkflowNodeProps {
 }
 
 export default function TaskTemplateNode(props: TaskTemplateNodeProps) {
-  const { mode, tasksData } = useEditorContext();
+  const { mode, tasks } = useWorkflowContext();
   // Get the first (and latest) version of the task template
-  const taskTemplate = tasksData[props.data.taskRef][0];
+  const taskTemplate = tasks[props.data.taskRef][0];
 
   if (mode === WorkflowEngineMode.Runner) {
-    return <TaskTemplateNodeExecution {...props} taskTemplate={taskTemplate} />;
+    return <TaskTemplateNodeRun {...props} taskTemplate={taskTemplate} />;
   }
 
-  return <TaskTemplateNodeDesigner {...props} taskTemplate={taskTemplate} TaskForm={props.TaskForm} />;
+  return <TaskTemplateNodeEditor {...props} taskTemplate={taskTemplate} TaskForm={props.TaskForm} />;
 }
 
-interface TaskTemplateNodeDesignerProps extends TaskTemplateNodeProps {
+interface TaskTemplateNodeEditorProps extends TaskTemplateNodeProps {
   taskTemplate: Task;
 }
 
-function TaskTemplateNodeDesigner(props: TaskTemplateNodeDesignerProps) {
+function TaskTemplateNodeEditor(props: TaskTemplateNodeEditorProps) {
   const { taskTemplate, TaskForm = DefaultTaskForm } = props;
   const reactFlowInstance = useReactFlow();
 
@@ -146,7 +146,7 @@ function TaskTemplateNodeDesigner(props: TaskTemplateNodeDesignerProps) {
       isConnectable
       className={props.className}
       icon={taskTemplate.icon}
-      kind={WorkflowEngineMode.Editor}
+      mode={WorkflowEngineMode.Editor}
       nodeProps={props}
       title={props.data.name}
       subtitle={taskTemplate.description}
@@ -157,12 +157,12 @@ function TaskTemplateNodeDesigner(props: TaskTemplateNodeDesignerProps) {
   );
 }
 
-interface TaskTemplateNodeExecutionProps extends WorkflowNodeProps {
+interface TaskTemplateNodeRunProps extends WorkflowNodeProps {
   className?: string;
   taskTemplate: Task;
 }
 
-function TaskTemplateNodeExecution(props: TaskTemplateNodeExecutionProps) {
+function TaskTemplateNodeRun(props: TaskTemplateNodeRunProps) {
   const { workflowRun } = useRunContext();
   const scrollToTask = () => {
     const taskLogItem = document.getElementById(`task-${props.data.name}`);
@@ -179,7 +179,7 @@ function TaskTemplateNodeExecution(props: TaskTemplateNodeExecutionProps) {
       className={props.className}
       icon={props.taskTemplate.icon}
       isConnectable={false}
-      kind={WorkflowEngineMode.Runner}
+      mode={WorkflowEngineMode.Runner}
       nodeProps={props}
       onClick={scrollToTask}
       status={status}

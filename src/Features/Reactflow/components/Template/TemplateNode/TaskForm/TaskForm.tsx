@@ -1,7 +1,8 @@
-import { DynamicFormik, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, ModalBody, ModalFooter, Tag } from "@carbon/react";
 import React from "react";
+import { Button, ModalBody, ModalFooter, Tag } from "@carbon/react";
+import { DynamicFormik, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import * as Yup from "yup";
+import type { DataDrivenInput, Task, WorkflowNodeData } from "Types";
 import {
   AutoSuggestInput,
   TextAreaSuggestInput,
@@ -13,7 +14,6 @@ import {
   toggleProps,
 } from "../../../shared/inputs";
 import styles from "./TaskForm.module.scss";
-import type { DataDrivenInput, TaskTemplate, WorkflowNodeData } from "Types";
 
 const ResultsDisplay = (props: { results: WorkflowNodeData["results"] }) => {
   const { results } = props;
@@ -40,7 +40,7 @@ interface WorkflowTaskFormProps {
   onSave: (inputs: Record<string, string>, results?: Array<{ name: string; description: string }>) => void;
   otherTaskNames: Array<string>;
   textEditorProps?: any;
-  task: TaskTemplate;
+  task: Task;
 }
 
 function WorkflowTaskForm(props: WorkflowTaskFormProps) {

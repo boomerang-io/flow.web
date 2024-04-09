@@ -1,5 +1,5 @@
 import React from "react";
-import { useEditorContext } from "Hooks";
+import { useWorkflowContext } from "Hooks";
 import { WorkflowEngineMode } from "Constants";
 import { WorkflowNodeProps } from "Types";
 import { TemplateNode } from "../Template";
@@ -7,7 +7,7 @@ import { CustomTaskForm } from "./CustomTaskForm";
 import styles from "./CustomTaskNode.module.scss";
 
 export default function CustomTaskNode(props: WorkflowNodeProps) {
-  const { mode } = useEditorContext();
+  const { mode } = useWorkflowContext();
   if (mode === WorkflowEngineMode.Runner) {
     return <CustomTaskNodeExection {...props} />;
   }

@@ -130,6 +130,7 @@ export const serviceUrl = {
       getWorkflow: ({ team, id, version }: TeamArg & IdArg & Partial<VersionArg>) => `${BASE_URL}/team/${team}/workflow/${id}${version ? `?version=${version}` : ""}`,
       getWorkflows: ({ team, query }: TeamArg & Partial<QueryArg>) => `${BASE_URL}/team/${team}/workflow/query${query ? "?" + query : ""}`,
       getWorkflowCompose: ({ team, id, version }: TeamArg & IdArg & Partial<VersionArg>) => `${BASE_URL}/team/${team}/workflow/${id}/compose${version ? `?version=${version}` : ""}`,
+      getWorkflowComposeRun: ({ team, id, version }: TeamArg & IdArg & Partial<VersionArg>) => `${BASE_URL}/team/${team}/workflow/${id}/compose${version ? `?version=${version}&kind=workflowRun` : ""}`,
       getWorkflowChangelog: ({ team, id }: TeamArg & IdArg) =>
         `${BASE_URL}/team/${team}/workflow/${id}/changelog`,
       postCreateWorkflow: ({ team }: TeamArg) => `${BASE_URL}/team/${team}/workflow`,

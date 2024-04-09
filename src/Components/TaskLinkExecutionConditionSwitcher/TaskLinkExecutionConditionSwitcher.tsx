@@ -1,8 +1,8 @@
 import React from "react";
 import cx from "classnames";
+import { WorkflowEngineMode } from "Constants";
 import { WorkflowEngineModeType } from "Types";
 import styles from "./TaskLinkExecutionConditionSwitcher.module.scss";
-import { WorkflowEngineMode } from "Constants";
 
 interface TaskLinkExecutionConditionSwitcherProps {
   disabled?: boolean;
@@ -11,7 +11,7 @@ interface TaskLinkExecutionConditionSwitcherProps {
     Icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
   };
   kind?: WorkflowEngineModeType;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 function TaskLinkExecutionConditionSwitcher({
@@ -22,7 +22,7 @@ function TaskLinkExecutionConditionSwitcher({
 }: TaskLinkExecutionConditionSwitcherProps) {
   const { name, Icon } = executionCondition;
   if (disabled) {
-    return <Icon className={cx(styles.container, styles[kind], styles[name])} />;
+    return <Icon className={cx(styles.container, styles[kind], styles[name], { [styles.disabled]: disabled })} />;
   } else {
     return (
       <button onClick={onClick} style={{ lineHeight: 1 }}>

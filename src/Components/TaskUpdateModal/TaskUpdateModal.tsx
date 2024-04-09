@@ -8,13 +8,13 @@ import EmptyState from "Components/EmptyState";
 import TextEditorModal from "Components/TextEditorModal";
 import { TEXT_AREA_TYPES } from "Constants/formInputTypes";
 import { serviceUrl, resolver } from "Config/servicesConfig";
-import { ObjectValues, TaskTemplate, WorkflowNode } from "Types";
+import { ObjectValues, Task, WorkflowNode } from "Types";
 import styles from "./taskUpdateModal.module.scss";
 
 interface TaskUpdateModalProps {
   availableParameters?: Array<string>;
   closeModal: () => void;
-  latestTaskTemplate: TaskTemplate;
+  latestTaskTemplate: Task;
   node: WorkflowNode["data"];
   onSave: ({ inputs, version }: { inputs: Record<string, string>; version: number }) => void;
 }
@@ -69,7 +69,7 @@ export default function TaskUpdateModal(props: TaskUpdateModalProps) {
 
   const getTaskTemplateUrl = serviceUrl.task.getTask({ name: node.taskRef, version: node.taskRef });
 
-  const templateQuery = useQuery<TaskTemplate>({
+  const templateQuery = useQuery<Task>({
     queryKey: getTaskTemplateUrl,
     queryFn: resolver.query(getTaskTemplateUrl),
   });

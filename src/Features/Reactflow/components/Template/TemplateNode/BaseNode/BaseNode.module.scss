@@ -18,11 +18,14 @@
     .port.right {
       background-color: #50565b;
       border: 0.0625rem solid #50565b;
+      right: -2.1875rem;
     }
 
     .port.left {
       background-color: #d5d9e0;
       border: 0.0625rem solid #50565b;
+      border-right: none;
+      left: -2.1875rem;
     }
 
     &.running {
@@ -63,37 +66,36 @@
   @include text-overflow-ellipsis();
 }
 
-.failure {
-  border: 0.1875rem solid var(--flow-failure);
+.notstarted {
+  border: 0.1875rem solid var(--cds-ui-01) !important;
+  opacity: 0.7;
+}
+
+.waiting {
+  border: 0.1875rem solid var(--flow-wait) !important;
 }
 
 .running {
-  border: 0.1875rem solid var(--cds-interactive-01);
+  border: 0.1875rem solid var(--cds-ui-01) !important;
 }
 
 .disabled {
-  border: none;
+  border: 0.1875rem solid var(--cds-ui-01) !important;
   opacity: 0.5;
 }
 
 .failed {
-  border: 0.1875rem solid var(--flow-failure);
-  border-color: var(--flow-failure) !important;
+  border: 0.1875rem solid var(--flow-failure) !important;
 }
 
-.completed {
-  border: 0.1875rem solid var(--cds-support-02);
-  border-color: var(--cds-support-02) !important;
+.succeeded {
+  border: 0.1875rem solid var(--cds-support-02) !important;
 }
 
 .notstarted,
 .invalid,
 .skipped {
-  border: 0.125rem solid var(--cds-ui-01);
-}
-
-.disabled {
-  opacity: 0.5;
+  border: 0.125rem solid var(--cds-ui-01) !important;
 }
 
 .progressBar {
@@ -167,26 +169,31 @@
   &.right {
     background-color: var(--cds-interactive-01);
     border: 0.0625rem solid var(--cds-interactive-01);
+    border-left: none;
     right: -2.125rem;
     top: 2.5rem;
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
     border-bottom-right-radius: 50%;
     border-top-right-radius: 50%;
-    background-image: url("../../../../../Assets/icons/chevron_white.svg");
+    background-image: url("../../../../../../Assets/icons/chevron_white.svg");
     background-position: center;
     background-repeat: no-repeat;
+    &.locked {
+      right: -2.1875rem;
+    }
   }
   &.left {
     background-color: #b3e6ff;
     border: 0.0625rem solid var(--cds-interactive-01);
+    border-right: none;
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
     border-bottom-left-radius: 50%;
     border-top-left-radius: 50%;
     left: -2.125rem;
     top: 2.5rem;
-    background-image: url("../../../../../Assets/icons/chevron.svg");
+    background-image: url("../../../../../../Assets/icons/chevron.svg");
     background-position: center;
     background-repeat: no-repeat;
   }

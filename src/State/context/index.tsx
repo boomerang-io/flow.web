@@ -4,7 +4,7 @@ import {
   FlowUser,
   PaginatedWorkflowResponse,
   Task,
-  Workflow,
+  WorkflowEditor,
   WorkflowEngineModeType,
   WorkflowRun,
 } from "Types";
@@ -34,17 +34,23 @@ type AppContext = {
   name: string;
 };
 
+interface WorkflowContext {
+  mode: WorkflowEngineModeType;
+  tasks: Record<string, Array<Task>>;
+}
+
+export const [useWorkflowContext, WorkflowProvider] = createContext<WorkflowContext>();
+
 interface RunContext {
+  workflow: WorkflowEditor;
   workflowRun: WorkflowRun;
 }
 export const [useRunContext, RunContextProvider] = createContext<RunContext>();
 
 interface EditorContext {
-  mode: WorkflowEngineModeType;
   availableParameters: Array<string>;
   revisionDispatch?: Function;
-  revisionState: Workflow;
-  tasksData: Record<string, Array<Task>>;
+  revisionState: WorkflowEditor;
   workflowsQueryData: PaginatedWorkflowResponse;
 }
 

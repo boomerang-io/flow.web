@@ -51,3 +51,20 @@
     filter: brightness(100%);
   }
 }
+
+.edge {
+  stroke: var(--cds-interactive-01);
+
+  &.locked {
+    stroke: #697077;
+  }
+}
+
+.edgeLabel {
+  display: flex;
+  gap: 0.5rem;
+  position: absolute;
+  font-size: 0.75rem;
+  font-weight: 700;
+  pointer-events: all;
+}

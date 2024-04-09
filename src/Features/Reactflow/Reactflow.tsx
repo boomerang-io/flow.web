@@ -18,10 +18,11 @@ import ReactFlow, {
   useNodesState,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { WorkflowProvider } from "State/context";
 import { EdgeExecutionCondition, NodeType, WorkflowEngineMode } from "Constants";
 import {
   NodeTypeType,
-  TaskTemplate,
+  Task,
   WorkflowEdge,
   WorkflowEdgeData,
   WorkflowEngineModeType,
@@ -133,6 +134,7 @@ interface FlowDiagramProps {
   edges?: Edge[];
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance?: React.Dispatch<React.SetStateAction<ReactFlowInstance | null>>;
+  tasks: Record<string, Array<Task>>;
 }
 
 // Determine if we should use auto-layout or not
@@ -216,7 +218,7 @@ function FlowDiagram(props: FlowDiagramProps) {
    */
   const onConnect = React.useCallback(
     (connection: Connection) =>
-      setEdges((edges) => addEdge({ ...connection, ...getLinkType(connection, nodes) }, edges)),
+      setEdges((edges) => addEdge({ ...connection, ...getEdgeType(connection, nodes) }, edges)),
     [setEdges, nodes],
   );
 
@@ -243,7 +245,7 @@ function FlowDiagram(props: FlowDiagramProps) {
       event.preventDefault();
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect() ?? { left: 0, top: 0 };
       const taskString = event.dataTransfer.getData("application/reactflow") as string;
-      const task = JSON.parse(taskString) as TaskTemplate;
+      const task = JSON.parse(taskString) as Task;
 
       // check if the dropped element is valid
       if (typeof task.type === "undefined" || !task) {
@@ -287,49 +289,54 @@ function FlowDiagram(props: FlowDiagramProps) {
 
   return (
     <div style={{ height: "100%", width: "100%" }}>
-      <ReactFlowProvider>
-        <div className="reactflow-wrapper" ref={reactFlowWrapper} style={{ height: "100%", width: "100%" }}>
-          <ReactFlow
-            edges={edges}
-            edgeTypes={edgeTypes}
-            elementsSelectable={isEnabled}
-            fitView={true}
-            fitViewOptions={{ maxZoom: 1 }}
-            nodeTypes={nodeTypes}
-            nodes={nodes}
-            nodesConnectable={isEnabled}
-            nodesDraggable={isEnabled}
-            onConnect={onConnect}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onEdgesChange={onEdgesChange}
-            onNodesChange={onNodesChange}
-            onInit={props.setReactFlowInstance}
-            proOptions={{ hideAttribution: true }}
-          >
-            <MarkerDefinition>
-              <CustomEdgeArrow id={markerTypes.decision} color="var(--flow-switch-primary)" />
-              <CustomEdgeArrow id={markerTypes.template} color="#0072c3" />
-            </MarkerDefinition>
-            <Background />
-            <Controls showInteractive={isEnabled}>
-              {isEnabled ? (
-                <ControlButton onClick={onLayout} title="auto-layout">
-                  <div>L</div>
-                </ControlButton>
-              ) : null}
-            </Controls>
-          </ReactFlow>
-        </div>
-      </ReactFlowProvider>
+      <WorkflowProvider value={{ mode: props.mode, tasks: props.tasks }}>
+        <ReactFlowProvider>
+          <div className="reactflow-wrapper" ref={reactFlowWrapper} style={{ height: "100%", width: "100%" }}>
+            <ReactFlow
+              edges={edges}
+              edgeTypes={edgeTypes}
+              elementsSelectable={isEnabled}
+              fitView={true}
+              fitViewOptions={{ maxZoom: 1 }}
+              nodeTypes={nodeTypes}
+              nodes={nodes}
+              nodesConnectable={isEnabled}
+              nodesDraggable={isEnabled}
+              onConnect={onConnect}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onEdgesChange={onEdgesChange}
+              onNodesChange={onNodesChange}
+              onInit={props.setReactFlowInstance}
+              proOptions={{ hideAttribution: true }}
+            >
+              <MarkerDefinition>
+                <CustomEdgeArrow id={markerTypes.decision} />
+                <CustomEdgeArrow id={markerTypes.template} />
+              </MarkerDefinition>
+              <Background />
+              <Controls showInteractive={isEnabled}>
+                {isEnabled ? (
+                  <ControlButton onClick={onLayout} title="auto-layout">
+                    <div>L</div>
+                  </ControlButton>
+                ) : null}
+              </Controls>
+            </ReactFlow>
+          </div>
+        </ReactFlowProvider>
+      </WorkflowProvider>
     </div>
   );
 }
 
-function getLinkType(connection: Connection, nodes: WorkflowNode[]): Pick<WorkflowEdge, "type" | "data"> {
+function getEdgeType(connection: Connection, nodes: WorkflowNode[]): Pick<WorkflowEdge, "type" | "data"> {
   const { source } = connection;
   const node = nodes.find((node) => node.id === source) as WorkflowNode;
-  return { type: node.type, data: { executionCondition: EdgeExecutionCondition.Always, decisionCondition: "" } };
+  return {
+    type: node.type,
+    data: { executionCondition: EdgeExecutionCondition.Always, decisionCondition: "" },
+  };
 }
 
 export default FlowDiagram;

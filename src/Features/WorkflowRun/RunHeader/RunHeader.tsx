@@ -10,6 +10,7 @@ import {
   TooltipHover,
   notify,
 } from "@boomerang-io/carbon-addons-boomerang-react";
+import { capitalize } from "lodash";
 import moment from "moment";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { useMutation, useQueryClient } from "react-query";
@@ -31,7 +32,7 @@ type Props = {
 const cancelStatusTypes = [RunStatus.NotStarted, RunStatus.Waiting, RunStatus.Ready, RunStatus.Running];
 const retryStatusTypes = [RunStatus.Cancelled, RunStatus.Failed, RunStatus.TimedOut, RunStatus.Invalid];
 
-export default function ExecutionHeader({ workflow, workflowRun, version }: Props) {
+export default function RunHeader({ workflow, workflowRun, version }: Props) {
   const { team } = useTeamContext();
   const history = useHistory<{ fromUrl: string; fromText: string }>();
   const state = history.location.state;
@@ -60,10 +61,10 @@ export default function ExecutionHeader({ workflow, workflowRun, version }: Prop
 
   const handleCancelWorkflow = async () => {
     try {
-      await cancelWorkflowRunMutation({ team: team.name, runId: id });
-      notify(<ToastNotification kind="success" title="Cancel run" subtitle="Execution successfully cancelled" />);
+      await cancelWorkflowRunMutation({ runId: id, team: team.name });
+      notify(<ToastNotification kind="success" title="Cancel run" subtitle="Run successfully cancelled" />);
     } catch {
-      notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to cancel this execution`} />);
+      notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to cancel this run`} />);
     }
   };
 
@@ -75,7 +76,7 @@ export default function ExecutionHeader({ workflow, workflowRun, version }: Prop
           <Breadcrumb noTrailingSlash>
             <BreadcrumbItem>
               <Link to={state ? state.fromUrl : appLink.activity({ team: team.name })}>
-                {state ? state.fromText : "Activity"}
+                {state ? capitalize(state.fromText) : "Activity"}
               </Link>
             </BreadcrumbItem>
             <BreadcrumbItem isCurrentPage>
@@ -90,12 +91,12 @@ export default function ExecutionHeader({ workflow, workflowRun, version }: Prop
             <ComposedModal
               composedModalProps={{ shouldCloseOnOverlayClick: true }}
               modalHeaderProps={{
-                title: "Advanced Detail",
+                title: "Advanced detail",
                 subtitle:
-                  "Use the following to dive deeper and debug the execution. Tip: copy the commands into your local terminal and add the namespace.",
+                  "Use the following to dive deeper and debug the run. Tip: copy the commands into your local terminal and add the namespace.",
               }}
               modalTrigger={({ openModal }) => (
-                <TooltipHover direction="right" content="Advanced Detail">
+                <TooltipHover direction="right" content="Advanced detail">
                   <button className={styles.workflowAdvancedDetailTrigger} onClick={openModal}>
                     <Catalog />
                   </button>
@@ -113,7 +114,7 @@ export default function ExecutionHeader({ workflow, workflowRun, version }: Prop
           {Boolean(workflowRun.statusMessage) && (
             <ComposedModal
               composedModalProps={{ shouldCloseOnOverlayClick: true }}
-              modalHeaderProps={{ title: "Execution Error" }}
+              modalHeaderProps={{ title: "Run Error" }}
               modalTrigger={({ openModal }) => (
                 <Button
                   className={styles.workflowErrorTrigger}
@@ -122,7 +123,7 @@ export default function ExecutionHeader({ workflow, workflowRun, version }: Prop
                   renderIcon={Warning}
                   size="sm"
                 >
-                  View Execution Error
+                  View Run Error
                 </Button>
               )}
             >
@@ -230,7 +231,7 @@ function WorkflowAdvancedDetail({ workflow }: { workflow: WorkflowEditor }) {
 
   return (
     <ModalBody>
-      <div>Use this information to debug the execution using the Tekton CLI.</div>
+      <div>Use this information to debug the run using the Tekton CLI.</div>
       <h1 className={styles.detailHeading} style={{ marginTop: "0rem" }}>
         Labels
       </h1>
@@ -242,9 +243,9 @@ function WorkflowAdvancedDetail({ workflow }: { workflow: WorkflowEditor }) {
         ))}
       </div>
       <h1 className={styles.detailHeading}>Tekton Information</h1>
-      <div>Use this information to debug the execution using the Tekton CLI.</div>
+      <div>Use this information to debug the run using the Tekton CLI.</div>
       <div className={styles.kubernetes}>
-        <TextArea readOnly value={tektonCommand} />
+        <TextArea labelText="" readOnly value={tektonCommand} />
         <TooltipHover direction="top" content={copyTokenText} hideOnClick={false}>
           <div className={styles.kubernetesCopyContainer}>
             <CopyToClipboard text={tektonCommand}>
@@ -262,9 +263,9 @@ function WorkflowAdvancedDetail({ workflow }: { workflow: WorkflowEditor }) {
         </TooltipHover>
       </div>
       <h1 className={styles.detailHeading}>Kubernetes Information</h1>
-      <div>Use this information to debug the execution using the Kubernetes CLI.</div>
+      <div>Use this information to debug the run using the Kubernetes CLI.</div>
       <div className={styles.kubernetes}>
-        <TextArea readOnly value={kubernetesCommand} />
+        <TextArea labelText="" readOnly value={kubernetesCommand} />
         <TooltipHover direction="top" content={copyTokenText} hideOnClick={false}>
           <div className={styles.kubernetesCopyContainer}>
             <CopyToClipboard text={kubernetesCommand}>

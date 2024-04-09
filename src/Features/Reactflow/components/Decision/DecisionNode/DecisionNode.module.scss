@@ -1,5 +1,5 @@
 .node {
-  border: 1px solid var(--flow-switch-primary) !important;
+  border: 0.125rem solid var(--flow-switch-primary);
   border-radius: 0.25rem;
   box-sizing: border-box;
   height: 8.75rem;
@@ -12,12 +12,14 @@
     }
   }
 
-  :global .source, :global .target {
+  :global .source,
+  :global .target {
     top: 4.5rem !important;
   }
 
   :global .source {
-    background-color: var(--flow-switch-primary) !important;
+    background-color: var(--flow-switch-primary);
+    border-color: var(--flow-switch-primary);
   }
 }
 
