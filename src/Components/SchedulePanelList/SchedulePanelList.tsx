@@ -1,5 +1,4 @@
 import React from "react";
-import { useMutation, useQueryClient } from "react-query";
 import {
   Button,
   Layer,
@@ -11,15 +10,16 @@ import {
   Tag,
   Tile,
 } from "@carbon/react";
-import { useTeamContext } from "Hooks";
+import { Add, CircleFilled, Information, RadioButton, Repeat, RepeatOne } from "@carbon/react/icons";
 import { ConfirmModal, TooltipHover, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
 import cronstrue from "cronstrue";
 import { matchSorter } from "match-sorter";
 import moment from "moment-timezone";
+import { useMutation, useQueryClient } from "react-query";
+import { useTeamContext } from "Hooks";
 import { DATETIME_LOCAL_DISPLAY_FORMAT } from "Utils/dateHelper";
 import { scheduleStatusOptions, scheduleStatusLabelMap, scheduleTypeLabelMap } from "Constants";
 import { resolver } from "Config/servicesConfig";
-import { Add, CircleFilled, Information, RadioButton, Repeat, RepeatOne } from "@carbon/react/icons";
 import { ScheduleUnion, PaginatedSchedulesResponse } from "Types";
 import styles from "./SchedulePanelList.module.scss";
 
@@ -53,7 +53,7 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
     }
 
     if (props.schedulesData && props.schedulesData.numberOfElements === 0) {
-      return <div>No schedules found</div>;
+      return <div style={{ marginTop: "1rem" }}>No schedules found</div>;
     }
 
     const schedules = props.schedulesData?.content;

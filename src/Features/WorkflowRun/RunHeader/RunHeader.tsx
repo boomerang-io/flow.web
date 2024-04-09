@@ -52,16 +52,16 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
 
   const handleRetryWorkflow = async () => {
     try {
-      await retryWorkflowRunMutation({ team: team.name, runId: id });
+      await retryWorkflowRunMutation({ id, team: team.name });
       notify(<ToastNotification kind="success" title="Retry run" subtitle="Retry successful" />);
     } catch {
-      notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to retry this execution`} />);
+      notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to retry this run`} />);
     }
   };
 
   const handleCancelWorkflow = async () => {
     try {
-      await cancelWorkflowRunMutation({ runId: id, team: team.name });
+      await cancelWorkflowRunMutation({ id, team: team.name });
       notify(<ToastNotification kind="success" title="Cancel run" subtitle="Run successfully cancelled" />);
     } catch {
       notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to cancel this run`} />);
@@ -175,7 +175,7 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
                   <Button
                     className={styles.cancelRun}
                     data-testid="cancel-run"
-                    kind="ghost"
+                    kind="primary"
                     iconDescription="Retry run"
                     onClick={openModal}
                     renderIcon={Redo}

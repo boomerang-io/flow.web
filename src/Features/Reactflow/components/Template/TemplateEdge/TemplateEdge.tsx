@@ -104,7 +104,6 @@ export function TemplateEdgeRun(props: WorkflowEdgeProps) {
   // The workflow.nodes IDs change with each call, so need to keep it stable
   const nodeName = React.useRef(workflow.nodes.find((node) => node.id === props.source)?.data.name);
   const status = workflowRun.tasks.find((task) => task.name === nodeName.current)?.status ?? "";
-  console.log(status);
 
   const executionConditionIndex = EXECUTION_CONDITIONS.findIndex(
     (condition) => condition.name === data?.executionCondition,

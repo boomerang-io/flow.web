@@ -70,7 +70,11 @@ function ExecutionConditionButton({
   }
   if (disabled) {
     return (
-      <ConditionButton alt={alt} className={cx(styles.container, className, styles[kind])} displayText={displayText} />
+      <ConditionButton
+        alt={alt}
+        className={cx(styles.container, className, styles[kind], styles.disabled)}
+        displayText={displayText}
+      />
     );
   }
   return (

@@ -1,12 +1,14 @@
 import React from "react";
 import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
+import cx from "classnames";
 import { getBezierPath, EdgeLabelRenderer, useReactFlow } from "reactflow";
 import { markerTypes } from "Features/Reactflow/Reactflow";
 import WorkflowCloseButton from "Components/WorkflowCloseButton";
-import { useWorkflowContext } from "Hooks";
+import { useRunContext, useWorkflowContext } from "Hooks";
 import { WorkflowEngineMode } from "Constants";
 import { WorkflowEdge, WorkflowEdgeProps } from "Types";
 import ConfigureSwitchModal from "./ConfigureModal";
+import styles from "./DecisionEdge.module.scss";
 import ExecutionConditionButton from "./ExecutionConditionButton";
 
 export default function SwitchEdge(props: WorkflowEdgeProps) {
@@ -35,7 +37,6 @@ function SwitchEdgeEditor(props: WorkflowEdgeProps) {
 
   const mergedStyles = {
     ...style,
-    stroke: "var(--flow-switch-primary)",
     strokeWidth: "2",
   };
 
@@ -59,23 +60,17 @@ function SwitchEdgeEditor(props: WorkflowEdgeProps) {
     <>
       <path
         id={id}
-        className="react-flow__edge-path"
+        className={cx("react-flow__edge-path", styles.editorEdge)}
         d={edgePath}
         markerEnd={`url(#${markerTypes.decision}`}
         style={mergedStyles}
       />
       <EdgeLabelRenderer>
         <div
+          className={cx("nodrag", "nopan", styles.edgeLabel)}
           style={{
-            display: "flex",
-            gap: "0.5rem",
-            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            fontSize: 12,
-            fontWeight: 700,
-            pointerEvents: "all",
           }}
-          className="nodrag nopan"
         >
           {mode === "editor" ? (
             <>
@@ -130,31 +125,30 @@ function SwitchEdgeRun(props: WorkflowEdgeProps) {
 
   const mergedStyles = {
     ...style,
-    stroke: "var(--flow-switch-primary)",
     strokeWidth: "2",
   };
+
+  const { workflowRun, workflow } = useRunContext();
+
+  // The workflow.nodes IDs change with each call, so need to keep it stable
+  const nodeName = React.useRef(workflow.nodes.find((node) => node.id === props.source)?.data.name);
+  const status = workflowRun.tasks.find((task) => task.name === nodeName.current)?.status ?? "";
 
   return (
     <>
       <path
         id={id}
-        className="react-flow__edge-path"
+        className={cx("react-flow__edge-path", styles.runEdge, styles[status])}
         d={edgePath}
         markerEnd={`url(#${markerTypes.decision}`}
         style={mergedStyles}
       />
       <EdgeLabelRenderer>
         <div
+          className={cx("nodrag", "nopan", styles.edgeLabel)}
           style={{
-            display: "flex",
-            gap: "0.5rem",
-            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            fontSize: 12,
-            fontWeight: 700,
-            pointerEvents: "all",
           }}
-          className="nodrag nopan"
         >
           <ExecutionConditionButton disabled onClick={() => {}} inputText={data?.decisionCondition} />
         </div>

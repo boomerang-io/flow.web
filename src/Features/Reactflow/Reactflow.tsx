@@ -32,7 +32,7 @@ import {
 import * as GraphComps from "./components";
 import "./styles.scss";
 
-function CustomEdgeArrow({ id, color }: any) {
+function CustomEdgeArrow({ id }: { id: string }) {
   return (
     <marker
       id={id}
@@ -44,14 +44,7 @@ function CustomEdgeArrow({ id, color }: any) {
       refX="0"
       refY="0"
     >
-      <polyline
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1"
-        fill={color}
-        points="-5,-4 0,0 -5,4 -5,-4"
-      ></polyline>
+      <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" points="-5,-4 0,0 -5,4 -5,-4"></polyline>
     </marker>
   );
 }
@@ -291,7 +284,12 @@ function FlowDiagram(props: FlowDiagramProps) {
     <div style={{ height: "100%", width: "100%" }}>
       <WorkflowProvider value={{ mode: props.mode, tasks: props.tasks }}>
         <ReactFlowProvider>
-          <div className="reactflow-wrapper" ref={reactFlowWrapper} style={{ height: "100%", width: "100%" }}>
+          <div
+            data-mode={props.mode}
+            className="reactflow-wrapper"
+            ref={reactFlowWrapper}
+            style={{ height: "100%", width: "100%" }}
+          >
             <ReactFlow
               edges={edges}
               edgeTypes={edgeTypes}
