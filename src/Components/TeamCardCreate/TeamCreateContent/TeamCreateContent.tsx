@@ -1,13 +1,12 @@
-import { ModalForm, TextInput, Loading } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
 import React from "react";
-import { useMutation } from "react-query";
+import { Button, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
+import { ModalForm, TextInput, Loading } from "@boomerang-io/carbon-addons-boomerang-react";
 import { Formik } from "formik";
 import kebabcase from "lodash/kebabCase";
+import { useMutation } from "react-query";
 import * as Yup from "yup";
-import styles from "./TeamCreateContent.module.scss";
 import { resolver } from "Config/servicesConfig";
-import { create } from "lodash";
+import styles from "./TeamCreateContent.module.scss";
 
 interface TeamCreateContentProps {
   closeModal: () => void;
@@ -101,7 +100,11 @@ export default function TeamCreateContent({ closeModal, createTeam, isLoading, i
               <Button kind="secondary" type="button" onClick={closeModal}>
                 Cancel
               </Button>
-              <Button disabled={!dirty || errors.name || isLoading || validateTeamNameMutator.isLoading} onClick={handleSubmit} data-testid="save-team-name">
+              <Button
+                disabled={!dirty || errors.name || isLoading || validateTeamNameMutator.isLoading}
+                onClick={handleSubmit}
+                data-testid="save-team-name"
+              >
                 {buttonText}
               </Button>
             </ModalFooter>
