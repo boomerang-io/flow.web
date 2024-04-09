@@ -140,6 +140,7 @@ export const serviceUrl = {
     },
     "workflowrun": {
       deleteCancelWorkflow: ({ team, id }: TeamArg & IdArg) => `${BASE_URL}/team/${team}/workflowrun/${id}/cancel`,
+      putRetryWorkflow: ({ team, id }: TeamArg & IdArg) => `${BASE_URL}/team/${team}/workflowrun/${id}/retry`,
       getWorkflowRunCount: ({ team, query }: TeamArg & Partial<QueryArg>) => `${BASE_URL}/team/${team}/workflowrun/count${query ? "?" + query : ""}`,
       getWorkflowRuns: ({ team, query }: TeamArg & Partial<QueryArg>) => `${BASE_URL}/team/${team}/workflowrun/query${query ? "?" + query : ""}`,
       getWorkflowRun: ({ team, id }: TeamArg & IdArg) => `${BASE_URL}/team/${team}/workflowrun/${id}`,
@@ -169,7 +170,8 @@ export const resolver = {
   putMutation: (request) => axios.put(request),
   deleteApproverGroup: ({ team, groupId }) => axios.delete(serviceUrl.resourceApproverGroups({ team, groupId })),
   // deleteArchiveTaskTemplate: ({ id }) => axios.delete(serviceUrl.deleteArchiveTaskTemplate({ id })),
-  deleteCancelWorkflow: ({ team, runId }) => axios.delete(serviceUrl.team.workflowrun.deleteCancelWorkflow({ team, runId })),
+  putRetryWorkflowRun: ({ team, runId }) => axios.delete(serviceUrl.team.workflowrun.putRetryWorkflow({ team, runId })),
+  deleteCancelWorkflowRun: ({ team, runId }) => axios.delete(serviceUrl.team.workflowrun.deleteCancelWorkflow({ team, runId })),
   deleteGlobalParameter: ({ key }) => axios.delete(serviceUrl.getGlobalParameter({ key })),
   deleteTeamMembers: ({ team, body }) => axios.delete(serviceUrl.team.deleteTeamMembers({ team }), body),
   deleteTeamParameters: ({ team, body }) =>

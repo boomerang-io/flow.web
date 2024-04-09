@@ -1,6 +1,6 @@
 import React from "react";
 import { Breadcrumb, BreadcrumbItem, Button, ModalBody, SkeletonPlaceholder, Tag, TextArea } from "@carbon/react";
-import { Catalog, CopyFile, StopOutline, Warning } from "@carbon/react/icons";
+import { Catalog, CopyFile, StopOutline, Warning, Redo } from "@carbon/react/icons";
 import {
   ComposedModal,
   ConfirmModal,
@@ -28,7 +28,8 @@ type Props = {
   version: number;
 };
 
-const cancelSatusTypes = [RunStatus.NotStarted, RunStatus.Waiting, RunStatus.Cancelled];
+const cancelStatusTypes = [RunStatus.NotStarted, RunStatus.Waiting, RunStatus.Ready, RunStatus.Running];
+const retryStatusTypes = [RunStatus.Cancelled, RunStatus.Failed, RunStatus.TimedOut, RunStatus.Invalid];
 
 export default function ExecutionHeader({ workflow, workflowRun, version }: Props) {
   const { team } = useTeamContext();
@@ -37,20 +38,35 @@ export default function ExecutionHeader({ workflow, workflowRun, version }: Prop
   const queryClient = useQueryClient();
 
   const { initiatedByRef, trigger, creationDate, status, id } = workflowRun;
-  const displayCancelButton = cancelSatusTypes.includes(status);
+  const displayCancelButton = cancelStatusTypes.includes(status);
+  const displayRetryButton = retryStatusTypes.includes(status);
 
-  const { mutateAsync: deleteCancelWorkflowMutation } = useMutation(resolver.deleteCancelWorkflow, {
+  const { mutateAsync: retryWorkflowRunMutation } = useMutation(resolver.putRetryWorkflowRun, {
     onSuccess: () => queryClient.invalidateQueries(serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id })),
   });
 
+  const { mutateAsync: cancelWorkflowRunMutation } = useMutation(resolver.deleteCancelWorkflowRun, {
+    onSuccess: () => queryClient.invalidateQueries(serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id })),
+  });
+
+  const handleRetryWorkflow = async () => {
+    try {
+      await retryWorkflowRunMutation({ team: team.name, runId: id });
+      notify(<ToastNotification kind="success" title="Retry run" subtitle="Retry successful" />);
+    } catch {
+      notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to retry this execution`} />);
+    }
+  };
+
   const handleCancelWorkflow = async () => {
     try {
-      await deleteCancelWorkflowMutation({ team: team.name, runId: id });
+      await cancelWorkflowRunMutation({ team: team.name, runId: id });
       notify(<ToastNotification kind="success" title="Cancel run" subtitle="Execution successfully cancelled" />);
     } catch {
       notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to cancel this execution`} />);
     }
   };
+
   return (
     <Header
       className={styles.container}
@@ -149,6 +165,26 @@ export default function ExecutionHeader({ workflow, workflowRun, version }: Prop
             <dd className={styles.dataValue}>{moment(creationDate).format("YYYY-MM-DD hh:mm A")}</dd>
           </dl>
           <dl className={styles.dataButton}>
+            {displayRetryButton && (
+              <ConfirmModal
+                affirmativeAction={handleRetryWorkflow}
+                children="Are you sure? A new execution of this Workflow will be started with all the same parameters."
+                title="Retry run"
+                modalTrigger={({ openModal }) => (
+                  <Button
+                    className={styles.cancelRun}
+                    data-testid="cancel-run"
+                    kind="ghost"
+                    iconDescription="Retry run"
+                    onClick={openModal}
+                    renderIcon={Redo}
+                    size="sm"
+                  >
+                    Retry run
+                  </Button>
+                )}
+              />
+            )}
             {displayCancelButton && (
               <ConfirmModal
                 affirmativeAction={handleCancelWorkflow}
