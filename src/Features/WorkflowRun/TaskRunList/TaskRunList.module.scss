@@ -39,15 +39,16 @@
   position: relative;
   width: 100%;
 
-  &.completed {
+  &.succeeded {
     background-color: #92eeee;
   }
 
-  &.failure, &.cancelled {
+  &.failed,
+  &.cancelled {
     background-color: #fcd0d3;
   }
 
-  &.inProgress,
+  &.running,
   &.notstarted,
   &.invalid,
   &.skipped {

@@ -8,7 +8,7 @@ import styles from "./CustomTaskNode.module.scss";
 
 export default function CustomTaskNode(props: WorkflowNodeProps) {
   const { mode } = useWorkflowContext();
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <CustomTaskNodeExection {...props} />;
   }
 

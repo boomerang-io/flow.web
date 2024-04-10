@@ -17,7 +17,7 @@ interface TaskLinkExecutionConditionSwitcherProps {
 function TaskLinkExecutionConditionSwitcher({
   disabled = false,
   executionCondition,
-  kind = WorkflowEngineMode.Editor,
+  kind = WorkflowEngineMode.Edit,
   onClick,
 }: TaskLinkExecutionConditionSwitcherProps) {
   const { name, Icon } = executionCondition;

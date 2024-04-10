@@ -57,7 +57,7 @@ const CreateWorkflowTemplates: React.FC<CreateWorkflowTemplatesProps> = ({
     formData.selectedWorkflow
       ? new WorkflowDagEngine({
           dag: formData.selectedWorkflow.revision.dag,
-          mode: WorkflowEngineMode.Runner,
+          mode: WorkflowEngineMode.Run,
         })
       : null,
   );
@@ -74,7 +74,7 @@ const CreateWorkflowTemplates: React.FC<CreateWorkflowTemplatesProps> = ({
     // setCurrentDag(
     //   new WorkflowDagEngine({
     //     dag: template.revision.dag,
-    //     mode: WorkflowEngineMode.Runner,
+    //     mode: WorkflowEngineMode.Run,
     //   })
     // );
   };

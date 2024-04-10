@@ -2,7 +2,7 @@
 
 .node {
   background: #002b50;
-  border: 0.125rem solid #161616;
+  border: 0.125rem solid #002b50;
   color: white;
   width: 9rem;
   height: 5rem;
@@ -36,6 +36,7 @@
   width: 2rem;
   background-color: #b3e6ff;
   border: 0.0625rem solid var(--cds-interactive-01);
+  border-right: none;
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
   border-bottom-left-radius: 50%;

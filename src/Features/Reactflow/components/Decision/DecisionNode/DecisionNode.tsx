@@ -7,7 +7,7 @@ import styles from "./DecisionNode.module.scss";
 
 export default function DecisionsNode(props: WorkflowNodeProps) {
   const { mode } = useWorkflowContext();
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <DecisionNodeRun {...props} />;
   }
   return <DecisionNodeEditor {...props} />;

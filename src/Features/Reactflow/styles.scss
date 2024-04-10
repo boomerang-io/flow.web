@@ -1,7 +1,7 @@
 @import "Styles/mixins";
 
-// Override pointer events so in Runner mode
-// we can click on the tile to scroll the corresponding
+// Override pointer events so in "runner" mode
+// we can click on the card to scroll the corresponding
 // task card into view and focus on it
 .react-flow__node {
   pointer-events: all !important;
@@ -9,4 +9,14 @@
 
 .cds--modal-footer .cds--btn:last-child:first-child {
   border-bottom-left-radius: 0;
+}
+
+.reactflow-container {
+  height: 100%;
+  width: 100%;
+}
+
+.reactflow-wrapper {
+  height: 100%;
+  width: 100%;
 }

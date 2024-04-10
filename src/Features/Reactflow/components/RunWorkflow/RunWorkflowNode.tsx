@@ -7,7 +7,7 @@ import { RunWorkflowForm } from "./RunWorkflowForm";
 
 export default function RunWorkFlowNode(props: WorkflowNodeProps) {
   const { mode } = useWorkflowContext();
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <RunWorkflowExecution {...props} />;
   }
   return <RunWorkflowDesigner {...props} />;

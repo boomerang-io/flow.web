@@ -32,35 +32,6 @@ import {
 import * as GraphComps from "./components";
 import "./styles.scss";
 
-function CustomEdgeArrow({ id }: { id: string }) {
-  return (
-    <marker
-      id={id}
-      markerWidth="16"
-      markerHeight="16"
-      viewBox="-10 -10 20 20"
-      markerUnits="strokeWidth"
-      orient="auto-start-reverse"
-      refX="0"
-      refY="0"
-    >
-      <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" points="-5,-4 0,0 -5,4 -5,-4"></polyline>
-    </marker>
-  );
-}
-
-interface MarkerDefinitionsProps {
-  children: React.ReactNode;
-}
-
-export function MarkerDefinition({ children }: MarkerDefinitionsProps) {
-  return (
-    <svg>
-      <defs>{children}</defs>
-    </svg>
-  );
-}
-
 export const markerTypes: { [K in NodeTypeType]: string } = {
   approval: "task-marker",
   acquirelock: "task-marker",
@@ -128,65 +99,6 @@ interface FlowDiagramProps {
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance?: React.Dispatch<React.SetStateAction<ReactFlowInstance | null>>;
   tasks: Record<string, Array<Task>>;
-}
-
-// Determine if we should use auto-layout or not
-function initElements(nodes: Array<WorkflowNode> = [], edges: Array<WorkflowEdge> = []) {
-  let useAutoLayout = false;
-  for (let node of nodes) {
-    if (!node.position) {
-      useAutoLayout = true;
-      break;
-    }
-  }
-
-  return useAutoLayout ? autoLayoutElements(nodes, edges) : { nodes, edges };
-}
-
-// Auto-layout via dagre
-function autoLayoutElements(nodes: Array<WorkflowNode> = [], edges: Array<WorkflowEdge> = []) {
-  const direction = edges.length === 0 ? "TB" : "LR";
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-  dagreGraph.setGraph({ rankdir: direction, edgesep: 100 });
-
-  nodes.forEach((node: WorkflowNode) => {
-    if (node.type === NodeType.Start || node.type === NodeType.End) {
-      dagreGraph.setNode(node.id, { width: 144 * 1.5, height: 80 });
-    } else {
-      dagreGraph.setNode(node.id, { width: 280 * 1.5, height: 80 });
-    }
-  });
-
-  edges.forEach((edge: Edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(dagreGraph);
-
-  nodes.forEach((node: WorkflowNode) => {
-    const positionedNode = dagreGraph.node(node.id);
-    node.targetPosition = Position.Left;
-    node.sourcePosition = Position.Right;
-
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left)
-    if (node.type === NodeType.Start || node.type === NodeType.End) {
-      node.position = {
-        x: (positionedNode.x - 144 / 2) * 1,
-        y: (positionedNode.y - 80 / 2) * 1,
-      };
-    } else {
-      node.position = {
-        x: (positionedNode.x - 240 / 2) * 1,
-        y: (positionedNode.y - 80 / 2) * 1,
-      };
-    }
-
-    return node;
-  });
-
-  return { nodes, edges };
 }
 
 function FlowDiagram(props: FlowDiagramProps) {
@@ -278,18 +190,13 @@ function FlowDiagram(props: FlowDiagramProps) {
     [props.reactFlowInstance, nodes, setNodes],
   );
 
-  const isEnabled = props.mode === WorkflowEngineMode.Editor;
+  const isEnabled = props.mode === WorkflowEngineMode.Edit;
 
   return (
-    <div style={{ height: "100%", width: "100%" }}>
+    <div className="reactflow-container">
       <WorkflowProvider value={{ mode: props.mode, tasks: props.tasks }}>
         <ReactFlowProvider>
-          <div
-            data-mode={props.mode}
-            className="reactflow-wrapper"
-            ref={reactFlowWrapper}
-            style={{ height: "100%", width: "100%" }}
-          >
+          <div className="reactflow-wrapper" data-mode={props.mode} ref={reactFlowWrapper}>
             <ReactFlow
               edges={edges}
               edgeTypes={edgeTypes}
@@ -313,7 +220,7 @@ function FlowDiagram(props: FlowDiagramProps) {
                 <CustomEdgeArrow id={markerTypes.template} />
               </MarkerDefinition>
               <Background />
-              <Controls showInteractive={isEnabled}>
+              <Controls showInteractive={false}>
                 {isEnabled ? (
                   <ControlButton onClick={onLayout} title="auto-layout">
                     <div>L</div>
@@ -326,6 +233,112 @@ function FlowDiagram(props: FlowDiagramProps) {
       </WorkflowProvider>
     </div>
   );
+}
+
+interface CustomEdgeArrowProps {
+  id: string;
+}
+function CustomEdgeArrow({ id }: CustomEdgeArrowProps) {
+  return (
+    <marker
+      id={id}
+      markerWidth="16"
+      markerHeight="16"
+      viewBox="-10 -10 20 20"
+      markerUnits="strokeWidth"
+      orient="auto-start-reverse"
+      refX="0"
+      refY="0"
+    >
+      <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" points="-5,-4 0,0 -5,4 -5,-4"></polyline>
+    </marker>
+  );
+}
+
+interface MarkerDefinitionsProps {
+  children: React.ReactNode;
+}
+
+export function MarkerDefinition({ children }: MarkerDefinitionsProps) {
+  return (
+    <svg>
+      <defs>{children}</defs>
+    </svg>
+  );
+}
+
+// Determine if we should use auto-layout or not
+function initElements(nodes: Array<WorkflowNode> = [], edges: Array<WorkflowEdge> = []) {
+  let useAutoLayout = false;
+  for (let node of nodes) {
+    if (!node.position) {
+      useAutoLayout = true;
+      break;
+    }
+  }
+
+  return useAutoLayout ? autoLayoutElements(nodes, edges) : { nodes, edges };
+}
+
+// Auto-layout via dagre
+function autoLayoutElements(nodes: Array<WorkflowNode> = [], edges: Array<WorkflowEdge> = []) {
+  const START_END_WIDTH = 144;
+  const NODE_HEIGHT = 60;
+  const NODE_WIDTH = 280;
+
+  const direction = edges.length === 0 ? "TB" : "LR";
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  dagreGraph.setGraph({ rankdir: direction, edgesep: 100 });
+
+  nodes.forEach((node: WorkflowNode) => {
+    if (node.type === NodeType.Start || node.type === NodeType.End) {
+      dagreGraph.setNode(node.id, { width: START_END_WIDTH * 1.5, height: NODE_HEIGHT });
+    } else {
+      dagreGraph.setNode(node.id, { width: NODE_WIDTH * 1.5, height: NODE_HEIGHT });
+    }
+  });
+
+  edges.forEach((edge: Edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  nodes.forEach((node: WorkflowNode) => {
+    const positionedNode = dagreGraph.node(node.id);
+    node.targetPosition = Position.Left;
+    node.sourcePosition = Position.Right;
+
+    // We are shifting the dagre node position (anchor=center center) to the top left
+    // so it matches the React Flow node anchor point (top left)
+    if (node.type === NodeType.Start || node.type === NodeType.End) {
+      node.position = {
+        x: positionedNode.x - START_END_WIDTH / 2,
+        y: positionedNode.y - NODE_HEIGHT / 2,
+      };
+    } else {
+      node.position = {
+        x: positionedNode.x - NODE_WIDTH / 2,
+        y: positionedNode.y - NODE_HEIGHT / 2,
+      };
+    }
+
+    // Do some additional adjustment if there are just two nodes
+    // so the start and end aren't so close together and look weird
+    if (nodes.length === 2) {
+      if (node.type === NodeType.Start) {
+        node.position.x = node.position.x - START_END_WIDTH * 2;
+      }
+      if (node.type === NodeType.End) {
+        node.position.x = node.position.x + START_END_WIDTH * 2;
+      }
+    }
+
+    return node;
+  });
+
+  return { nodes, edges };
 }
 
 function getEdgeType(connection: Connection, nodes: WorkflowNode[]): Pick<WorkflowEdge, "type" | "data"> {

@@ -7,7 +7,7 @@ import { RunScheduledWorkflowForm } from "./RunScheduledWorkflowForm";
 
 export default function RunScheduledWorkflowNode(props: WorkflowNodeProps) {
   const { mode } = useWorkflowContext();
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <RunScheduledWorkflowRun {...props} />;
   }
   return <RunScheduledWorkflowEditor {...props} />;

@@ -165,9 +165,9 @@ export const UserTypeCopy = {
 } as const;
 
 export const WorkflowEngineMode = {
-  Editor: "editor",
-  Runner: "runner",
-  Viewer: "viewer",
+  Edit: "edit",
+  Run: "run",
+  View: "view",
 } as const;
 
 export const WorkflowPropertyAction = {

@@ -1,18 +1,18 @@
 import React from "react";
+import { ErrorMessage, Loading } from "@boomerang-io/carbon-addons-boomerang-react";
+import { useFeature } from "flagged";
 import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
-import { useFeature } from "flagged";
-import { useAppContext } from "Hooks";
 import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { Box } from "reflexbox";
-import { ErrorMessage, Loading } from "@boomerang-io/carbon-addons-boomerang-react";
-import Header from "./Header";
-import Labels from "./Labels";
-import Teams from "./Teams";
-import Settings from "./Settings";
-import { FlowUser } from "Types";
+import { useAppContext } from "Hooks";
 import { AppPath, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
+import { FlowUser } from "Types";
+import Header from "./Header";
+import Labels from "./Labels";
+import Settings from "./Settings";
+import Teams from "./Teams";
 import styles from "./UserDetailed.module.scss";
 
 interface FeatureLayoutProps {

@@ -56,7 +56,7 @@ function ExecutionConditionButton({
   alt = "Switch edit button",
   className,
   disabled = false,
-  kind = WorkflowEngineMode.Editor,
+  kind = WorkflowEngineMode.Edit,
   onClick,
   inputText,
   ...rest

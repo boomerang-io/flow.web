@@ -14,7 +14,7 @@ import styles from "./TemplateEdge.module.scss";
 export default function TaskTemplateEdge(props: WorkflowEdgeProps) {
   const { mode } = useWorkflowContext();
 
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <TemplateEdgeRun {...props} />;
   }
 
@@ -25,7 +25,7 @@ export function TemplateEdgeEditor(props: WorkflowEdgeProps) {
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style, data } = props;
   const reactFlowInstance = useReactFlow();
   const { mode } = useWorkflowContext();
-  const isEditor = mode === WorkflowEngineMode.Editor;
+  const isEditor = mode === WorkflowEngineMode.Edit;
 
   const executionConditionIndex = EXECUTION_CONDITIONS.findIndex(
     (condition) => condition.name === data?.executionCondition,

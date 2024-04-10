@@ -1,13 +1,17 @@
 import React from "react";
+import { Bee } from "@carbon/react/icons";
 import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
-import { useReactFlow, Node } from "reactflow";
+import cx from "classnames";
+import { Connection, Handle, Node, Position, useReactFlow } from "reactflow";
 import TaskUpdateModal from "Components/TaskUpdateModal";
+import WorkflowCloseButton from "Components/WorkflowCloseButton";
 import WorkflowEditButton from "Components/WorkflowEditButton";
 import WorkflowWarningButton from "Components/WorkflowWarningButton";
 import { useEditorContext, useRunContext, useWorkflowContext } from "Hooks";
+import { taskIcons } from "Utils/taskIcons";
 import { WorkflowEngineMode } from "Constants";
 import type { DataDrivenInput, Task, WorkflowNode, WorkflowNodeProps } from "Types";
-import BaseNode from "./BaseNode";
+import { RunStatus, WorkflowEngineModeType } from "Types";
 import { TaskForm as DefaultTaskForm } from "./TaskForm";
 import styles from "./TemplateNode.module.scss";
 
@@ -23,7 +27,7 @@ export default function TaskTemplateNode(props: TaskTemplateNodeProps) {
   // Get the first (and latest) version of the task template
   const taskTemplate = tasks[props.data.taskRef][0];
 
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <TaskTemplateNodeRun {...props} taskTemplate={taskTemplate} />;
   }
 
@@ -86,8 +90,16 @@ function TaskTemplateNodeEditor(props: TaskTemplateNodeEditorProps) {
     reactFlowInstance.setNodes(newNodes);
   };
 
-  const ConfigureTask = () => {
-    return (
+  return (
+    <BaseNode
+      isConnectable
+      className={props.className}
+      icon={taskTemplate.icon}
+      mode={WorkflowEngineMode.Edit}
+      nodeProps={props}
+      title={props.data.name}
+      subtitle={taskTemplate.description}
+    >
       <ComposedModal
         modalHeaderProps={{
           title: `Edit ${taskTemplate.displayName}`,
@@ -107,11 +119,6 @@ function TaskTemplateNodeEditor(props: TaskTemplateNodeEditorProps) {
           />
         )}
       </ComposedModal>
-    );
-  };
-
-  const UpdateTaskVersion = () => {
-    return (
       <ComposedModal
         composedModalProps={{
           containerClassName: styles.updateTaskModalContainer,
@@ -138,21 +145,6 @@ function TaskTemplateNodeEditor(props: TaskTemplateNodeEditorProps) {
           />
         )}
       </ComposedModal>
-    );
-  };
-
-  return (
-    <BaseNode
-      isConnectable
-      className={props.className}
-      icon={taskTemplate.icon}
-      mode={WorkflowEngineMode.Editor}
-      nodeProps={props}
-      title={props.data.name}
-      subtitle={taskTemplate.description}
-    >
-      <ConfigureTask />
-      <UpdateTaskVersion />
     </BaseNode>
   );
 }
@@ -179,7 +171,7 @@ function TaskTemplateNodeRun(props: TaskTemplateNodeRunProps) {
       className={props.className}
       icon={props.taskTemplate.icon}
       isConnectable={false}
-      mode={WorkflowEngineMode.Runner}
+      mode={WorkflowEngineMode.Run}
       nodeProps={props}
       onClick={scrollToTask}
       status={status}
@@ -203,4 +195,79 @@ function inputRecordToNameAndParamListRecord(inputRecord: Record<string, string>
   });
 
   return { name, params };
+}
+
+//About: based on WorkflowNode component that serves as a base for many of the the components
+//TODO: add icon
+//TODO: look at what props are required
+
+interface BaseNodeProps {
+  children?: React.ReactNode;
+  className?: string;
+  icon?: string;
+  isConnectable: boolean;
+  mode: WorkflowEngineModeType;
+  nodeProps: WorkflowNodeProps;
+  onClick?: () => void;
+  subtitle?: string;
+  title?: string;
+  status?: RunStatus;
+}
+
+function BaseNode(props: BaseNodeProps) {
+  const { isConnectable, children, className, icon, onClick, status, subtitle, title } = props;
+  const reactFlowInstance = useReactFlow();
+  let Icon = () => <Bee style={{ willChange: "auto" }} />;
+
+  if (icon) {
+    //@ts-ignore
+    Icon = taskIcons.find((taskIcon) => taskIcon.name === icon)?.Icon ?? Icon;
+  }
+
+  const isEditor = props.mode === WorkflowEngineMode.Edit;
+  return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    <div className={cx(styles.node, className, styles[status ?? ""], { [styles.locked]: !isEditor })} onClick={onClick}>
+      {isEditor ? (
+        <div style={{ position: "absolute", top: "-1rem", right: "-0.875rem", display: "flex", gap: "0.25rem" }}>
+          <WorkflowCloseButton
+            style={{ height: "1.75rem" }}
+            className={""}
+            onClick={() => reactFlowInstance.deleteElements({ nodes: [props.nodeProps] })}
+          >
+            Delete
+          </WorkflowCloseButton>
+        </div>
+      ) : null}
+      {status === RunStatus.Running ? <div className={styles.progressBar} /> : null}
+      <header className={styles.header}>
+        <Icon />
+        <h3 title={title || "Task"} className={styles.title}>
+          {title || "Task"}
+        </h3>
+      </header>
+      <p title={subtitle} className={styles.subtitle}>
+        {subtitle || "Task"}
+      </p>
+      <Handle
+        className={cx(styles.port, styles.right)}
+        isConnectable={isConnectable}
+        isValidConnection={isValidHandle}
+        position={Position.Right}
+        type="source"
+      />
+      <Handle
+        className={cx(styles.port, styles.left)}
+        isConnectable={isConnectable}
+        isValidConnection={isValidHandle}
+        position={Position.Left}
+        type="target"
+      />
+      {children}
+    </div>
+  );
+
+  function isValidHandle(connection: Connection) {
+    return connection.source !== connection.target;
+  }
 }

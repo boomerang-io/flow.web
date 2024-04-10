@@ -9,7 +9,7 @@ export function StartNode(props: NodeProps) {
   const { mode } = useWorkflowContext();
   const { isConnectable } = props;
   return (
-    <div className={cx(styles.node, { [styles.locked]: mode !== WorkflowEngineMode.Editor })}>
+    <div className={cx(styles.node, { [styles.locked]: mode !== WorkflowEngineMode.Edit })}>
       <h2>Start</h2>
       <Handle
         className={cx(styles.port)}

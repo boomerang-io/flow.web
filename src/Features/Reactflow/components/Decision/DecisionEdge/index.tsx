@@ -14,7 +14,7 @@ import ExecutionConditionButton from "./ExecutionConditionButton";
 export default function SwitchEdge(props: WorkflowEdgeProps) {
   const { mode } = useWorkflowContext();
 
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <SwitchEdgeRun {...props} />;
   }
 
@@ -72,7 +72,7 @@ function SwitchEdgeEditor(props: WorkflowEdgeProps) {
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
           }}
         >
-          {mode === "editor" ? (
+          {mode === WorkflowEngineMode.Edit ? (
             <>
               <WorkflowCloseButton
                 style={{ path: "var(--flow-switch-primary)" }}

@@ -39,7 +39,7 @@ function DesignerContainer(props: DesignerContainerProps) {
       <>
         <div id="workflow-dag-designer" className={styles.workflowContainer}>
           <ReactFlow
-            mode={WorkflowEngineMode.Editor}
+            mode={WorkflowEngineMode.Edit}
             nodes={workflow.nodes}
             edges={workflow.edges}
             reactFlowInstance={reactFlowInstance!}

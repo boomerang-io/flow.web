@@ -7,7 +7,7 @@ import { TemplateNode } from "../Template";
 
 export default function ApprovalNode(props: WorkflowNodeProps) {
   const { mode } = useWorkflowContext();
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <ApprovalNodeRun {...props} />;
   }
 
@@ -17,10 +17,11 @@ export default function ApprovalNode(props: WorkflowNodeProps) {
 function ApprovalNodeEditor(props: WorkflowNodeProps) {
   const { team } = useTeamContext();
 
-  const options = team.approverGroups.map((approverGroup) => ({
-    key: approverGroup.id,
-    value: approverGroup.name,
-  }));
+  const options =
+    team.approverGroups?.map((approverGroup) => ({
+      key: approverGroup.id,
+      value: approverGroup.name,
+    })) ?? [];
 
   const formInputsToMerge =
     options.length > 0

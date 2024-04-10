@@ -308,7 +308,7 @@ const EditorStateContainer: React.FC<EditorStateContainerProps> = ({
 
   const revisionCount = changeLogData.length;
   const { markdown, version } = revisionState;
-  const mode = version === revisionCount ? WorkflowEngineMode.Editor : WorkflowEngineMode.Viewer;
+  const mode = version === revisionCount ? WorkflowEngineMode.Edit : WorkflowEngineMode.View;
   const store = useMemo(() => {
     return {
       availableParameters,

@@ -1,10 +1,4 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import { useQuery } from "react-query";
-import { useFeature } from "flagged";
-import { Switch, Route, useRouteMatch } from "react-router-dom";
-import { useAppContext } from "Hooks";
-import { Box } from "reflexbox";
 import {
   ErrorMessage,
   FeatureHeader,
@@ -12,15 +6,21 @@ import {
   FeatureHeaderSubtitle as HeaderSubtitle,
   Loading,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import Header from "./Header";
-import Members from "./Members";
-import Settings from "./Settings";
-import Quotas from "./Quotas";
-import Tokens from "./Tokens";
-import Workflows from "./Workflows";
-import ApproverGroups from "./ApproverGroups";
+import { useFeature } from "flagged";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+import { Switch, Route, useRouteMatch } from "react-router-dom";
+import { Box } from "reflexbox";
+import { useAppContext } from "Hooks";
 import { AppPath, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
+import ApproverGroups from "./ApproverGroups";
+import Header from "./Header";
+import Members from "./Members";
+import Quotas from "./Quotas";
+import Settings from "./Settings";
+import Tokens from "./Tokens";
+import Workflows from "./Workflows";
 import styles from "./teamDetailed.module.scss";
 
 const FeatureLayout: React.FC = ({ children }) => {

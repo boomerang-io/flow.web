@@ -11,7 +11,7 @@ import styles from "./StartNode.module.scss";
 export function StartEdge(props: WorkflowEdgeProps) {
   const { mode } = useWorkflowContext();
 
-  if (mode === WorkflowEngineMode.Runner) {
+  if (mode === WorkflowEngineMode.Run) {
     return <StartEdgeRun {...props} />;
   }
 
@@ -38,7 +38,7 @@ function StartEdgeEditor(props: WorkflowEdgeProps) {
     strokeWidth: "2",
   };
 
-  const isEditor = mode === WorkflowEngineMode.Editor;
+  const isEditor = mode === WorkflowEngineMode.Edit;
 
   return (
     <>

@@ -169,7 +169,7 @@ function Main(props: MainProps) {
             <WorkflowActions workflow={workflow} />
           </div>
           <ReactFlow
-            mode={WorkflowEngineMode.Runner}
+            mode={WorkflowEngineMode.Run}
             nodes={workflow.nodes}
             edges={workflow.edges}
             reactFlowInstance={reactFlowInstance}
