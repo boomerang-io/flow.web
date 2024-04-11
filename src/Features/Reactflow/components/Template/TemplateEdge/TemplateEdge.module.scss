@@ -11,6 +11,7 @@
   }
   &.waiting,
   &.notstarted,
+  &.skipped,
   &.ready {
     opacity: 0.5;
   }
