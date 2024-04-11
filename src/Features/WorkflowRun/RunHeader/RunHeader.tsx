@@ -196,7 +196,7 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
                   <Button
                     className={styles.cancelRun}
                     data-testid="cancel-run"
-                    kind="danger--ghost"
+                    kind="danger--tertiary"
                     iconDescription="Cancel run"
                     onClick={openModal}
                     renderIcon={StopOutline}

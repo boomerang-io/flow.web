@@ -6,13 +6,15 @@
 }
 
 .runEdge {
-  &.succeeded {
-    stroke: #50565b;
-  }
+  stroke: #50565b;
+
   &.waiting,
+  &.running {
+    stroke: green;
+  }
+
   &.notstarted,
-  &.skipped,
-  &.ready {
+  &.skipped {
     opacity: 0.5;
   }
 }
