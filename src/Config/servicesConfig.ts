@@ -138,6 +138,7 @@ export const serviceUrl = {
       postSubmitWorkflow: ({ team, workflowId }: TeamArg & WorkflowIdArg) => `${BASE_URL}/team/${team}/workflow/${workflowId}/submit`,
       getAvailableParameters: ({ team, workflowId }: TeamArg & WorkflowIdArg) => `${BASE_URL}/team/${team}/workflow/${workflowId}/available-parameters`,
       putApplyWorkflow: ({ team, workflowId }: TeamArg & WorkflowIdArg) => `${BASE_URL}/team/${team}/workflow/${workflowId}/compose`,
+      getExportWorkflow: ({ team, workflowId }: TeamArg & WorkflowIdArg) => `${BASE_URL}/team/${team}/workflow/${workflowId}/export`,
     },
     "workflowrun": {
       deleteCancelWorkflow: ({ team, id }: TeamArg & IdArg) => `${BASE_URL}/team/${team}/workflowrun/${id}/cancel`,

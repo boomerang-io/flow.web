@@ -8,11 +8,6 @@
 .runEdge {
   stroke: #50565b;
 
-  &.waiting,
-  &.running {
-    stroke: green;
-  }
-
   &.notstarted,
   &.skipped {
     opacity: 0.5;

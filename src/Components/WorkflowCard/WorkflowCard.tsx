@@ -127,7 +127,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
   const handleExportWorkflow = (workflow: Workflow) => {
     notify(<ToastNotification kind="info" title={`Export ${viewType}`} subtitle="Export starting soon" />);
     axios
-      .get(`${BASE_URL}/workflow/${workflow.id}/export`)
+      .get(serviceUrl.team.workflow.getExportWorkflow({team: teamName, workflowId: workflow.id}))
       .then(({ data }) => {
         fileDownload(JSON.stringify(data, null, 4), `${workflow.name}.json`);
       })
