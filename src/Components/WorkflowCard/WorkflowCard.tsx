@@ -178,13 +178,19 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
         closeModal();
       }
     } catch (err) {
-      seterrorMessage(
-        formatErrorMessage({
-          error: err,
-          defaultMessage: "Run Workflow Failed",
-        }),
-      );
-      //no-op
+      if (err.response?.status === 429) {
+        seterrorMessage({
+            "title": "Quota Exceeded",
+            "message": err.response?.data?.message,
+          });
+      } else {
+        seterrorMessage(
+          formatErrorMessage({
+            error: err,
+            defaultMessage: "Run Workflow Failed",
+          }),
+        );
+      }
     }
   };
 
@@ -288,6 +294,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
                 isExecuting={isExecuting}
                 /* @ts-ignore-next-line */
                 inputs={formattedProperties}
+                errorMessage={errorMessage}
               />
             )}
           </ComposedModal>

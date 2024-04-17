@@ -99,7 +99,7 @@ const team: FlowTeam = {
     maxWorkflowExecutionTime: 30,
     maxConcurrentWorkflows: 4,
     currentWorkflowCount: 1,
-    currentConcurrentWorkflows: 0,
+    currentConcurrentRuns: 0,
     currentWorkflowExecutionMonthly: 10,
     currentAverageExecutionTime: 2,
     monthlyResetDate: "August 1, 2020",
