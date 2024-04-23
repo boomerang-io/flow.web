@@ -12,8 +12,10 @@ import { ModalTriggerProps, FlowTeam } from "Types";
 
 function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: boolean; teamDetailsUrl: string }) {
   let workflowLimitPercentage = (team.quotas.currentWorkflowCount / team.quotas.maxWorkflowCount) * 100;
+  let concurrentLimitPercentage = (team.quotas.currentConcurrentRuns / team.quotas.maxConcurrentRuns) * 100;
   let monthlyExecutionPercentage = (team.quotas.currentRuns / team.quotas.maxWorkflowRunMonthly) * 100;
 
+  if (concurrentLimitPercentage > 100) concurrentLimitPercentage = 100; 
   if (workflowLimitPercentage > 100) workflowLimitPercentage = 100;
   if (monthlyExecutionPercentage > 100) monthlyExecutionPercentage = 100;
 
@@ -99,7 +101,7 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
         </QuotaCard>
         <QuotaCard
           subtitle="Maximum amount of time that a single Workflow can take for one run (execution)."
-          title="Run time"
+          title="Run Duration"
           modalSubtitle="Set the maximum amount of run time for a single Workflow."
           minValue={0}
           detailedTitle="Current average execution time"
@@ -117,7 +119,7 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
         </QuotaCard>
         <QuotaCard
           subtitle="Max number of Workflows able to run at the same time."
-          title="Concurrent runs (executions)"
+          title="Concurrent Runs (executions)"
           modalSubtitle="Set the maximum number of Workflows that are able to run at the same time."
           minValue={1}
           detailedTitle="Current number of Concurrent Workflow Runs"
@@ -132,10 +134,16 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
           teamDetailsUrl={teamDetailsUrl}
         >
           <h3 className={styles.detailedHeading}> {`${team.quotas.maxConcurrentRuns} Workflows`}</h3>
+          <ProgressBar
+            maxValue={team.quotas.maxConcurrentRuns}
+            value={concurrentLimitPercentage}
+            coverageBarStyle={coverageBarStyle}
+          />
+          <p className={styles.detailedSmallText}>{`Current usage: ${team.quotas.currentConcurrentRuns}`}</p>
         </QuotaCard>
         <QuotaCard
           subtitle="Workspace size limit for each Workflow using persistent storage on this Team."
-          title="Workflow Workspace capacity"
+          title="Workspace Capacity - Per Workflow"
           modalSubtitle="Set the storage size limit for each Workflow Workspace using persistent storage on this Team."
           minValue={0}
           detailedTitle="Persistent storage size limit"
@@ -153,7 +161,7 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
         </QuotaCard>
         <QuotaCard
           subtitle="Workspace size limit for each WorkflowRun using persistent storage on this Team."
-          title="WorkflowRun Workspace capacity"
+          title="Workspace Capacity - Per Run"
           modalSubtitle="Set the storage size limit for each WorkflowRun Workspace using persistent storage on this Team."
           minValue={0}
           detailedTitle="Persistent storage size limit"
