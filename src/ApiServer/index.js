@@ -448,10 +448,10 @@ export function startApiServer({ environment = "test", timing = 0 } = {}) {
       this.get(serviceUrl.getTeamQuotaDefaults(), (schema, request) => {
         return {
           maxWorkflowCount: 20,
-          maxWorkflowExecutionMonthly: 150,
+          maxWorkflowRunMonthly: 150,
           maxWorkflowStorage: 10,
-          maxWorkflowExecutionTime: 30,
-          maxConcurrentWorkflows: 4,
+          maxWorkflowRunDuration: 30,
+          maxConcurrentRuns: 4,
         };
       });
 

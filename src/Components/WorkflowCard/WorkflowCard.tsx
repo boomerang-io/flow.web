@@ -230,15 +230,18 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
   const formattedProperties = formatPropertiesForEdit();
   const { name, Icon = Bee } = workflowIcons.find((icon) => icon.name === workflow.icon) ?? {};
   let hasReachedMonthlyRunLimit = false;
+  let hasReachedConcurrentLimit = false;
 
   if (quotas) {
     hasReachedMonthlyRunLimit = quotas?.maxWorkflowRunMonthly <= quotas?.currentRuns;
+    hasReachedConcurrentLimit = quotas?.maxConcurrentRuns <= quotas?.currentConcurrentRuns;
   }
 
   const canRunManually = workflow?.triggers?.manual?.enabled ?? false;
-  const isDisabledViaQuota = workflowQuotasEnabled && hasReachedMonthlyRunLimit;
+  const isDisabledViaRunQuota = workflowQuotasEnabled && hasReachedMonthlyRunLimit;
+  const isDisabledViaConcurrentQuota = workflowQuotasEnabled && hasReachedConcurrentLimit;
   const isDisabledViaTrigger = canRunManually === false;
-  const isDisabled = isDisabledViaQuota || isDisabledViaTrigger;
+  const isDisabled = isDisabledViaRunQuota || isDisabledViaConcurrentQuota || isDisabledViaTrigger;
 
   let loadingText = "";
 
@@ -348,10 +351,17 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
         />
       ) : (
         <div className={styles.status}>
-          {isDisabledViaQuota ? (
+          {isDisabledViaRunQuota ? (
             <TooltipHover
               direction="top"
               tooltipText="This team has reached the maximum number of runs (executions) allowed this month. Contact your administrator or team owner to increase the quota, or wait until the quota resets next month."
+            >
+              <InformationFilled className={styles.warningIcon} style={{ fill: "#ff832b" }} />
+            </TooltipHover>
+          ) : isDisabledViaConcurrentQuota ? (
+            <TooltipHover
+              direction="top"
+              tooltipText="This team has reached the maximum number of concurrent runs (executions) allowed. Contact your administrator or team owner to increase the quota, or wait until a run has completed execution."
             >
               <InformationFilled className={styles.warningIcon} style={{ fill: "#ff832b" }} />
             </TooltipHover>

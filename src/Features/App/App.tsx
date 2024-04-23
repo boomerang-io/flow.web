@@ -183,7 +183,6 @@ export default function App() {
             setShouldShowBrowserWarning={setShouldShowBrowserWarning}
             shouldShowBrowserWarning={shouldShowBrowserWarning}
             userData={userQuery.data}
-            quotas={featureQuery.data.quotas}
           />
         </ErrorBoundary>
       </FlagsProvider>
@@ -199,7 +198,6 @@ interface MainProps {
   setShouldShowBrowserWarning: (shouldShowBrowserWarning: boolean) => void;
   shouldShowBrowserWarning: boolean;
   userData: FlowUser;
-  quotas: FlowFeatures["quotas"];
 }
 
 function Main({
@@ -209,7 +207,6 @@ function Main({
   setShouldShowBrowserWarning,
   shouldShowBrowserWarning,
   userData,
-  quotas,
 }: MainProps) {
   const { id: userId, type: platformRole } = userData;
 
@@ -227,7 +224,6 @@ function Main({
       value={{
         isTutorialActive,
         setIsTutorialActive,
-        quotas,
         communityUrl: contextData?.platform?.communityUrl ?? "",
         name: contextData?.platform?.name ?? "",
         teams: sortBy(userData.teams, "name"),

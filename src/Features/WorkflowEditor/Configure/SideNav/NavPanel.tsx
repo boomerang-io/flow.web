@@ -29,13 +29,13 @@ const NavPanel: React.FC<NavPanelProps> = ({ team, workflowId }) => {
         workflowId: workflowId,
       })}`,
     },
-    {
-      name: "Parameters",
-      path: `${appLink.editorConfigureParams({
-        team: team,
-        workflowId: workflowId,
-      })}`,
-    },
+    // {
+    //   name: "Parameters",
+    //   path: `${appLink.editorConfigureParams({
+    //     team: team,
+    //     workflowId: workflowId,
+    //   })}`,
+    // },
     {
       name: "Run Options",
       path: `${appLink.editorConfigureRun({

@@ -14,7 +14,8 @@ const team = {
         maxWorkflowCount: 10,
         maxWorkflowRunMonthly: 100,
         maxWorkflowStorage: 5,
-        maxWorkflowRunTime: 30,
+        maxWorkflowRunStorage: 5,
+        maxWorkflowRunDuration: 30,
         maxConcurrentRuns: 4,
         currentWorkflowCount: 3,
         currentRuns: 10,
@@ -22,7 +23,7 @@ const team = {
         currentRunMedianDuration: 2,
         currentRunTotalDuration: 20,
         monthlyResetDate: "August 1, 2020",
-        currentTotalWorkflowStorage: 0,
+        currentWorkflowStorage: 0,
       },
       members: [
         {

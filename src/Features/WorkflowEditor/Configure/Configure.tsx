@@ -51,15 +51,11 @@ const TRIGGER_YUP_SCHEMA = Yup.object().shape({
 });
 
 interface ConfigureContainerProps {
-  quotas: {
-    maxActivityStorageSize: string;
-    maxWorkflowStorageSize: string;
-  };
   workflow: Workflow;
   settingsRef: React.MutableRefObject<FormikProps<any> | null>;
 }
 
-function ConfigureContainer({ quotas, workflow, settingsRef }: ConfigureContainerProps) {
+function ConfigureContainer({ workflow, settingsRef }: ConfigureContainerProps) {
   const { team } = useTeamContext();
   const params = useParams<{ team: string; workflowId: string }>();
   const workflowTriggersEnabled = useFeature(FeatureFlag.WorkflowTriggersEnabled);
@@ -139,8 +135,8 @@ function ConfigureContainer({ quotas, workflow, settingsRef }: ConfigureContaine
           timeout: Yup.number()
             .min(0)
             .max(
-              team.quotas.maxWorkflowRunTime,
-              `Timeout must not exceed quota of ${team.quotas.maxWorkflowRunTime} minutes`,
+              team.quotas.maxWorkflowRunDuration,
+              `Timeout must not exceed quota of ${team.quotas.maxWorkflowRunDuration} minutes`,
             ),
           triggers: Yup.object().shape({
             schedule: TRIGGER_YUP_SCHEMA,
@@ -158,7 +154,6 @@ function ConfigureContainer({ quotas, workflow, settingsRef }: ConfigureContaine
               <Configure
                 workflowTriggersEnabled={workflowTriggersEnabled as boolean}
                 formikProps={formikProps}
-                quotas={quotas}
                 workflow={workflow}
                 githubAppInstallation={getGitHubInstallationQuery.data}
                 team={team}
@@ -176,10 +171,6 @@ export default ConfigureContainer;
 interface ConfigureProps {
   workflowTriggersEnabled: boolean;
   formikProps: FormikProps<ConfigureWorkflowFormValues>;
-  quotas: {
-    maxWorkflowRunStorageSize: string;
-    maxWorkflowStorageSize: string;
-  };
   workflow: Workflow;
   githubAppInstallation: any;
   team: FlowTeam;
@@ -192,7 +183,6 @@ function Configure(props: ConfigureProps) {
   };
 
   const {
-    quotas,
     formikProps: { errors, handleBlur, touched, values, setFieldValue },
   } = props;
 
@@ -654,7 +644,7 @@ function Configure(props: ConfigureProps) {
             </>
           )}
         </Route>
-        <Route exact path={AppPath.EditorConfigureParams}>
+        {/* <Route exact path={AppPath.EditorConfigureParams}> */}
           {/* <Section title="GitHub" description="Auto inject GitHub Parameters." beta>
             <div className={styles.toggleContainer}>
               <Toggle
@@ -667,7 +657,7 @@ function Configure(props: ConfigureProps) {
               />
             </div>
           </Section> */}
-        </Route>
+        {/* </Route> */}
         <Route exact path={AppPath.EditorConfigureRun}>
           <Section title="Execution" description="Customize how your Workflow behaves.">
             <div>
@@ -675,7 +665,7 @@ function Configure(props: ConfigureProps) {
                 <TextInput
                   id="timeout"
                   label="Timeout"
-                  helperText={`In minutes. Maximum defined by your Team quota is ${props.team.quotas.maxWorkflowRunTime} minutes.`}
+                  helperText={`In minutes. Maximum defined by your Team quota is ${props.team.quotas.maxWorkflowRunDuration} minutes.`}
                   value={values.timeout}
                   onBlur={handleBlur}
                   onChange={(e) => props.formikProps.handleChange(e)}
@@ -701,16 +691,16 @@ function Configure(props: ConfigureProps) {
           <Section
             title="Workspaces"
             description="Declare storage options to be used at execution time. This will be
-                  limited by the Storage Capacity quota which will error executions if you exceed the allowed maximum."
+                  limited by your teams Storage quotas which will error executions if you exceed the allowed maximum."
           >
             <div className={styles.storageToggle}>
               <div className={styles.toggleContainer}>
                 <Toggle
                   id="enableWorkflowPersistentStorage"
-                  label="Enable Workflow Persistent Storage"
+                  label="Enable Workflow Storage"
                   toggled={values.storage?.workflow?.enabled}
                   onToggle={(checked: boolean) => handleOnToggleChange(checked, "storage.workflow.enabled")}
-                  tooltipContent="Persist data across workflow executions"
+                  tooltipContent="Persist data across workflow runs (executions)"
                   tooltipProps={{ direction: "top" }}
                   reversed
                 />
@@ -719,11 +709,11 @@ function Configure(props: ConfigureProps) {
                 <div className={styles.webhookContainer}>
                   <ComposedModal
                     modalHeaderProps={{
-                      title: "Configure Workspace - Workflow Persistent Storage",
+                      title: "Configure Workspace - Workflow Storage",
                       subtitle: (
                         <>
                           <p>
-                            The Workflow storage is persisted across workflow executions and allows you to share
+                            The Workflow storage is persisted across workflow runs (executions) and allows you to share
                             artifacts between workflows, such as maintaining a cache of files used every execution.
                           </p>
                           <p style={{ marginTop: "0.5rem" }}>
@@ -758,7 +748,7 @@ function Configure(props: ConfigureProps) {
                           setFieldValue("storage.workflow", storageValues);
                         }}
                         closeModal={closeModal}
-                        quotas={quotas.maxWorkflowStorageSize}
+                        quota={props.team.quotas.maxWorkflowStorage}
                       />
                     )}
                   </ComposedModal>
@@ -768,8 +758,8 @@ function Configure(props: ConfigureProps) {
             <div className={styles.storageToggle}>
               <div className={styles.toggleContainer}>
                 <Toggle
-                  id="enableActivityPersistentStorage"
-                  label="Enable Activity Persistent Storage"
+                  id="enableRunPersistentStorage"
+                  label="Enable Run Storage"
                   toggled={values.storage?.workflowrun?.enabled}
                   onToggle={(checked: boolean) => handleOnToggleChange(checked, "storage.workflowrun.enabled")}
                   tooltipContent="Persist workflow data per executions"
@@ -781,16 +771,16 @@ function Configure(props: ConfigureProps) {
                 <div className={styles.webhookContainer}>
                   <ComposedModal
                     modalHeaderProps={{
-                      title: "Configure Workflow - Activity Persistent Storage",
+                      title: "Configure Workflow - Run Storage",
                       subtitle: (
                         <>
                           <p>
-                            The activity storage is persisted per workflow execution and allows you to share short-lived
+                            The Run storage is persisted per workflow execution and allows you to share short-lived
                             artifacts between tasks in the workflow.
                           </p>
                           <p style={{ marginTop: "0.5rem" }}>
                             Note: All artifacts will be deleted at the end of the workflow execution. If you want to
-                            persist long term use Workspace storage.
+                            persist long term use alternative Workspaces.
                           </p>
                         </>
                       ),
@@ -809,7 +799,7 @@ function Configure(props: ConfigureProps) {
                           setFieldValue("storage.activity", storageValues);
                         }}
                         closeModal={closeModal}
-                        quotas={quotas.maxWorkflowRunStorageSize}
+                        quota={props.team.quotas.maxWorkflowRunStorage}
                         isActivity
                       />
                     )}

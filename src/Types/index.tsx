@@ -374,11 +374,13 @@ export interface FlowTeamQuotas {
   currentConcurrentRuns: number;
   currentRunTotalDuration: number;
   currentRunMedianDuration: number;
-  currentTotalWorkflowStorage: number;
+  currentWorkflowStorage: number;
+  currentWorkflowRunStorage: number;
   maxWorkflowCount: number;
   maxWorkflowRunMonthly: number;
   maxWorkflowStorage: number;
-  maxWorkflowRunTime: number;
+  maxWorkflowRunStorage: number;
+  maxWorkflowRunDuration: number;
   maxConcurrentRuns: number;
   monthlyResetDate: string;
 }
@@ -575,14 +577,9 @@ export type FlowFeatureKey =
   | "workflow.tokens"
   | "workflow.triggers";
 
-export type FlowQuotaKey = "maxActivityStorageSize" | "maxWorkflowStorageSize";
-
 export interface FlowFeatures {
   features: {
     [k in FlowFeatureKey]: boolean;
-  };
-  quotas: {
-    [k in FlowQuotaKey]: string;
   };
 }
 

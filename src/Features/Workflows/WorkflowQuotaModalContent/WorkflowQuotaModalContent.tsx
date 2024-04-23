@@ -36,7 +36,7 @@ export default function WorkflowQuotaModalContent({
         >{`Current usage: ${quotas.currentWorkflowCount} of ${quotas.maxWorkflowCount}`}</p>
       </QuotaSection>
       <QuotaSection
-        title="Concurrent Workflows"
+        title="Concurrent runs (executions)"
         description="Number of Workflows able to run at the same time"
         value={quotas.maxConcurrentRuns}
         valueUnit="Workflows"
@@ -47,8 +47,8 @@ export default function WorkflowQuotaModalContent({
         >{`Current usage: ${quotas.currentConcurrentRuns} of ${quotas.maxConcurrentRuns}`}</p>
       </QuotaSection>
       <QuotaSection
-        description="Number of executions per month across all Workflows"
-        title="Total Workflow executions"
+        description="Number of runs per month across all Workflows"
+        title="Total Workflow Runs"
         value={quotas.maxWorkflowRunMonthly}
         valueUnit="per month"
       >
@@ -63,14 +63,20 @@ export default function WorkflowQuotaModalContent({
       <hr className={styles.divider} />
       <QuotaSection
         description="Persistent storage size limit per Workflow"
-        title="Storage size capacity"
+        title="Workflow Storage size capacity"
+        value={quotas.maxWorkflowStorage}
+        valueUnit="GB"
+      />
+      <QuotaSection
+        description="Persistent storage size limit per Workflow run"
+        title="Run Storage size capacity"
         value={quotas.maxWorkflowStorage}
         valueUnit="GB"
       />
       <QuotaSection
         description="Maximum amount of time that a single Workflow can take for one execution."
-        title="Execution time"
-        value={quotas.maxWorkflowRunTime}
+        title="Run duration"
+        value={quotas.maxWorkflowRunDuration}
         valueUnit="minutes"
       />
     </ModalBody>

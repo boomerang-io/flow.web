@@ -84,7 +84,7 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
           inputUnits="executions"
           stepValue={1}
           teamName={team.name}
-          quotaProperty="maxWorkflowExecutionMonthly"
+          quotaProperty="maxWorkflowRunMonthly"
           quotaValue={team.quotas.maxWorkflowRunMonthly}
           disabled={!canEdit}
           teamDetailsUrl={teamDetailsUrl}
@@ -108,16 +108,16 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
           inputUnits="minutes"
           stepValue={1}
           teamName={team.name}
-          quotaProperty="maxWorkflowExecutionTime"
-          quotaValue={team.quotas.maxWorkflowRunTime}
+          quotaProperty="maxWorkflowRunDuration"
+          quotaValue={team.quotas.maxWorkflowRunDuration}
           disabled={!canEdit}
           teamDetailsUrl={teamDetailsUrl}
         >
-          <h3 className={styles.detailedHeading}> {`${team.quotas.maxWorkflowRunTime} minutes`}</h3>
+          <h3 className={styles.detailedHeading}> {`${team.quotas.maxWorkflowRunDuration} minutes`}</h3>
         </QuotaCard>
         <QuotaCard
           subtitle="Max number of Workflows able to run at the same time."
-          title="Concurrent Workflows"
+          title="Concurrent runs (executions)"
           modalSubtitle="Set the maximum number of Workflows that are able to run at the same time."
           minValue={1}
           detailedTitle="Current number of Concurrent Workflow Runs"
@@ -126,7 +126,7 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
           inputUnits="Workflows"
           stepValue={1}
           teamName={team.name}
-          quotaProperty="maxConcurrentWorkflows"
+          quotaProperty="maxConcurrentRuns"
           quotaValue={team.quotas.maxConcurrentRuns}
           disabled={!canEdit}
           teamDetailsUrl={teamDetailsUrl}

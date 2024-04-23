@@ -10,7 +10,7 @@ type Props = {
   mountPath: string;
   handleOnChange: (...values: any) => void;
   closeModal: (...args: any) => void;
-  quotas: string;
+  quota: number;
   isActivity?: boolean;
 };
 
@@ -19,7 +19,7 @@ export default function ConfigureStorage({
   mountPath,
   handleOnChange,
   closeModal,
-  quotas,
+  quota,
   isActivity = false,
 }: Props) {
   const thresholdRef = React.createRef();
@@ -51,7 +51,7 @@ export default function ConfigureStorage({
               <BasicSlider
                 id="storage-config-size-slider"
                 min={1}
-                max={parseInt(quotas, 10)}
+                max={quota}
                 inputType="text"
                 labelText="Storage Size"
                 helperText="Size in Gigabytes."
@@ -86,7 +86,7 @@ export default function ConfigureStorage({
                 name="mountPath"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                placeholder={`/workspace/${isActivity ? "activity" : "workflow"}`}
+                placeholder={`/workspace/${isActivity ? "workflowrun" : "workflow"}`}
                 style={{ minWidth: "10rem" }}
                 type="mountPath"
                 value={values.mountPath}
