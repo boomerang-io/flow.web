@@ -135,7 +135,7 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
         </QuotaCard>
         <QuotaCard
           subtitle="Workspace size limit for each Workflow using persistent storage on this Team."
-          title="Workspace size capacity"
+          title="Workflow Workspace capacity"
           modalSubtitle="Set the storage size limit for each Workflow Workspace using persistent storage on this Team."
           minValue={0}
           detailedTitle="Persistent storage size limit"
@@ -150,6 +150,24 @@ function Quotas({ team, canEdit, teamDetailsUrl }: { team: FlowTeam; canEdit: bo
           teamDetailsUrl={teamDetailsUrl}
         >
           <h3 className={styles.detailedHeading}> {`${team.quotas.maxWorkflowStorage}GB per Workflow`}</h3>
+        </QuotaCard>
+        <QuotaCard
+          subtitle="Workspace size limit for each WorkflowRun using persistent storage on this Team."
+          title="WorkflowRun Workspace capacity"
+          modalSubtitle="Set the storage size limit for each WorkflowRun Workspace using persistent storage on this Team."
+          minValue={0}
+          detailedTitle="Persistent storage size limit"
+          detailedData={`${team.quotas.maxWorkflowRunStorage}GB per Workflow`}
+          inputLabel="Storage limit"
+          inputUnits="GB"
+          stepValue={1}
+          teamName={team.name}
+          quotaProperty="maxWorkflowRunStorage"
+          quotaValue={team.quotas.maxWorkflowRunStorage}
+          disabled={!canEdit}
+          teamDetailsUrl={teamDetailsUrl}
+        >
+          <h3 className={styles.detailedHeading}> {`${team.quotas.maxWorkflowRunStorage}GB per WorkflowRun`}</h3>
         </QuotaCard>
       </section>
     </section>
