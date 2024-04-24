@@ -128,7 +128,7 @@ interface WorkflowContentProps {
 
 const WorkflowContent: React.FC<WorkflowContentProps> = ({ team, searchQuery, workflowList, getWorkflowsUrl }) => {
   const hasWorkflows = workflowList.length > 0;
-  const workflowQuotasEnabled = useFeature(FeatureFlag.WorkflowQuotasEnabled);
+  const teamQuotasEnabled = useFeature(FeatureFlag.TeamQuotasEnabled);
   const hasReachedWorkflowLimit = team.quotas.maxWorkflowCount <= team.quotas.currentWorkflowCount;
 
   const filteredWorkflowList = Boolean(searchQuery)
@@ -142,7 +142,7 @@ const WorkflowContent: React.FC<WorkflowContentProps> = ({ team, searchQuery, wo
   return (
     <>
       <hgroup className={styles.header}>
-        {workflowQuotasEnabled ? (
+        {teamQuotasEnabled ? (
           <div className={styles.teamQuotaContainer}>
             <div className={styles.quotaDescriptionContainer}>
               <p

@@ -42,7 +42,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
   const queryClient = useQueryClient();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateWorkflowModalOpen, setIsUpdateWorkflowModalOpen] = useState(false);
-  const workflowQuotasEnabled = useFeature(FeatureFlag.WorkflowQuotasEnabled);
+  const teamQuotasEnabled = useFeature(FeatureFlag.TeamQuotasEnabled);
   const activityEnabled = useFeature(FeatureFlag.ActivityEnabled);
 
   const history = useHistory();
@@ -238,8 +238,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
   }
 
   const canRunManually = workflow?.triggers?.manual?.enabled ?? false;
-  const isDisabledViaRunQuota = workflowQuotasEnabled && hasReachedMonthlyRunLimit;
-  const isDisabledViaConcurrentQuota = workflowQuotasEnabled && hasReachedConcurrentLimit;
+  const isDisabledViaRunQuota = teamQuotasEnabled && hasReachedMonthlyRunLimit;
+  const isDisabledViaConcurrentQuota = teamQuotasEnabled && hasReachedConcurrentLimit;
   const isDisabledViaTrigger = canRunManually === false;
   const isDisabled = isDisabledViaRunQuota || isDisabledViaConcurrentQuota || isDisabledViaTrigger;
 

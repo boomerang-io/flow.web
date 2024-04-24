@@ -23,7 +23,7 @@ interface CreateWorkflowProps {
 const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflowLimit, workflows, viewType }) => {
   const queryClient = useQueryClient();
   const history = useHistory();
-  const workflowQuotasEnabled = useFeature(FeatureFlag.WorkflowQuotasEnabled);
+  const teamQuotasEnabled = useFeature(FeatureFlag.TeamQuotasEnabled);
 
   const createWorkflowMutator = useMutation(resolver.postCreateWorkflow);
 
@@ -83,7 +83,7 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
     <ComposedModal
       composedModalProps={{ containerClassName: styles.modalContainer }}
       modalTrigger={({ openModal }: ModalTriggerProps) =>
-        workflowQuotasEnabled && hasReachedWorkflowLimit ? (
+        teamQuotasEnabled && hasReachedWorkflowLimit ? (
           <TooltipHover
             direction="top"
             tooltipText={
@@ -123,7 +123,7 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
           type={viewType}
           workflows={workflows}
           //@ts-ignore
-          workflowQuotasEnabled={workflowQuotasEnabled}
+          teamQuotasEnabled={teamQuotasEnabled}
         />
       )}
     </ComposedModal>

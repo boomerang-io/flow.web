@@ -216,7 +216,7 @@ export enum FeatureFlag {
   TeamParametersEnabled = "TeamParametersEnabled",
   TeamTasksEnabled = "TeamTasksEnabled",
   UserManagementEnabled = "UserManagementEnabled",
-  WorkflowQuotasEnabled = "WorkflowQuotasEnabled",
+  TeamQuotasEnabled = "TeamQuotasEnabled",
   WorkflowTokensEnabled = "WorkflowTokensEnabled",
   WorkflowTriggersEnabled = "WorkflowTriggersEnabled",
 }

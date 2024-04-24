@@ -32,7 +32,7 @@ describe("Inputs --- RTL", () => {
       <FlagsProvider
         features={{
           TeamManagementEnabled: true,
-          WorkflowQuotasEnabled: true,
+          TeamQuotasEnabled: true,
           SettingsEnabled: true,
           UserManagementEnabled: true,
           GlobalParametersEnabled: true,

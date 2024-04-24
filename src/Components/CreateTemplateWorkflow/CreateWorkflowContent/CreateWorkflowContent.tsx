@@ -21,7 +21,7 @@ interface CreateWorkflowContentProps {
   formData: any;
   saveValues: any;
   requestPreviousStep: any;
-  workflowQuotasEnabled: boolean;
+  teamQuotasEnabled: boolean;
   workflowList: Array<Workflow>;
 }
 
@@ -32,12 +32,12 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
   createWorkflow,
   isLoading,
   team,
-  workflowQuotasEnabled,
+  teamQuotasEnabled,
   workflowList,
 }) => {
   const formikRef = useRef<any>();
   const hasReachedWorkflowLimit = team.quotas.maxWorkflowCount <= team.quotas.currentWorkflowCount;
-  const createWorkflowsDisabled = workflowQuotasEnabled && hasReachedWorkflowLimit;
+  const createWorkflowsDisabled = teamQuotasEnabled && hasReachedWorkflowLimit;
   const existingWorkflowNames = workflowList.map((workflow) => workflow.name) ?? [];
 
   const handleSubmit = (values: any) => {

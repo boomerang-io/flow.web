@@ -161,7 +161,7 @@ export default function App() {
           TeamParametersEnabled: feature["team.parameters"],
           TeamTasksEnabled: feature["team.tasks"],
           UserManagementEnabled: feature["user.management"],
-          WorkflowQuotasEnabled: feature["workflow.quotas"],
+          TeamQuotasEnabled: feature["workflow.quotas"],
           WorkflowTokensEnabled: feature["workflow.tokens"],
           WorkflowTriggersEnabled: feature["workflow.triggers"],
         }}

@@ -22,7 +22,7 @@ interface CreateTemplateWorkflowProps {
 function CreateTemplateWorkflow({ team, workflowList }: CreateTemplateWorkflowProps) {
   const queryClient = useQueryClient();
   const history = useHistory();
-  const workflowQuotasEnabled: boolean = useFeature(FeatureFlag.WorkflowQuotasEnabled);
+  const teamQuotasEnabled: boolean = useFeature(FeatureFlag.TeamQuotasEnabled);
   const workflowTemplatesUrl = serviceUrl.template.getWorkflowTemplates();
 
   //WorkflowTemplates are global Tasks only
@@ -109,7 +109,7 @@ function CreateTemplateWorkflow({ team, workflowList }: CreateTemplateWorkflowPr
         createError={createTemplateWorkflowError}
         isLoading={isLoading}
         team={team}
-        workflowQuotasEnabled={workflowQuotasEnabled}
+        teamQuotasEnabled={teamQuotasEnabled}
         workflowList={workflowList}
       />
     </ModalFlow>

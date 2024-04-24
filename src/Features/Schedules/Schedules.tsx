@@ -93,7 +93,7 @@ export default function Schedules() {
     },
     queryStringOptions
   );
-  const getCalendarUrl = serviceUrl.getSchedulesCalendars({ query: calendarUrlQuery });
+  const getCalendarUrl = serviceUrl.team.schedule.getSchedulesCalendars({ team: team?.name, query: calendarUrlQuery });
 
   /**
    * Component functions

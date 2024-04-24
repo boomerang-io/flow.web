@@ -18,7 +18,7 @@ interface CreateWorkflowContainerProps {
   team?: FlowTeam;
   type: string;
   workflows: Array<Workflow>;
-  workflowQuotasEnabled: boolean;
+  teamQuotasEnabled: boolean;
 }
 
 const CreateWorkflowContainer: React.FC<CreateWorkflowContainerProps> = ({
@@ -31,7 +31,7 @@ const CreateWorkflowContainer: React.FC<CreateWorkflowContainerProps> = ({
   team,
   type,
   workflows,
-  workflowQuotasEnabled,
+  teamQuotasEnabled,
 }) => {
   const [selectedOption, setSelectedOption] = React.useState(NEW_WORKFLOW);
   const radioWorkflowOptions = [
@@ -66,7 +66,7 @@ const CreateWorkflowContainer: React.FC<CreateWorkflowContainerProps> = ({
           existingWorkflowNames={existingWorkflowNames}
           isLoading={isLoading}
           team={team}
-          workflowQuotasEnabled={workflowQuotasEnabled}
+          teamQuotasEnabled={teamQuotasEnabled}
           viewType={WorkflowView.Workflow}
         />
       ) : (
