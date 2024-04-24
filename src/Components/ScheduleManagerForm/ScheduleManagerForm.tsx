@@ -52,11 +52,11 @@ export default function CreateEditForm(props: CreateEditFormProps) {
   /**
    * Namespace parameter values if they exist
    */
-  if (props.schedule?.parameters && Object.keys(props.schedule?.parameters ?? {}).length > 0) {
-    const parameterKeys = Object.keys(props.schedule?.parameters);
+  if (props.schedule?.params && Object.keys(props.schedule?.params ?? {}).length > 0) {
+    const parameterKeys = Object.keys(props.schedule?.params);
     for (const key of parameterKeys) {
       //@ts-ignore
-      initFormValues[`$parameter:${key}`] = props.schedule.parameters[key];
+      initFormValues[`$parameter:${key}`] = props.schedule.params[key];
     }
   }
 

@@ -64,7 +64,7 @@ function ActivityHeader({
       header={
         <>
           <HeaderTitle>Activity</HeaderTitle>
-          <HeaderSubtitle className={styles.headerMessage}>The place to view WorkflowRuns</HeaderSubtitle>
+          <HeaderSubtitle className={styles.headerMessage}>The place to watch your Workflow runs unfold. Just Like a Boomerang's return.</HeaderSubtitle>
         </>
       }
       actions={

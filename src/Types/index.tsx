@@ -603,7 +603,7 @@ export interface Schedule {
   description?: string;
   labels?: Record<string, string>;
   nextScheduleDate: string;
-  parameters?: { [k: string]: any };
+  params?: Array<Param>;
   status: ScheduleStatus;
   type: ScheduleType;
   timezone: string;

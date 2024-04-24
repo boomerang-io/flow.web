@@ -82,7 +82,7 @@ function ScheduleEditor(props: ScheduleEditorProps) {
       type,
       labels: scheduleLabels,
       timezone: timezone.value,
-      parameters: resetParameters,
+      params: resetParameters,
       workflowRef: workflow.id || props.workflow?.id,
     };
 
