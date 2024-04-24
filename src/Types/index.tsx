@@ -573,7 +573,7 @@ export type FlowFeatureKey =
   | "team.parameters"
   | "team.tasks"
   | "user.management"
-  | "workflow.quotas"
+  | "team.quotas"
   | "workflow.tokens"
   | "workflow.triggers";
 

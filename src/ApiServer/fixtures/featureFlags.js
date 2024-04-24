@@ -8,7 +8,7 @@ const featureFlag = {
     "team.parameters": true,
     "team.tasks": true,
     "user.management": true,
-    "workflow.quotas": true,
+    "team.quotas": true,
     "workflow.tokens": true,
     "workflow.triggers": true,
   },
