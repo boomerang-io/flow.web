@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppContext } from "Hooks";
+import { useAppContext, useTeamContext } from "Hooks";
 import { Link } from "react-router-dom";
 import { Button, DataTableSkeleton, DataTable, Pagination } from "@carbon/react";
 import { TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
@@ -81,6 +81,7 @@ const headers = [
 
 function ActionsTable(props: ActionsTableProps) {
   const { user } = useAppContext();
+  const { team } = useTeamContext();
   const isManual = props.location.pathname.includes("/manual");
   const [selectedActions, setSelectedActions] = React.useState<string[]>([]);
   const noSelectedActions = selectedActions.length === 0;
@@ -203,7 +204,7 @@ function ActionsTable(props: ActionsTableProps) {
         return <time className={styles.tableTextarea}>{value ? dateHelper.humanizedSimpleTimeAgo(value) : "---"}</time>;
       case HeadersKey.ActivityLink:
         return (
-          <Link to={appLink.execution({ runId: currentAction?.activityId, workflowId: currentAction?.workflowId })}>
+          <Link to={appLink.execution({ team: team.name, runId: currentAction?.workflowRunRef, workflowId: currentAction?.workflowRef })}>
             View Activity
           </Link>
         );
