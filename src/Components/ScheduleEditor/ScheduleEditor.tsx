@@ -1,13 +1,13 @@
-import { ComposedModal, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
 import React from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { ComposedModal, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
 import moment from "moment-timezone";
+import { useMutation, useQueryClient } from "react-query";
 import ScheduleManagerForm from "Components/ScheduleManagerForm";
 import { useTeamContext } from "Hooks";
 import { cronDayNumberMap } from "Utils/cronHelper";
-import styles from "./ScheduleEditor.module.scss";
 import { resolver } from "Config/servicesConfig";
 import { ScheduleManagerFormInputs, ScheduleUnion, Workflow } from "Types";
+import styles from "./ScheduleEditor.module.scss";
 
 interface ScheduleEditorProps {
   getCalendarUrl: string;
@@ -70,9 +70,14 @@ function ScheduleEditor(props: ScheduleEditorProps) {
     // }
 
     // Undo the namespacing of parameter keys and add to parameter object
-    const resetParameters: { [key: string]: any } = {};
+    const resetParameters: ScheduleUnion["params"] = [];
     Object.keys(parameters).forEach((paramKey) => {
-      resetParameters[paramKey.replace("$parameter:", "")] = parameters[paramKey];
+      const key = paramKey.replace("$parameter:", "");
+      const param = {
+        name: key,
+        value: parameters[paramKey],
+      };
+      resetParameters.push(param);
     });
 
     const schedule: Partial<ScheduleUnion> = {

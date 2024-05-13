@@ -1,3 +1,5 @@
+import React from "react";
+import { Button, InlineNotification, ModalBody, ModalFooter, RadioButtonGroup, RadioButton } from "@carbon/react";
 import {
   Creatable,
   CheckboxList,
@@ -8,25 +10,23 @@ import {
   TextArea,
   TextInput,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, InlineNotification, ModalBody, ModalFooter, RadioButtonGroup, RadioButton } from "@carbon/react";
-import React from "react";
 import axios from "axios";
 import cronstrue from "cronstrue";
 import moment from "moment-timezone";
 import * as Yup from "yup";
 import { cronToDateTime, daysOfWeekCronList } from "Utils/cronHelper";
 import { DATETIME_LOCAL_INPUT_FORMAT, defaultTimeZone, timezoneOptions, transformTimeZone } from "Utils/dateHelper";
-import styles from "./ScheduleManagerForm.module.scss";
-import { serviceUrl } from "Config/servicesConfig";
 import { scheduleTypeLabelMap } from "Constants";
+import { serviceUrl } from "Config/servicesConfig";
 import { DataDrivenInput, DayOfWeekKey, ScheduleManagerFormInputs, ScheduleUnion, Workflow } from "Types";
+import styles from "./ScheduleManagerForm.module.scss";
 
 interface CreateEditFormProps {
   handleSubmit: (args: ScheduleManagerFormInputs) => void;
   includeWorkflowDropdown?: boolean;
   isError: boolean;
   isLoading: boolean;
-  modalProps;
+  modalProps: any;
   schedule?: ScheduleUnion;
   type: "create" | "edit";
   workflow?: Workflow;
@@ -49,14 +49,13 @@ export default function CreateEditForm(props: CreateEditFormProps) {
     labels: [],
   };
 
+  console.log(props.schedule?.params);
   /**
    * Namespace parameter values if they exist
    */
-  if (props.schedule?.params && Object.keys(props.schedule?.params ?? {}).length > 0) {
-    const parameterKeys = Object.keys(props.schedule?.params);
-    for (const key of parameterKeys) {
-      //@ts-ignore
-      initFormValues[`$parameter:${key}`] = props.schedule.params[key];
+  if (Array.isArray(props.schedule?.params) && props.schedule?.params?.length > 0) {
+    for (const param of props.schedule.params) {
+      initFormValues[`$parameter:${param["name"]}`] = param["value"];
     }
   }
 

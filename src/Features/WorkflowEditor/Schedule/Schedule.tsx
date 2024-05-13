@@ -1,20 +1,20 @@
 import React from "react";
-import { useQuery, UseQueryResult } from "react-query";
 import { Loading } from "@carbon/react";
-import { useTeamContext } from "Hooks";
+import isArray from "lodash/isArray";
+import moment from "moment-timezone";
+import queryString from "query-string";
+import type { SlotInfo } from "react-big-calendar";
+import { useQuery, UseQueryResult } from "react-query";
 import ErrorDragon from "Components/ErrorDragon";
 import ScheduleCalendar from "Components/ScheduleCalendar";
 import ScheduleCreator from "Components/ScheduleCreator";
 import ScheduleEditor from "Components/ScheduleEditor";
 import SchedulePanelDetail from "Components/SchedulePanelDetail";
 import SchedulePanelList from "Components/SchedulePanelList";
-import isArray from "lodash/isArray";
-import moment from "moment-timezone";
-import queryString from "query-string";
+import { useTeamContext } from "Hooks";
+import { scheduleStatusOptions } from "Constants";
 import { queryStringOptions } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
-import { scheduleStatusOptions } from "Constants";
-import type { SlotInfo } from "react-big-calendar";
 import type {
   CalendarDateRange,
   CalendarEvent,
@@ -49,7 +49,7 @@ export default function ScheduleView(props: ScheduleProps) {
       statuses: scheduleStatusOptions.map((statusObj) => statusObj.value),
       workflows: props.workflow.id,
     },
-    queryStringOptions
+    queryStringOptions,
   );
   const getSchedulesUrl = serviceUrl.team.schedule.getSchedules({ team: team?.name, query: schedulesUrlQuery });
 
@@ -76,7 +76,7 @@ export default function ScheduleView(props: ScheduleProps) {
       fromDate: fromDate,
       toDate: toDate,
     },
-    queryStringOptions
+    queryStringOptions,
   );
   const getCalendarUrl = serviceUrl.team.schedule.getSchedulesCalendars({ team: team?.name, query: calendarUrlQuery });
 
@@ -103,7 +103,7 @@ export default function ScheduleView(props: ScheduleProps) {
    */
 
   if (!schedulesQuery.data) {
-    return <Loading />;
+    return <Loading withOverlay={true} />;
   }
 
   if (schedulesQuery.error) {
@@ -177,7 +177,7 @@ function CalendarView(props: CalendarViewProps) {
   if (props.workflowCalendarQuery.data && props.workflowSchedules) {
     for (let calendarEntry of props.workflowCalendarQuery.data) {
       const matchingSchedule: ScheduleUnion | undefined = props.workflowSchedules.find(
-        (schedule: ScheduleUnion) => schedule.id === calendarEntry.scheduleId
+        (schedule: ScheduleUnion) => schedule.id === calendarEntry.scheduleId,
       );
       if (matchingSchedule) {
         for (const date of calendarEntry.dates) {
