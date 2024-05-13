@@ -49,7 +49,6 @@ export default function CreateEditForm(props: CreateEditFormProps) {
     labels: [],
   };
 
-  console.log(props.schedule?.params);
   /**
    * Namespace parameter values if they exist
    */
