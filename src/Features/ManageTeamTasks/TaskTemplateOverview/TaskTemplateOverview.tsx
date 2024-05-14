@@ -226,12 +226,14 @@ type TaskTemplateOverviewProps = {
   taskTemplates: any[];
   updateTemplateInState: (args: TaskModel) => void;
   editVerifiedTasksEnabled: any;
+  canEditWorkflow: boolean;
 };
 
 export function TaskTemplateOverview({
   taskTemplates,
   updateTemplateInState,
   editVerifiedTasksEnabled,
+  canEditWorkflow,
 }: TaskTemplateOverviewProps) {
   const cancelRequestRef = React.useRef();
   const queryClient = useQueryClient();
@@ -264,9 +266,12 @@ export function TaskTemplateOverview({
       onSuccess: invalidateQueries,
     }
   );
-  const { mutateAsync: restoreTaskTemplateMutation, isLoading: restoreIsLoading } = useMutation(resolver.putRestoreTaskTemplate, {
-    onSuccess: invalidateQueries,
-  });
+  const { mutateAsync: restoreTaskTemplateMutation, isLoading: restoreIsLoading } = useMutation(
+    resolver.putRestoreTaskTemplate,
+    {
+      onSuccess: invalidateQueries,
+    }
+  );
 
   let selectedTaskTemplate = taskTemplates.find((taskTemplate) => taskTemplate.id === params.taskId) ?? {};
   const canEdit = !selectedTaskTemplate?.verified || (editVerifiedTasksEnabled && selectedTaskTemplate?.verified);
@@ -327,6 +332,8 @@ export function TaskTemplateOverview({
         config: values.currentConfig,
         results: values.result,
         envs: values.envs,
+        serviceAccountName: values.serviceAccountName,
+        securityContext: values.securityContext,
         changelog: {
           reason: values.comments,
         },
@@ -353,6 +360,8 @@ export function TaskTemplateOverview({
         config: values.currentConfig,
         results: values.result,
         envs: values.envs,
+        serviceAccountName: values.serviceAccountName,
+        securityContext: values.securityContext,
         changelog: {
           reason: values.comments,
         },
@@ -491,6 +500,8 @@ export function TaskTemplateOverview({
         workingDir: currentRevision.workingDir ?? "",
         result: currentRevision.results ?? [],
         envs: currentRevision.envs ?? [],
+        serviceAccountName: currentRevision.serviceAccountName ?? "",
+        securityContext: currentRevision.securityContext ?? "",
         comments: "",
       }}
       enableReinitialize={true}
@@ -551,6 +562,7 @@ export function TaskTemplateOverview({
               isLoading={isLoading}
               isOldVersion={isOldVersion}
               cancelRequestRef={cancelRequestRef}
+              canEditWorkflow={canEditWorkflow}
             />
             <div className={styles.content}>
               <section className={styles.taskActionsSection}>
@@ -563,41 +575,45 @@ export function TaskTemplateOverview({
                     subtitle="Admins can adjust this in global settings"
                   />
                 )}
-                <ConfirmModal
-                  affirmativeAction={() => handleArchiveTaskTemplate(selectedTaskTemplate)}
-                  affirmativeText="Archive this task"
-                  containerClassName={styles.archiveContainer}
-                  children={<ArchiveText />}
-                  title="Archive"
-                  modalTrigger={({ openModal }) => (
-                    <Button
-                      iconDescription="Archive"
-                      renderIcon={Archive16}
-                      kind="ghost"
-                      size="field"
-                      disabled={isOldVersion || !isActive || !canEdit}
-                      className={styles.archive}
-                      onClick={openModal}
-                    >
-                      Archive
-                    </Button>
-                  )}
-                />
+                {canEditWorkflow && (
+                  <ConfirmModal
+                    affirmativeAction={() => handleArchiveTaskTemplate(selectedTaskTemplate)}
+                    affirmativeText="Archive this task"
+                    containerClassName={styles.archiveContainer}
+                    children={<ArchiveText />}
+                    title="Archive"
+                    modalTrigger={({ openModal }) => (
+                      <Button
+                        iconDescription="Archive"
+                        renderIcon={Archive16}
+                        kind="ghost"
+                        size="field"
+                        disabled={isOldVersion || !isActive || !canEdit}
+                        className={styles.archive}
+                        onClick={openModal}
+                      >
+                        Archive
+                      </Button>
+                    )}
+                  />
+                )}
               </section>
               <div className={styles.detailCardsContainer}>
                 <Tile className={styles.editDetailsCard}>
                   <section className={styles.editTitle}>
                     <h1>Basics</h1>
-                    <EditTaskTemplateModal
-                      taskTemplates={taskTemplates}
-                      setFieldValue={setFieldValue}
-                      fields={values.currentConfig}
-                      values={values}
-                      isOldVersion={isOldVersion}
-                      isActive={isActive}
-                      nodeType={selectedTaskTemplate.nodeType}
-                      canEdit={canEdit}
-                    />
+                    {canEditWorkflow && (
+                      <EditTaskTemplateModal
+                        taskTemplates={taskTemplates}
+                        setFieldValue={setFieldValue}
+                        fields={values.currentConfig}
+                        values={values}
+                        isOldVersion={isOldVersion}
+                        isActive={isActive}
+                        nodeType={selectedTaskTemplate.nodeType}
+                        canEdit={canEdit}
+                      />
+                    )}
                   </section>
                   <dl className={styles.detailsDataList}>
                     <DetailDataElements value={values.name} label="Name" />
@@ -610,6 +626,8 @@ export function TaskTemplateOverview({
                     <DetailDataElements value={values.script} label="Script" />
                     <DetailDataElements value={values.workingDir} label="Working Directory" />
                     <DetailDataElements value={values.envs} label="Envs" />
+                    <DetailDataElements value={values.serviceAccountName} label="Service Account Name" />
+                    <DetailDataElements value={values.securityContext} label="Security Context" />
                     <section className={styles.infoSection}>
                       <dt className={styles.label}>Contribution level</dt>
                       <div className={styles.basicIcon}>
@@ -663,7 +681,7 @@ export function TaskTemplateOverview({
                         templateFields={values.currentConfig}
                         isOldVersion={isOldVersion}
                         isActive={isActive}
-                        canEdit={canEdit}
+                        canEdit={canEdit && canEditWorkflow}
                       />
                     </div>
                   </section>
@@ -685,7 +703,7 @@ export function TaskTemplateOverview({
                                     deleteConfiguration={deleteConfiguration}
                                     isOldVersion={isOldVersion}
                                     isActive={isActive}
-                                    canEdit={canEdit}
+                                    canEdit={canEdit && canEditWorkflow}
                                   />
                                 )}
                               </Draggable>
@@ -714,7 +732,7 @@ export function TaskTemplateOverview({
                       templateFields={values.result}
                       isOldVersion={isOldVersion}
                       isActive={isActive}
-                      canEdit={canEdit}
+                      canEdit={canEdit && canEditWorkflow}
                     />
                   </section>
                   <div className={styles.fieldsContainer}>
@@ -727,7 +745,7 @@ export function TaskTemplateOverview({
                           DeleteResult={DeleteResult}
                           isOldVersion={isOldVersion}
                           isActive={isActive}
-                          canEdit={canEdit}
+                          canEdit={canEdit && canEditWorkflow}
                           index={index}
                         />
                       ))

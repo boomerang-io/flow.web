@@ -44,12 +44,20 @@ function AddTaskTemplate({ addTemplateInState, taskTemplates, history, location 
       closeModal();
     } catch (err) {
       if (!isCancel(err)) {
+        let errorTitle = err.toString();
+        let subTitle = "";
         const { data } = err && err.response;
+        if (data && data.status && data.error) {
+          errorTitle = data.status + " - " + data.error;
+        }
+        if (data && data.message) {
+          subTitle = data.message;
+        }
         notify(
           <ToastNotification
             kind="error"
-            title={`${data.status} - ${data.error}`}
-            subtitle={data.message}
+            title={errorTitle}
+            subtitle={subTitle}
             data-testid="create-task-template-notification"
           />
         );

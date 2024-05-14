@@ -156,8 +156,8 @@ dependencies:
     specifier: ^4.0.6
     version: 4.0.6(react@16.14.0)
   typeface-ibm-plex-sans:
-    specifier: 0.0.75
-    version: 0.0.75
+    specifier: 1.1.13
+    version: 1.1.13
   use-immer:
     specifier: ^0.4.0
     version: 0.4.2(immer@9.0.15)(react@16.14.0)
@@ -241,9 +241,6 @@ devDependencies:
   '@types/yup':
     specifier: ^0.29.3
     version: 0.29.14
-  commitizen:
-    specifier: ^4.2.4
-    version: 4.2.4
   cross-env:
     specifier: 7.0.2
     version: 7.0.2
@@ -14492,8 +14489,8 @@ packages:
     dependencies:
       is-typedarray: 1.0.0
 
-  /typeface-ibm-plex-sans@0.0.75:
-    resolution: {integrity: sha512-IBxDEt5r0Xo5EshGBb1CR1ec3ApNI0jK0o2gSGNZIoKml9q99a/Qcbb8u8IK0x/M+nso8FzcMW03Hz6gSfCIAg==}
+  /typeface-ibm-plex-sans@1.1.13:
+    resolution: {integrity: sha512-WLe7IEjz4m3lDU5xXHMpOyVxnhGmCnuee5A9GJExHpYJcto+JzFg6uRNBSlsW6KDmb8mh8WJSGLSJJgjzj6iMg==}
     dev: false
 
   /typescript-plugin-css-modules@3.4.0(typescript@4.7.4):

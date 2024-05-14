@@ -6,7 +6,7 @@ import matchSorter from "match-sorter";
 import {
   Accordion,
   AccordionItem,
-  Dropdown,
+  ComboBox,
   OverflowMenu,
   Checkbox,
   CheckboxList,
@@ -31,9 +31,16 @@ interface SideInfoProps {
   taskTemplates: TaskModel[];
   setActiveTeam: Function;
   activeTeam: string | string[] | null;
+  canEditWorkflow: boolean;
 }
 
-const SideInfo: React.FC<SideInfoProps> = ({ addTemplateInState, taskTemplates, setActiveTeam, activeTeam }) => {
+const SideInfo: React.FC<SideInfoProps> = ({
+  addTemplateInState,
+  taskTemplates,
+  setActiveTeam,
+  activeTeam,
+  canEditWorkflow,
+}) => {
   const { teams } = useAppContext();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [activeFilters, setActiveFilters] = React.useState<Array<string>>([]);
@@ -103,39 +110,40 @@ const SideInfo: React.FC<SideInfoProps> = ({ addTemplateInState, taskTemplates, 
     setActiveFilters([]);
   };
 
-  const teamOptions = teams.map((team) => ({ id: team.id, name: team.name }));
-  const selectedTeam = teamOptions.find((team) => team.id === activeTeam);
+  const selectedTeam = teams.find((team) => team.id === activeTeam);
 
   const handleSelectTeam = (selectedTeam: any) => {
-    setActiveTeam(selectedTeam?.selectedItem?.id);
-    history.push(appLink.manageTaskTemplates({ teamId: selectedTeam?.selectedItem?.id }));
+    if (selectedTeam && selectedTeam.selectedItem) {
+      setActiveTeam(selectedTeam?.selectedItem?.id);
+      history.push(appLink.manageTaskTemplates({ teamId: selectedTeam?.selectedItem?.id }));
+    }
   };
 
   return (
     <SideNav className={styles.container} border="right">
       <h1 className={styles.title}>Task manager</h1>
       <p className={styles.description}>{DESCRIPTION}</p>
-      <Dropdown
+      <ComboBox
         id="dropdown-team"
-        type="default"
-        label="Team selection"
-        ariaLabel="Dropdown"
-        // light={false}
-        initialSelectedItem={selectedTeam}
-        items={teamOptions}
-        itemToString={(item: any) => (item ? item.name : "")}
+        items={teams}
         onChange={handleSelectTeam}
+        placeholder="Select a team"
+        initialSelectedItem={selectedTeam}
+        selectedItem={selectedTeam}
+        ariaLabel="Select a team"
       />
       {taskTemplates && (
         <div className={styles.tasksContainer}>
           <div className={styles.addTaskContainer}>
             <p className={styles.existingTasks}>{`Existing Tasks (${taskTemplates.length})`}</p>
-            <AddTaskTemplate
-              addTemplateInState={addTemplateInState}
-              taskTemplates={taskTemplates}
-              history={history}
-              location={location}
-            />
+            {canEditWorkflow && (
+              <AddTaskTemplate
+                addTemplateInState={addTemplateInState}
+                taskTemplates={taskTemplates}
+                history={history}
+                location={location}
+              />
+            )}
           </div>
           <section className={styles.tools}>
             <Search
