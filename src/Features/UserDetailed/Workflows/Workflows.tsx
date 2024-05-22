@@ -1,7 +1,8 @@
 import React from "react";
+import { useFeature } from "flagged";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
-// import queryString from "query-string";
+import queryString from "query-string";
 import {
   Search,
   StructuredListWrapper,
@@ -13,11 +14,12 @@ import {
 import EmptyState from "Components/EmptyState";
 import ms from "match-sorter";
 import sortBy from "lodash/sortBy";
-import { appLink } from "Config/appConfig";
+import { appLink, FeatureFlag } from "Config/appConfig";
 import { FlowUser } from "Types";
 import styles from "./Workflows.module.scss";
 
 function Workflows({ user }: { user: FlowUser }) {
+  const activityEnabled = useFeature(FeatureFlag.ActivityEnabled);
   const [searchQuery, setSearchQuery] = React.useState("");
   const workflows = user.workflows ?? [];
   const filteredWorkflowsList = searchQuery
@@ -51,7 +53,7 @@ function Workflows({ user }: { user: FlowUser }) {
               <StructuredListCell head>Summary</StructuredListCell>
               <StructuredListCell head>Revision Count</StructuredListCell>
               <StructuredListCell head />
-              <StructuredListCell head />
+              {activityEnabled && <StructuredListCell head />}
             </StructuredListRow>
           </StructuredListHead>
           <StructuredListBody>
@@ -78,19 +80,21 @@ function Workflows({ user }: { user: FlowUser }) {
                       View/edit
                     </Link>
                   </StructuredListCell>
-                  <StructuredListCell>
-                    {/* <Link
-                      className={styles.viewWorkflowLink}
-                      to={{
-                        pathname: appLink.activity(),
-                        search: queryString.stringify({ page: 0, size: 10, workflowIds: workflow.id }),
-                        state: { fromUser: { id: user.id, name: user.name } },
-                      }}
-                    >
+                  {activityEnabled && (
+                    <StructuredListCell>
+                      <Link
+                        className={styles.viewWorkflowLink}
+                        to={{
+                          pathname: appLink.activity(),
+                          search: queryString.stringify({ page: 0, size: 10, workflowIds: workflow.id }),
+                          state: { fromUser: { id: user.id, name: user.name } },
+                        }}
+                      >
+                        Activity
+                      </Link>
                       Activity
-                    </Link> */}
-                    Activity
-                  </StructuredListCell>
+                    </StructuredListCell>
+                  )}
                 </StructuredListRow>
               );
             })}

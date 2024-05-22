@@ -20,19 +20,33 @@ exports[`Execution --- Snapshot Capturing Snapshot of WorkflowExecutionContainer
             <div
               class="headerNav"
             >
-              <div
-                class="breadcrumbNav"
+              <nav
+                aria-label="Breadcrumb"
               >
-                Activity /
-                 
-                <div
-                  class="breadcrumbNavItem"
+                <ol
+                  class="bx--breadcrumb bx--breadcrumb--no-trailing-slash"
                 >
-                  <p>
-                    ML Train – Bot Efficiency
-                  </p>
-                </div>
-              </div>
+                  <li
+                    class="bx--breadcrumb-item"
+                  >
+                    <a
+                      class="bx--link"
+                      href="/activity"
+                    >
+                      Activity
+                    </a>
+                  </li>
+                  <li
+                    class="bx--breadcrumb-item bx--breadcrumb-item--current"
+                  >
+                    <p
+                      class="bx--link"
+                    >
+                      ML Train – Bot Efficiency
+                    </p>
+                  </li>
+                </ol>
+              </nav>
               <button
                 class="workflowAdvancedDetailTrigger"
               >
