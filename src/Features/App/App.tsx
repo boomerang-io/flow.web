@@ -321,7 +321,8 @@ const AppFeatures = React.memo(function AppFeatures({ platformRole }: AppFeature
             allowedUserRoles={["*"]}
             component={<Execution />}
             path={AppPath.Execution}
-            userRole={activityEnabled ? "*" : ""}
+            userRole={"*"}
+            // userRole={activityEnabled ? "*" : ""}
           />
           {!activityEnabled && <Redirect exact from={AppPath.Activity} to={AppPath.Workflows} />}
           {activityEnabled && (
@@ -329,7 +330,8 @@ const AppFeatures = React.memo(function AppFeatures({ platformRole }: AppFeature
               allowedUserRoles={["*"]}
               component={<Activity />}
               path={AppPath.Activity}
-              userRole={activityEnabled ? "*" : ""}
+              userRole={"*"}
+              // userRole={activityEnabled ? "*" : ""}
             />
           )}
           <ProtectedRoute
