@@ -1,7 +1,8 @@
 import React from "react";
+import { useFeature } from "flagged";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
-// import queryString from "query-string";
+import queryString from "query-string";
 import {
   Search,
   StructuredListWrapper,
@@ -13,11 +14,12 @@ import {
 import EmptyState from "Components/EmptyState";
 import ms from "match-sorter";
 import sortBy from "lodash/sortBy";
-import { appLink } from "Config/appConfig";
+import { appLink, FeatureFlag } from "Config/appConfig";
 import { FlowTeam } from "Types";
 import styles from "./Workflows.module.scss";
 
 function Workflows({ team }: { team: FlowTeam }) {
+  const activityEnabled = useFeature(FeatureFlag.ActivityEnabled);
   const [searchQuery, setSearchQuery] = React.useState("");
   const { workflows } = team;
   const filteredWorkflowsList = searchQuery ? ms(workflows, searchQuery, { keys: ["name", "description"] }) : workflows;
@@ -49,7 +51,7 @@ function Workflows({ team }: { team: FlowTeam }) {
               <StructuredListCell head>Summary</StructuredListCell>
               <StructuredListCell head>Revision Count</StructuredListCell>
               <StructuredListCell head />
-              <StructuredListCell head />
+              {activityEnabled && <StructuredListCell head />}
             </StructuredListRow>
           </StructuredListHead>
           <StructuredListBody>
@@ -76,19 +78,21 @@ function Workflows({ team }: { team: FlowTeam }) {
                       View/edit
                     </Link>
                   </StructuredListCell>
-                  <StructuredListCell>
-                    {/* <Link
-                      className={styles.viewWorkflowLink}
-                      to={{
-                        pathname: appLink.activity(),
-                        search: queryString.stringify({ page: 0, size: 10, workflowIds: workflow.id }),
-                        state: { fromTeam: { id: team.id, name: team.name } },
-                      }}
-                    >
+                  {activityEnabled && (
+                    <StructuredListCell>
+                      <Link
+                        className={styles.viewWorkflowLink}
+                        to={{
+                          pathname: appLink.activity(),
+                          search: queryString.stringify({ page: 0, size: 10, workflowIds: workflow.id }),
+                          state: { fromTeam: { id: team.id, name: team.name } },
+                        }}
+                      >
+                        Activity
+                      </Link>
                       Activity
-                    </Link> */}
-                    Activity
-                  </StructuredListCell>
+                    </StructuredListCell>
+                  )}
                 </StructuredListRow>
               );
             })}
