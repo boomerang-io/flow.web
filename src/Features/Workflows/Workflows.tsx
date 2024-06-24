@@ -313,7 +313,11 @@ const TeamWorkflows: React.FC<TeamWorkflowsProps> = ({ searchQuery, team, teams,
 
   const systemWorkflowsEnabled = elevatedUserRoles.includes(user.type);
   const canEditWorkflow =
-    (team?.userRoles && team?.userRoles.indexOf(UserType.Operator) > -1) || systemWorkflowsEnabled;
+    (team?.userRoles ? team?.userRoles.indexOf(UserType.Operator) > -1 : true) || systemWorkflowsEnabled;
+
+  console.log(team);
+  console.log(team?.userRoles ? team?.userRoles.indexOf(UserType.Operator) > -1 : true);
+  console.log("canEditWorkflow-workflows: " + canEditWorkflow);
 
   if (searchQuery && !hasFilteredWorkflows) {
     return null;
