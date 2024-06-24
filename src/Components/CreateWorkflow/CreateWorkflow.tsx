@@ -121,11 +121,6 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({
 
   const isLoading = workflowIsLoading || workflowRevisionIsLoading || importIsLoading;
 
-  console.log("canEditWorkflow-createworkflow: " + canEditWorkflow);
-  console.log("workflowQuotasEnabled-createworkflow: " + workflowQuotasEnabled);
-
-  console.log("hasReachedWorkflowLimit-createworkflow: " + hasReachedWorkflowLimit);
-
   return (
     <ComposedModal
       composedModalProps={{ containerClassName: styles.modalContainer }}
