@@ -404,12 +404,14 @@ const EditorStateContainer: React.FC<EditorStateContainerProps> = ({
     return setRevisionNumber(revisionNumber);
   };
 
-  const { revisionCount } = summaryData;
+  const { revisionCount, scope } = summaryData;
   const { markdown, version } = revisionState;
   const team = teams.find((team) => team.id === summaryData.flowTeamId);
   const systemWorkflowsEnabled = elevatedUserRoles.includes(user.type);
   const canEditWorkflow =
-    (team?.userRoles && team?.userRoles.indexOf(UserType.Operator) > -1) || systemWorkflowsEnabled;
+    ("team" === scope && (team?.userRoles ? team?.userRoles.indexOf(UserType.Operator) > -1 : true)) ||
+    "user" === scope ||
+    systemWorkflowsEnabled;
 
   const mode =
     version === revisionCount && canEditWorkflow ? WorkflowDagEngineMode.Editor : WorkflowDagEngineMode.Viewer;

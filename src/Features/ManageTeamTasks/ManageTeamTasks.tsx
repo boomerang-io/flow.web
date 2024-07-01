@@ -64,7 +64,8 @@ const TaskTemplatesContainer: React.FC = () => {
   const selectedTeam = teams.find((team) => team.id === activeTeam);
   const systemWorkflowsEnabled = elevatedUserRoles.includes(roleType);
   const canEditWorkflow =
-    (selectedTeam?.userRoles && selectedTeam?.userRoles.indexOf(UserType.Operator) > -1) || systemWorkflowsEnabled;
+    (selectedTeam?.userRoles ? selectedTeam?.userRoles.indexOf(UserType.Operator) > -1 : true) ||
+    systemWorkflowsEnabled;
 
   return (
     <div className={styles.container}>
