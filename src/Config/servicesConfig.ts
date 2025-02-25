@@ -69,7 +69,7 @@ export const serviceUrl = {
   getUsers: ({ query }: QueryArg) => `${BASE_URL}/user/query${query ? "?" + query : ""}`,
   getUser: ({ userId }) => `${BASE_URL}/user/${userId}`,
   deleteUser: ({ userId }) => `${BASE_URL}/user/${userId}`,
-  getUserProfile: () => `${BASE_URL}/user/profile`,
+  getUserProfile: () => `${BASE_URL}/profile`,
   getUserProfileImage: ({ userEmail }) => `${BASE_CORE_USERS_URL}/image/${userEmail}`,
   getIntegrations: ({ team }: TeamArg) => `${BASE_URL}/integration${team ? "?team=" + team : ""}`,
   getTaskrunLog: ({ id }: IdArg) =>
