@@ -27,6 +27,7 @@ import { DataDrivenInput, Task } from "Types";
 import Header from "../Header";
 import { TemplateRequestType, FieldTypes } from "../constants";
 import styles from "./TaskTemplateOverview.module.scss";
+import { log } from "console";
 
 interface DetailDataElementsProps {
   label: string;
@@ -261,8 +262,7 @@ export function TaskTemplateOverview({
   const canEdit = !selectedTaskTemplate?.verified || (editVerifiedTasksEnabled && selectedTaskTemplate?.verified);
   const isActive = selectedTaskTemplate.status === TaskTemplateStatus.Active;
   // params.version is a string, getChangelogQuery.data.length is a number
-  const isOldVersion = Boolean(params.version !== getChangelogQuery.data.length);
-
+  const isOldVersion = Boolean(params.version < getChangelogQuery.data.length);
   const fieldKeys = selectedTaskTemplate.config?.map((input: DataDrivenInput) => input.key) ?? [];
   const resultKeys = selectedTaskTemplate.result?.map((input: DataDrivenInput) => input.key) ?? [];
 
@@ -275,33 +275,34 @@ export function TaskTemplateOverview({
 
   const handleSaveTaskTemplate = async (values, resetForm, requestType, setRequestError, closeModal) => {
     setIsSaving(true);
+    console.log('Request Type:', requestType);
     let newVersion =
       requestType === TemplateRequestType.Overwrite ? selectedTaskTemplate.version : getChangelogQuery.data.length + 1;
     let changeReason =
       requestType === TemplateRequestType.Copy
         ? `Version copied from ${values.currentConfig.version}`
         : values.comments;
-    let newEnvs = values.envs.map((env) => {
+    let newEnvs = values.envs ? values.envs.map((env) => {
       let index = env.indexOf(":");
       return { name: env.substring(0, index), value: env.substring(index + 1, env.length) };
-    });
+    }) : selectedTaskTemplate.spec.envs;
     const spec = {
-      arguments: Boolean(values.arguments) ? values.arguments.trim().split(/\n{1,}/) : [],
-      command: Boolean(values.command) ? values.command.trim().split(/\n{1,}/) : [],
+      arguments: Boolean(values.arguments) ? values.arguments.trim().split(/\n{1,}/) : selectedTaskTemplate.spec.arguments,
+      command: Boolean(values.command) ? values.command.trim().split(/\n{1,}/) : selectedTaskTemplate.spec.command,
       envs: newEnvs,
-      image: values.image,
-      results: Boolean(values.result) ? values.result : [],
-      script: values.script,
-      workingDir: values.workingDir,
+      image: values.image ? values.image : selectedTaskTemplate.spec.image,
+      results: Boolean(values.result) ? values.result : selectedTaskTemplate.spec.results,
+      script: values.script ? values.script : selectedTaskTemplate.spec.script,
+      workingDir: values.workingDir ? values.workingDir : selectedTaskTemplate.spec.workingDir,
     };
     const body: Task = {
-      name: values.name,
-      displayName: values.displayName,
-      description: values.description,
+      name: selectedTaskTemplate.name,
+      displayName: values.displayName ? values.displayName : selectedTaskTemplate.displayName,
+      description: values.description ? values.description : selectedTaskTemplate.description,
       status: "active",
-      category: values.category,
+      category: values.category ? values.category : selectedTaskTemplate.category,
       version: newVersion,
-      icon: values.icon,
+      icon: values.icon ? values.icon : selectedTaskTemplate.icon,
       type: "template",
       changelog: { reason: changeReason },
       config: Boolean(values.currentConfig) ? values.currentConfig : [],
@@ -312,9 +313,9 @@ export function TaskTemplateOverview({
       let replace = requestType === TemplateRequestType.Overwrite ? "true" : "false";
       let response;
       if (params.team) {
-        response = await applyTeamTaskTemplateMutation.mutateAsync({ replace, team: params.team, body });
+        response = await applyTeamTaskTemplateMutation.mutateAsync({ name: params.name, team: params.team, replace, body });
       } else {
-        response = await applyTaskTemplateMutation.mutateAsync({ replace, body });
+        response = await applyTaskTemplateMutation.mutateAsync({ name: params.name, replace, body });
       }
       await queryClient.invalidateQueries(getTaskTemplateUrl);
       await queryClient.invalidateQueries(getChangelogUrl);

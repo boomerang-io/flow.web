@@ -99,7 +99,7 @@ export const serviceUrl = {
       `${BASE_URL}/task/${name}${version ? `?version=${version}` : ""}`,
     getTaskChangelog: ({ name }: NameArg) =>
       `${BASE_URL}/task/${name}/changelog`,
-    putTask: ({ name, replace }: NameArg & Partial<ReplaceArg>) => `${BASE_URL}/task/${name}/?replace=${replace ? replace : false}`,
+    putTask: ({ name, replace }: NameArg & Partial<ReplaceArg>) => `${BASE_URL}/task/${name}?replace=${replace ? replace : false}`,
     postValidateYaml: () => `${BASE_URL}/task/validate`,
   },
   "template": {

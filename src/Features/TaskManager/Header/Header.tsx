@@ -40,7 +40,6 @@ interface SaveModalProps {
   name: string;
   formikProps: FormikProps<FormProps>;
   handleSubmit: (
-    name: string,
     values: any,
     resetForm: () => void,
     requestType: string,
@@ -51,7 +50,7 @@ interface SaveModalProps {
   canEdit: boolean;
 }
 
-const SaveModal: React.FC<SaveModalProps> = ({ name, formikProps, handleSubmit, isLoading, canEdit }) => {
+const SaveModal: React.FC<SaveModalProps> = ({ formikProps, handleSubmit, isLoading, canEdit }) => {
   const [requestError, setRequestError] = React.useState<{ title?: string; subtitle?: string } | null>(null);
   const SaveMessage = () => {
     return (
@@ -130,7 +129,6 @@ const SaveModal: React.FC<SaveModalProps> = ({ name, formikProps, handleSubmit, 
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.preventDefault();
                   handleSubmit(
-                    name,
                     formikProps.values,
                     formikProps.resetForm,
                     TemplateRequestType.Overwrite,
@@ -145,7 +143,6 @@ const SaveModal: React.FC<SaveModalProps> = ({ name, formikProps, handleSubmit, 
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.preventDefault();
                   handleSubmit(
-                    name,
                     formikProps.values,
                     formikProps.resetForm,
                     TemplateRequestType.New,
@@ -169,7 +166,6 @@ interface HeaderProps {
   editVerifiedTasksEnabled: boolean;
   formikProps: FormikProps<FormProps>;
   handleSaveTaskTemplate: (
-    name: string,
     values: any,
     resetForm: () => void,
     requestType: string,
@@ -314,7 +310,6 @@ const Header: React.FC<HeaderProps> = ({
             <ConfirmModal
               affirmativeAction={() =>
                 handleSaveTaskTemplate(
-                  selectedTaskTemplate.name,
                   formikProps.values,
                   formikProps.resetForm,
                   TemplateRequestType.Copy,

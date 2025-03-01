@@ -82,11 +82,12 @@ function EditTaskTemplateForm({ closeModal, handleEditTaskTemplateModal, taskTem
                 invalid={Boolean(errors.name && touched.name)}
                 invalidText={errors.name}
                 labelText="Name"
-                helperText="Must be unique"
+                helperText="Names cannot be changed after creation"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 placeholder="Enter a name"
                 value={values.name}
+                readOnly
               />
               <TextInput
                 id="displayName"

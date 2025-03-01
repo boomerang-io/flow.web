@@ -104,9 +104,9 @@ export function TaskTemplateYamlEditor({
   const canEdit = !selectedTaskTemplate?.verified || (editVerifiedTasksEnabled && selectedTaskTemplate?.verified);
   const isActive = selectedTaskTemplate.status === TaskTemplateStatus.Active;
   // params.version is a string, getChangelogQuery.data.length is a number
-  const isOldVersion = params.version !== getChangelogQuery.data.length;
+  const isOldVersion = params.version < getChangelogQuery.data.length;
 
-  const handleSaveTaskTemplate = async (name, values, resetForm, requestType, setRequestError, closeModal) => {
+  const handleSaveTaskTemplate = async (values, resetForm, requestType, setRequestError, closeModal) => {
     setIsSaving(true);
     try {
       let response;
@@ -120,13 +120,14 @@ export function TaskTemplateYamlEditor({
         if (params.team) {
           response = await applyTeamTaskTemplateMutation.mutateAsync({
             team: params.team,
-            name: name,
+            name: params.name,
             replace: false,
             body,
           });
         } else {
           response = await applyTaskTemplateMutation.mutateAsync({
             replace: false,
+            name: params.name,
             body,
           });
         }
@@ -139,11 +140,13 @@ export function TaskTemplateYamlEditor({
           response = await applyTeamTaskTemplateYamlMutation.mutateAsync({
             replace: replace,
             team: params.team,
+            name: params.name,
             body: values.yaml,
           });
         } else {
           response = await applyTaskTemplateYamlMutation.mutateAsync({
             replace: replace,
+            name: params.name,
             body: values.yaml,
           });
         }
