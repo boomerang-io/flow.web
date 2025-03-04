@@ -13,16 +13,17 @@ import { Link } from "react-router-dom";
 import EmptyState from "Components/EmptyState";
 import { matchSorter as ms } from "match-sorter";
 import { appLink } from "Config/appConfig";
-import { FlowUser } from "Types";
+import { FlowUser, FlowTeam } from "Types";
 import styles from "./UserTeams.module.scss";
 
 interface UserTeamsProps {
   user: FlowUser;
+  teams?: Array<FlowTeam>;
 }
 
-function UserTeams({ user }: UserTeamsProps) {
+function UserTeams({ user, teams }: UserTeamsProps) {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const userTeams = user.userTeams ?? [];
+  const userTeams = teams ?? [];
   const filteredTeamsList = searchQuery ? ms(userTeams, searchQuery, { keys: ["name"] }) : userTeams;
 
   return (
@@ -54,14 +55,25 @@ function UserTeams({ user }: UserTeamsProps) {
           </StructuredListHead>
           <StructuredListBody>
             {sortBy(filteredTeamsList, "name").map((team) => (
-              <StructuredListRow key={team.id}>
-                <StructuredListCell>{team.name}</StructuredListCell>
+              <StructuredListRow key={team.name}>
+                <StructuredListCell>{team.displayName}</StructuredListCell>
                 <StructuredListCell>
                   <Link
                     className={styles.viewTeamLink}
                     to={{
-                      pathname: appLink.team({ teamId: team.id }),
-                      state: { fromUser: { name: user.name, id: user.id } },
+                      pathname: appLink.manageTeam({ team: team.name }),
+                      state: {
+                        navList: [
+                          {
+                            to: appLink.userList(),
+                            text: "Users",
+                          },
+                          {
+                            to: appLink.user({ userId: user.id }),
+                            text: user.name,
+                          },
+                        ],
+                      },
                     }}
                   >
                     View team

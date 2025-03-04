@@ -1,18 +1,12 @@
 import React from "react";
-import { useMutation, useQueryClient } from "react-query";
 import { ComposedModal, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
-import ScheduleManagerForm from "Components/ScheduleManagerForm";
 import moment from "moment-timezone";
+import { useMutation, useQueryClient } from "react-query";
+import ScheduleManagerForm from "Components/ScheduleManagerForm";
+import { useTeamContext } from "Hooks";
 import { cronDayNumberMap } from "Utils/cronHelper";
 import { resolver } from "Config/servicesConfig";
-import {
-  ComposedModalChildProps,
-  ScheduleManagerFormInputs,
-  ScheduleDate,
-  ScheduleUnion,
-  WorkflowSummary,
-  DayOfWeekCronAbbreviation,
-} from "Types";
+import { ScheduleManagerFormInputs, ScheduleDate, ScheduleUnion, Workflow, DayOfWeekCronAbbreviation } from "Types";
 import styles from "./ScheduleCreator.module.scss";
 
 interface CreateScheduleProps {
@@ -22,12 +16,13 @@ interface CreateScheduleProps {
   isModalOpen: boolean;
   onCloseModal: () => void;
   schedule?: Pick<ScheduleDate, "dateSchedule" | "type">;
-  workflow?: WorkflowSummary;
-  workflowOptions?: Array<WorkflowSummary>;
+  workflow?: Workflow;
+  workflowOptions?: Array<Workflow>;
 }
 
 export default function CreateSchedule(props: CreateScheduleProps) {
   const queryClient = useQueryClient();
+  const { team } = useTeamContext();
   /**
    * Create schedule
    */
@@ -35,13 +30,13 @@ export default function CreateSchedule(props: CreateScheduleProps) {
 
   const handleCreateSchedule = async (schedule: ScheduleUnion) => {
     // intentionally don't handle error so it can be done by the ScheduleManagerForm
-    await createScheduleMutator({ body: schedule });
+    await createScheduleMutator({ team: team?.name, body: schedule });
     notify(
       <ToastNotification
         kind="success"
         title={`Create Schedule`}
         subtitle={`Successfully created schedule ${schedule.name} `}
-      />
+      />,
     );
     queryClient.invalidateQueries(props.getCalendarUrl);
     queryClient.invalidateQueries(props.getSchedulesUrl);
@@ -65,13 +60,13 @@ export default function CreateSchedule(props: CreateScheduleProps) {
       ...parameters
     } = values;
 
-    let scheduleLabels: Array<{ key: string; value: string }> = [];
-    if (values.labels.length) {
-      scheduleLabels = values.labels.map((pair: string) => {
-        const [key, value] = pair.split(":");
-        return { key, value };
-      });
-    }
+    let scheduleLabels: Record<string, string> = {};
+    // if (values.labels.length) {
+    //   scheduleLabels = values.labels.map((pair: string) => {
+    //     const [key, value] = pair.split(":");
+    //     return { key, value };
+    //   });
+    // }
 
     // Undo the namespacing of parameter keys and add to parameter object
     const resetParameters: { [key: string]: any } = {};
@@ -86,7 +81,7 @@ export default function CreateSchedule(props: CreateScheduleProps) {
       timezone: timezone.value,
       labels: scheduleLabels,
       parameters: resetParameters,
-      workflowId: workflow.id,
+      workflowRef: workflow.id,
     };
 
     if (schedule.type === "runOnce") {
@@ -122,7 +117,7 @@ export default function CreateSchedule(props: CreateScheduleProps) {
         title: "Create a Schedule",
       }}
     >
-      {(modalProps: ComposedModalChildProps) => (
+      {(modalProps) => (
         <ScheduleManagerForm
           handleSubmit={handleSubmit}
           includeWorkflowDropdown={props.includeWorkflowDropdown}

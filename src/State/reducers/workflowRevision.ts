@@ -1,59 +1,30 @@
+import { Workflow, WorkflowCanvasState } from "Types";
+
 //@ts-nocheck
 export const RevisionActionTypes = {
-  AddNode: "ADD_NODE",
-  DeleteNode: "DELETE_NODE",
+  UpdateNodes: "UPDATE_NODES",
+  UpdateEdges: "UPDATE_EDGES",
+  UpdateConfig: "UPDATE_CONFIG",
   Reset: "RESET",
   Set: "SET",
   UpdateNodeConfig: "UPDATE_NODE_CONFIG",
   UpdateNodeTaskVersion: "UPDATE_NODE_TASK_VERSION",
-  UpdateNotes: "UPDATE_Notes",
-};
+  UpdateNotes: "UPDATE_NOTES",
+} as const;
 
-export function revisionReducer(state, action) {
+type RevisionActionType = typeof RevisionActionTypes[keyof typeof RevisionActionTypes];
+
+export function revisionReducer(state: WorkflowCanvasState, action: { data: any; type: RevisionActionType }) {
+  console.log({ action });
   switch (action.type) {
-    case RevisionActionTypes.AddNode: {
-      const { data } = action;
+    case RevisionActionTypes.UpdateEdges: {
       state.hasUnsavedUpdates = true;
-      state.config[data.nodeId] = data;
+      state.edges = action.data;
       return state;
     }
-    case RevisionActionTypes.DeleteNode: {
-      let { nodeId } = action.data;
-      delete state.config[nodeId];
-      state.dag.nodes = state.dag?.nodes?.filter((node) => node.nodeId !== nodeId) ?? [];
+    case RevisionActionTypes.UpdateNodes: {
       state.hasUnsavedUpdates = true;
-      return state;
-    }
-    case RevisionActionTypes.UpdateNodeConfig: {
-      const { nodeId, inputs } = action.data;
-      if(state.config[nodeId])
-        state.config[nodeId].inputs = Boolean(state.config?.[nodeId]?.inputs)
-          ? { ...state.config[nodeId].inputs, ...inputs }
-          : { ...inputs };
-      state.hasUnsavedUpdates = true;
-      return state;
-    }
-    case RevisionActionTypes.UpdateNodeConfigWithResult: {
-      const { nodeId, inputs, outputs } = action.data;
-      if(state.config[nodeId]) {
-        state.config[nodeId].inputs = Boolean(state.config?.[nodeId]?.inputs)
-          ? { ...state.config[nodeId].inputs, ...inputs }
-          : { ...inputs };
-        state.config[nodeId].outputs = outputs;
-      }
-      state.hasUnsavedUpdates = true;
-      return state;
-    }
-    case RevisionActionTypes.UpdateNodeTaskVersion: {
-      const { nodeId, inputs, version } = action.data;
-      state.dag.nodes.find((node) => node.nodeId === nodeId).templateUpgradeAvailable = false;
-      if(state.config[nodeId]) {
-        state.config[nodeId].taskVersion = version;
-        state.config[nodeId].inputs = Boolean(state.config?.[nodeId]?.inputs)
-          ? { ...state.config[nodeId].inputs, ...inputs }
-          : { ...inputs };
-        }
-      state.hasUnsavedUpdates = true;
+      state.nodes = action.data;
       return state;
     }
     case RevisionActionTypes.UpdateNotes: {
@@ -63,25 +34,21 @@ export function revisionReducer(state, action) {
       return state;
     }
     case RevisionActionTypes.Set: {
-      return initRevisionReducerState(action.data);
+      return action.data;
+    }
+    case RevisionActionTypes.UpdateConfig: {
+      const { parameters } = action.data;
+      state.config = parameters;
+      return state;
     }
     case RevisionActionTypes.Reset: {
-      return initRevisionReducerState(action.data);
+      return action.data;
     }
     default:
       throw new Error();
   }
 }
 
-export function initRevisionReducerState(revisionData) {
-  if (revisionData) {
-    const { config, ...rest } = revisionData;
-    const normalizedNodesObj = {};
-    config.nodes.forEach((node) => {
-      normalizedNodesObj[node.nodeId] = node;
-    });
-
-    return { ...rest, config: normalizedNodesObj };
-  }
-  return {};
+export function initRevisionReducerState(workflow: Workflow): WorkflowCanvasState {
+  return { ...workflow, hasUnsavedUpdates: false };
 }

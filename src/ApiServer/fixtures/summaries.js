@@ -136,9 +136,37 @@ const summaries = [
     shortDescription: "Train and store ML model for Bot Efficiency.",
     status: "active",
     triggers: {
-      scheduler: { enable: false, schedule: "", timezone: "", advancedCron: false },
-      webhook: { enable: false, token: "" },
-      event: { enable: false, topic: "" },
+      manual: {
+        type: "manual",
+        enabled: true,
+        conditions: null,
+      },
+      webhook: {
+        type: "webhook",
+        enabled: false,
+        conditions: null,
+      },
+      schedule: {
+        type: "scheduler",
+        enabled: false,
+        conditions: null,
+      },
+      event: {
+        type: "event",
+        enabled: true,
+        conditions: [
+          { operation: "matches", field: "type", value: "io.boomerang.test" },
+          { operation: "matches", field: "subject", value: "australia" },
+        ],
+      },
+      github: {
+        type: "github",
+        enabled: true,
+        conditions: [
+          { operation: "in", field: "event", values: ["create", "delete"] },
+          { operation: "in", field: "repository", values: ["australia", "img", "test"] },
+        ],
+      },
     },
     labels: [
       {
@@ -159,7 +187,6 @@ const summaries = [
       },
     ],
     scope: "team",
-    tokens: [],
     storage: {
       activity: {
         enabled: true,
@@ -174,7 +201,7 @@ const summaries = [
     },
     enableACCIntegration: false,
     revisionCount: 2,
-    templateUpgradesAvailable: false,
+    upgradesAvailable: false,
   },
 
   {
@@ -314,9 +341,37 @@ const summaries = [
     shortDescription: "Train and store ML model for Bot Efficiency.",
     status: "active",
     triggers: {
-      scheduler: { enable: false, schedule: "", timezone: "", advancedCron: false },
-      webhook: { enable: false, token: "" },
-      event: { enable: false, topic: "" },
+      manual: {
+        type: "manual",
+        enabled: true,
+        conditions: null,
+      },
+      webhook: {
+        type: "webhook",
+        enabled: false,
+        conditions: null,
+      },
+      schedule: {
+        type: "scheduler",
+        enabled: false,
+        conditions: null,
+      },
+      event: {
+        type: "event",
+        enabled: true,
+        conditions: [
+          { operation: "matches", field: "type", value: "io.boomerang.test" },
+          { operation: "matches", field: "subject", value: "australia" },
+        ],
+      },
+      github: {
+        type: "github",
+        enabled: true,
+        conditions: [
+          { operation: "in", field: "event", values: ["create", "delete"] },
+          { operation: "in", field: "repository", values: ["australia", "img", "test"] },
+        ],
+      },
     },
     labels: [
       {
@@ -325,7 +380,6 @@ const summaries = [
       },
     ],
     scope: "system",
-    tokens: [],
     storage: {
       activity: {
         enabled: true,
@@ -340,7 +394,7 @@ const summaries = [
     },
     enableACCIntegration: false,
     revisionCount: 2,
-    templateUpgradesAvailable: false,
+    upgradesAvailable: false,
   },
   {
     properties: [
@@ -373,38 +427,37 @@ const summaries = [
     status: "active",
     triggers: {
       manual: {
-        enable: true,
-        token: null,
-        topic: null,
-      },
-      scheduler: {
-        enable: false,
-        schedule: "",
-        timezone: "",
-        advancedCron: false,
+        type: "manual",
+        enabled: true,
+        conditions: null,
       },
       webhook: {
-        enable: true,
-        token: "test",
-        topic: null,
+        type: "webhook",
+        enabled: false,
+        conditions: null,
       },
-      dockerhub: {
-        enable: false,
-        token: null,
-        topic: null,
+      schedule: {
+        type: "scheduler",
+        enabled: false,
+        conditions: null,
       },
-      slack: {
-        enable: false,
-        token: null,
-        topic: null,
+      event: {
+        type: "event",
+        enabled: true,
+        conditions: [
+          { operation: "matches", field: "type", value: "io.boomerang.test" },
+          { operation: "matches", field: "subject", value: "australia" },
+        ],
       },
-      custom: {
-        enable: false,
-        token: null,
-        topic: null,
+      github: {
+        type: "github",
+        enabled: true,
+        conditions: [
+          { operation: "in", field: "event", values: ["create", "delete"] },
+          { operation: "in", field: "repository", values: ["australia", "img", "test"] },
+        ],
       },
     },
-    tokens: [],
     storage: {
       activity: {
         enabled: true,
@@ -419,7 +472,7 @@ const summaries = [
     },
     scope: "team",
     revisionCount: 8,
-    templateUpgradesAvailable: false,
+    upgradesAvailable: false,
   },
   {
     properties: [
@@ -452,38 +505,37 @@ const summaries = [
     status: "active",
     triggers: {
       manual: {
-        enable: true,
-        token: null,
-        topic: null,
-      },
-      scheduler: {
-        enable: false,
-        schedule: "",
-        timezone: "",
-        advancedCron: false,
+        type: "manual",
+        enabled: true,
+        conditions: null,
       },
       webhook: {
-        enable: true,
-        token: "test",
-        topic: null,
+        type: "webhook",
+        enabled: false,
+        conditions: null,
       },
-      dockerhub: {
-        enable: false,
-        token: null,
-        topic: null,
+      schedule: {
+        type: "scheduler",
+        enabled: false,
+        conditions: null,
       },
-      slack: {
-        enable: false,
-        token: null,
-        topic: null,
+      event: {
+        type: "event",
+        enabled: true,
+        conditions: [
+          { operation: "matches", field: "type", value: "io.boomerang.test" },
+          { operation: "matches", field: "subject", value: "australia" },
+        ],
       },
-      custom: {
-        enable: false,
-        token: null,
-        topic: null,
+      github: {
+        type: "github",
+        enabled: true,
+        conditions: [
+          { operation: "in", field: "event", values: ["create", "delete"] },
+          { operation: "in", field: "repository", values: ["australia", "img", "test"] },
+        ],
       },
     },
-    tokens: [],
     storage: {
       activity: {
         enabled: true,
@@ -498,7 +550,7 @@ const summaries = [
     },
     scope: "system",
     revisionCount: 16,
-    templateUpgradesAvailable: false,
+    upgradesAvailable: false,
   },
 ];
 

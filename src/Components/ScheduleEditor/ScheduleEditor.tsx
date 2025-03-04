@@ -1,11 +1,12 @@
 import React from "react";
-import { useMutation, useQueryClient } from "react-query";
 import { ComposedModal, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
-import ScheduleManagerForm from "Components/ScheduleManagerForm";
 import moment from "moment-timezone";
+import { useMutation, useQueryClient } from "react-query";
+import ScheduleManagerForm from "Components/ScheduleManagerForm";
+import { useTeamContext } from "Hooks";
 import { cronDayNumberMap } from "Utils/cronHelper";
 import { resolver } from "Config/servicesConfig";
-import { ComposedModalChildProps, ScheduleManagerFormInputs, ScheduleUnion, WorkflowSummary } from "Types";
+import { ScheduleManagerFormInputs, ScheduleUnion, Workflow } from "Types";
 import styles from "./ScheduleEditor.module.scss";
 
 interface ScheduleEditorProps {
@@ -15,27 +16,28 @@ interface ScheduleEditorProps {
   isModalOpen: boolean;
   onCloseModal: () => void;
   schedule?: ScheduleUnion;
-  workflow?: WorkflowSummary;
-  workflowOptions?: Array<WorkflowSummary>;
+  workflow?: Workflow;
+  workflowOptions?: Array<Workflow>;
 }
 
 function ScheduleEditor(props: ScheduleEditorProps) {
   const queryClient = useQueryClient();
+  const { team } = useTeamContext();
   /**
    * Update schedule
    */
-  const { mutateAsync: updateScheduleMutator, ...editScheduleMutation } = useMutation(resolver.patchSchedule, {});
+  const { mutateAsync: updateScheduleMutator, ...editScheduleMutation } = useMutation(resolver.putSchedule, {});
 
   const handleUpdateSchedule = async (updatedSchedule: ScheduleUnion) => {
     if (props.schedule) {
       // intentionally don't catch error so it can be done by the ScheduleManagerForm
-      await updateScheduleMutator({ body: updatedSchedule, scheduleId: props.schedule.id });
+      await updateScheduleMutator({ team: team.name, body: updatedSchedule });
       notify(
         <ToastNotification
           kind="success"
           title={`Update Schedule`}
           subtitle={`Successfully updated schedule ${props.schedule.name} `}
-        />
+        />,
       );
       queryClient.invalidateQueries(props.getCalendarUrl);
       queryClient.invalidateQueries(props.getSchedulesUrl);
@@ -59,28 +61,34 @@ function ScheduleEditor(props: ScheduleEditorProps) {
       ...parameters
     } = values;
 
-    let scheduleLabels: Array<{ key: string; value: string }> = [];
-    if (values.labels.length) {
-      scheduleLabels = values.labels.map((pair: string) => {
-        const [key, value] = pair.split(":");
-        return { key, value };
-      });
-    }
+    let scheduleLabels: Record<string, string> = {};
+    // if (values.labels.length) {
+    //   scheduleLabels = values.labels.map((pair: string) => {
+    //     const [key, value] = pair.split(":");
+    //     return { key, value };
+    //   });
+    // }
 
     // Undo the namespacing of parameter keys and add to parameter object
-    const resetParameters: { [key: string]: any } = {};
+    const resetParameters: ScheduleUnion["params"] = [];
     Object.keys(parameters).forEach((paramKey) => {
-      resetParameters[paramKey.replace("$parameter:", "")] = parameters[paramKey];
+      const key = paramKey.replace("$parameter:", "");
+      const param = {
+        name: key,
+        value: parameters[paramKey],
+      };
+      resetParameters.push(param);
     });
 
     const schedule: Partial<ScheduleUnion> = {
+      id: props.schedule?.id,
       description,
       name,
       type,
       labels: scheduleLabels,
       timezone: timezone.value,
-      parameters: resetParameters,
-      workflowId: workflow.id || props.workflow?.id,
+      params: resetParameters,
+      workflowRef: workflow.id || props.workflow?.id,
     };
 
     if (schedule.type === "runOnce") {
@@ -117,7 +125,7 @@ function ScheduleEditor(props: ScheduleEditorProps) {
         title: "Edit a Schedule",
       }}
     >
-      {(modalProps: ComposedModalChildProps) => (
+      {(modalProps) => (
         <ScheduleManagerForm
           handleSubmit={handleSubmit}
           isError={editScheduleMutation.isError}

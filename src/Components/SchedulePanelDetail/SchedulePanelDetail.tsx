@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, CodeSnippet, Tag } from "@carbon/react";
+import { Button, CodeSnippet } from "@carbon/react";
 import { TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import SlidingPane from "react-sliding-pane";
 import cronstrue from "cronstrue";
@@ -7,14 +7,7 @@ import cx from "classnames";
 import moment from "moment-timezone";
 import { DATETIME_LOCAL_DISPLAY_FORMAT } from "Utils/dateHelper";
 import { scheduleStatusLabelMap, scheduleTypeLabelMap } from "Constants";
-import {
-  CircleFilled,
-  Information,
-  SettingsAdjust,
-  RadioButton,
-  Repeat,
-  RepeatOne,
-} from "@carbon/react/icons";
+import { CircleFilled, Information, SettingsAdjust, RadioButton, Repeat, RepeatOne } from "@carbon/react/icons";
 import { ScheduleUnion } from "Types";
 import "react-sliding-pane/dist/react-sliding-pane.css";
 import styles from "./SchedulePanelDetail.module.scss";
@@ -39,17 +32,18 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
     // Convert from UTC to configured timezone to get the correct offset, adjusting for daylight saving time
     // Then convert to the local time of the users's browser
     const nextScheduledDate = moment(moment.tz(schedule.nextScheduleDate, schedule.timezone).toISOString()).format(
-      DATETIME_LOCAL_DISPLAY_FORMAT
+      DATETIME_LOCAL_DISPLAY_FORMAT,
     );
 
     const labels = [];
-    for (const entry of schedule?.labels || []) {
-      labels.push(
-        <Tag key={entry.key} style={{ marginLeft: 0 }} type="teal">
-          {entry.key}:{entry.value}
-        </Tag>
-      );
-    }
+    //TODO: fix labels
+    // for (const entry of schedule?.labels || []) {
+    //   labels.push(
+    //     <Tag key={entry.key} style={{ marginLeft: 0 }} type="teal">
+    //       {entry.key}:{entry.value}
+    //     </Tag>
+    //   );
+    // }
 
     return (
       <>
@@ -128,7 +122,9 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
             <h2>Workflow Parameters</h2>
             <p style={{ marginBottom: "1rem" }}>Values for your workflow</p>
             <CodeSnippet light hideCopyButton type="multi">
-              {JSON.stringify(schedule?.parameters, null, 2)}
+              {schedule?.params
+                ? JSON.stringify(schedule?.params, null, 2)
+                : "No parameters have been set on this Schedule."}
             </CodeSnippet>
           </section>
           <hr />

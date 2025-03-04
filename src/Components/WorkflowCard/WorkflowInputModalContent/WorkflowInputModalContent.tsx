@@ -10,6 +10,7 @@ interface WorkflowInputModalContentProps {
   executeWorkflow: (closeModal: () => void, redirect: boolean, properties: {}) => Promise<void>;
   inputs: Array<typeof InputProperty>;
   isExecuting: boolean;
+  errorMessage: { title: string; message: string } | null;
 }
 
 const WorkflowInputModalContent: React.FC<WorkflowInputModalContentProps> = ({
@@ -18,6 +19,7 @@ const WorkflowInputModalContent: React.FC<WorkflowInputModalContentProps> = ({
   executeWorkflow,
   inputs,
   isExecuting,
+  errorMessage,
 }) => {
   const [isRedirectEnabled, setIsRedirectEnabled] = React.useState(false);
 
@@ -53,12 +55,7 @@ const WorkflowInputModalContent: React.FC<WorkflowInputModalContentProps> = ({
           <ModalBody aria-label="inputs">
             {inputs}
             {executeError && (
-              <InlineNotification
-                lowContrast
-                kind="error"
-                title="Something's Wrong"
-                subtitle="Request to execute workflow failed"
-              />
+             <InlineNotification lowContrast kind="error" title={errorMessage?.title} subtitle={errorMessage?.message} />
             )}
           </ModalBody>
           <ModalFooter>

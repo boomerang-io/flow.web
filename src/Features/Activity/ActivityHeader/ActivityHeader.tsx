@@ -1,45 +1,70 @@
-//@ts-nocheck
 import React from "react";
-import PropTypes from "prop-types";
-import HeaderWidget from "Components/HeaderWidget";
+import { SkeletonPlaceholder, Breadcrumb, BreadcrumbItem } from "@carbon/react";
+import { ArrowDownRight, ArrowUpRight } from "@carbon/react/icons";
 import {
   FeatureHeader as Header,
   FeatureHeaderTitle as HeaderTitle,
   FeatureHeaderSubtitle as HeaderSubtitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { SkeletonPlaceholder } from "@carbon/react";
-import { ArrowDownRight, ArrowUpRight } from "@carbon/react/icons";
+import { Link } from "react-router-dom";
+import HeaderWidget from "Components/HeaderWidget";
+import { appLink } from "Config/appConfig";
 import styles from "./activityHeader.module.scss";
 
-ActivityHeader.propTypes = {
-  inProgressActivities: PropTypes.number,
-  isError: PropTypes.bool,
-  isLoading: PropTypes.bool.isRequired,
-  failedActivities: PropTypes.number,
-  runActivities: PropTypes.number,
-  succeededActivities: PropTypes.number,
-};
+interface ActivityHeaderProps {
+  inProgressActivities: number | string;
+  isError: boolean;
+  isLoading: boolean;
+  failedActivities: number | string;
+  runActivities: number | string;
+  team: any;
+  succeededActivities: number | string;
+}
 
 function ActivityHeader({
   inProgressActivities,
   isError,
   isLoading,
   runActivities,
+  team,
   succeededActivities,
   failedActivities,
-}) {
-  const successRate = runActivities > 0 ? (succeededActivities + inProgressActivities) / runActivities : 0;
+}: ActivityHeaderProps) {
+  let successRate = 0;
+  if (
+    typeof runActivities === "number" &&
+    typeof succeededActivities === "number" &&
+    typeof inProgressActivities === "number"
+  ) {
+    const successNum = succeededActivities + inProgressActivities;
+    successRate = runActivities > 0 ? successNum / runActivities : 0;
+  }
+
   const successRatePercentage = Math.round(successRate * 100);
   const emoji = successRatePercentage > 79 ? "🙌" : successRatePercentage > 49 ? "😮" : "😨";
+
+  const NavigationComponent = () => {
+    return (
+      <Breadcrumb noTrailingSlash>
+        <BreadcrumbItem>
+          <Link to={appLink.home()}>Home</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem isCurrentPage>
+          <p>{team.displayName}</p>
+        </BreadcrumbItem>
+      </Breadcrumb>
+    );
+  };
 
   return (
     <Header
       className={styles.container}
       includeBorder={false}
+      nav={<NavigationComponent />}
       header={
         <>
-          <HeaderSubtitle>This is all of the</HeaderSubtitle>
           <HeaderTitle>Activity</HeaderTitle>
+          <HeaderSubtitle className={styles.headerMessage}>The place to watch your Workflow runs unfold. Just Like a Boomerang's return.</HeaderSubtitle>
         </>
       }
       actions={
@@ -50,6 +75,7 @@ function ActivityHeader({
             <>
               <p className={styles.text}>Today's numbers</p>
               <HeaderWidget text="Runs" value={"--"} />
+              <HeaderWidget text="In Progress" value={"--"} />
               <HeaderWidget text="Successes" value={"--"} />
               <HeaderWidget text="Failures" value={"--"} />
               <HeaderWidget text="Success rate" value={"--"} />
@@ -58,6 +84,7 @@ function ActivityHeader({
             <>
               <p className={styles.text}>Today's numbers</p>
               <HeaderWidget icon={ArrowUpRight} text="Runs" value={runActivities} />
+              <HeaderWidget icon={ArrowUpRight} text="In Progress" value={inProgressActivities} />
               <HeaderWidget icon={ArrowUpRight} text="Successes" value={succeededActivities} />
               <HeaderWidget icon={ArrowDownRight} text="Failures" value={failedActivities} />
               <HeaderWidget icon={emoji} text="Success rate" value={`${successRatePercentage}%`} />

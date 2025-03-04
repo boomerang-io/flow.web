@@ -1,5 +1,4 @@
 import React from "react";
-// import PropTypes from "prop-types";
 import { useEditorContext } from "Hooks";
 import { RevisionActionTypes } from "State/reducers/workflowRevision";
 import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
@@ -17,7 +16,7 @@ const CustomTaskNodeDesigner = React.memo(function CustomTaskNodeDesigner({ diag
     revisionDispatch,
     revisionState,
     // summaryData,
-    taskTemplatesData,
+    tasksData,
   } = useEditorContext();
 
   /**
@@ -27,7 +26,7 @@ const CustomTaskNodeDesigner = React.memo(function CustomTaskNodeDesigner({ diag
   const inputProperties = availableParametersQueryData;
   const nodeDag = revisionState.dag?.nodes?.find((revisionNode) => revisionNode.nodeId === designerNode.id) ?? {};
   const nodeConfig = revisionState.config[designerNode.id] ?? {};
-  const task = taskTemplatesData.find((taskTemplate) => taskTemplate.id === designerNode.taskId);
+  const task = tasksData.find((taskTemplate) => taskTemplate.id === designerNode.taskId);
 
   // Get the taskNames names from the nodes on the model
   const taskNames = Object.values(diagramEngine.getDiagramModel().getNodes())

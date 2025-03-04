@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 import {
@@ -9,11 +9,10 @@ import {
   ModalFooter,
   InlineNotification,
 } from "@carbon/react";
-import { ComboBox, Loading, TextInput } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Loading, TextInput, TextArea } from "@boomerang-io/carbon-addons-boomerang-react";
 import { requiredWorkflowProps } from "./constants";
 import { ErrorFilled } from "@carbon/react/icons";
-import { FlowTeam, WorkflowExport, WorkflowSummary } from "Types";
-import { WorkflowScope } from "Constants";
+import { FlowTeam, Workflow } from "Types";
 import styles from "./importWorkflowContent.module.scss";
 
 const FILE_UPLOAD_MESSAGE = "Choose a file or drag one here";
@@ -29,9 +28,9 @@ function checkIsValidWorkflow(data: any) {
     }
   });
   //Validate if workflow has the latest structure for dag
-  if (!data.latestRevision?.dag?.tasks) {
-    isValid = false;
-  }
+  // if (!data.latestRevision?.dag?.tasks) {
+  //   isValid = false;
+  // }
   return isValid;
 }
 
@@ -40,18 +39,16 @@ interface ImportWorkflowContentProps {
   existingWorkflowNames: string[];
   isLoading: boolean;
   importError: any;
-  importWorkflow: (workflowExport: WorkflowExport, closeModal: () => void, team: FlowTeam) => Promise<void>;
-  scope: string;
-  teams?: FlowTeam[] | null;
-  team?: FlowTeam | null;
+  importWorkflow: (workflowExport: Workflow, closeModal: () => void) => Promise<void>;
+  team: FlowTeam;
   type: string;
 }
 
 interface FormProps {
-  selectedTeam: FlowTeam | null;
+  team?: FlowTeam;
   name: string;
-  summary: string;
-  file: WorkflowExport | undefined;
+  description: string;
+  file: Workflow | undefined;
 }
 
 const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
@@ -60,19 +57,15 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
   isLoading,
   importError,
   importWorkflow,
-  scope,
   team,
-  teams,
   type,
 }) => {
-  const [existingNames, setExistingNames] = useState(existingWorkflowNames);
-
   /**
    * Return promise for reading file
    * @param file {File}
    * @return {Promise}
    */
-  const readFile = (file: any, setFieldError: (field: string, errorMsg: string) => void): Promise<WorkflowExport> => {
+  const readFile = (file: any, setFieldError: (field: string, errorMsg: string) => void): Promise<Workflow> => {
     const reader = new FileReader();
     return new Promise((resolve, reject) => {
       reader.onerror = () => {
@@ -99,48 +92,36 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
     });
   };
 
-  const handleChangeTeam = (selectedItem: FlowTeam) => {
-    let existingWorkflowNames: any = [];
-    if (selectedItem?.workflows?.length) {
-      existingWorkflowNames = selectedItem.workflows.map((item: WorkflowSummary) => item.name);
-    }
-    setExistingNames(existingWorkflowNames);
-  };
-
   const handleSubmit = async (values: any) => {
-    const fileData: WorkflowExport = values.file.contents;
+    const fileData: Workflow = values.file.contents;
     importWorkflow(
       {
         ...fileData,
-        shortDescription: values.summary,
         name: values.name,
-        flowTeamId: values.selectedTeam?.id ?? values.file.flowTeamId,
+        description: values.description,
       },
-      closeModal,
-      values.selectedTeam
+      closeModal
     );
   };
 
   return (
     <Formik
       initialValues={{
-        selectedTeam: team ?? null,
         name: "",
-        summary: "",
+        description: "",
         file: undefined,
       }}
       validateOnMount
       onSubmit={handleSubmit}
       validationSchema={Yup.object().shape({
-        selectedTeam: scope === WorkflowScope.Team ? Yup.mixed().required("Team is required") : Yup.mixed(),
         name: Yup.string()
           .required(`Please enter a name for your ${type}`)
           .max(64, "Name must not be greater than 64 characters")
           .notOneOf(
-            existingNames,
+            existingWorkflowNames,
             `There’s already a ${type} with that name in this team, consider giving this one a different name.`
           ),
-        summary: Yup.string().max(128, "Summary must not be greater than 128 characters"),
+        description: Yup.string().max(250, "Description must not be greater than 250 characters"),
         file: Yup.mixed()
           .test(
             "fileSize",
@@ -198,7 +179,7 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
                   };
                   setFieldValue("file", fileInfo);
                   setFieldValue("name", contents?.name ?? "");
-                  setFieldValue("summary", contents?.shortDescription ?? "");
+                  setFieldValue("description", contents?.description ?? "");
                 }}
               />
               {values.file && (
@@ -218,42 +199,25 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
                   </div>
                 ) : (
                   <div className={styles.confirmInfoForm}>
-                    {scope === WorkflowScope.Team && (
-                      <ComboBox
-                        id="selectedTeam"
-                        styles={{ marginBottom: "2.5rem" }}
-                        onBlur={handleBlur}
-                        onChange={({ selectedItem }: { selectedItem: FlowTeam }) => {
-                          setFieldValue("selectedTeam", selectedItem ? selectedItem : "");
-                          handleChangeTeam(selectedItem);
-                        }}
-                        items={teams}
-                        initialSelectedItem={values.selectedTeam}
-                        itemToString={(item: FlowTeam) => (item ? item.name : "")}
-                        titleText="Team"
-                        placeholder="Select a team"
-                        invalid={Boolean(errors.selectedTeam)}
-                        invalidText={errors.selectedTeam}
-                      />
-                    )}
                     <TextInput
                       id="name"
-                      labelText={`${type} Name`}
-                      name="name"
+                      labelText="Name"
+                      helperText="Enter a unique name for your workflow"
                       value={values.name}
                       onBlur={handleBlur}
                       onChange={handleChange}
                       invalid={Boolean(errors.name && touched.name)}
                       invalidText={errors.name}
                     />
-                    <TextInput
-                      id="summary"
-                      labelText="Summary"
-                      value={values.summary}
+                    <TextArea
+                      id="description"
+                      labelText="Description (optional)"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      invalid={Boolean(errors.summary && touched.summary)}
-                      invalidText={errors.summary}
+                      invalid={Boolean(errors.description && touched.description)}
+                      invalidText={errors.description}
+                      style={{ resize: "none", width: "100%" }}
+                      value={values.description}
                     />
                   </div>
                 )

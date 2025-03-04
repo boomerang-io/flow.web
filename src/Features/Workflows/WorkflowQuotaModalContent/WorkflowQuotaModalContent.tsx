@@ -1,23 +1,23 @@
 import React from "react";
-import moment from "moment";
 import { ModalBody } from "@carbon/react";
+import moment from "moment";
 import ProgressBar from "Components/ProgressBar";
 import { FlowTeamQuotas } from "Types";
-import { WorkflowScope } from "Constants";
 import styles from "./WorkflowQuotaModalContent.module.scss";
+import { c } from "vitest/dist/reporters-5f784f42";
 
 export default function WorkflowQuotaModalContent({
   closeModal,
   quotas,
-  scope,
 }: {
   closeModal: () => void;
   quotas: FlowTeamQuotas;
-  scope: string;
 }) {
   let workflowLimitPercentage = (quotas.currentWorkflowCount / quotas.maxWorkflowCount) * 100;
-  let monthlyExecutionPercentage = (quotas.currentWorkflowExecutionMonthly / quotas.maxWorkflowExecutionMonthly) * 100;
+  let concurrentLimitPercentage = (quotas.currentConcurrentRuns / quotas.maxConcurrentRuns) * 100;
+  let monthlyExecutionPercentage = (quotas.currentRuns / quotas.maxWorkflowRunMonthly) * 100;
 
+  if (concurrentLimitPercentage > 100) concurrentLimitPercentage = 100; 
   if (workflowLimitPercentage > 100) workflowLimitPercentage = 100;
   if (monthlyExecutionPercentage > 100) monthlyExecutionPercentage = 100;
 
@@ -25,11 +25,7 @@ export default function WorkflowQuotaModalContent({
     <ModalBody className={styles.container}>
       <hr className={styles.divider} />
       <QuotaSection
-        description={
-          scope === WorkflowScope.Team
-            ? "Number of Workflows that can be created for this team."
-            : "Number of Workflows that can be created."
-        }
+        description="Number of Workflows that can be created."
         title="Number of Workflows"
         value={quotas.currentWorkflowCount}
         valueUnit="Workflows"
@@ -40,15 +36,26 @@ export default function WorkflowQuotaModalContent({
         >{`Current usage: ${quotas.currentWorkflowCount} of ${quotas.maxWorkflowCount}`}</p>
       </QuotaSection>
       <QuotaSection
-        description="Number of executions per month across all Workflows"
-        title="Total Workflow executions"
-        value={quotas.maxWorkflowExecutionMonthly}
+        title="Concurrent runs (executions)"
+        description="Number of Workflows able to run at the same time"
+        value={quotas.maxConcurrentRuns}
+        valueUnit="Workflows"
+      >
+        <ProgressBar maxValue={quotas.maxConcurrentRuns} value={concurrentLimitPercentage} />
+        <p
+          className={styles.currentUsage}
+        >{`Current usage: ${quotas.currentConcurrentRuns} of ${quotas.maxConcurrentRuns}`}</p>
+      </QuotaSection>
+      <QuotaSection
+        description="Number of runs per month across all Workflows"
+        title="Total Workflow Runs"
+        value={quotas.maxWorkflowRunMonthly}
         valueUnit="per month"
       >
-        <ProgressBar maxValue={quotas.maxWorkflowExecutionMonthly} value={monthlyExecutionPercentage} />
+        <ProgressBar maxValue={quotas.maxWorkflowRunMonthly} value={monthlyExecutionPercentage} />
         <p
           className={styles.detailedText}
-        >{`Current usage: ${quotas.currentWorkflowExecutionMonthly} of ${quotas.maxWorkflowExecutionMonthly}`}</p>
+        >{`Current usage: ${quotas.currentRuns} of ${quotas.maxWorkflowRunMonthly}`}</p>
         <time className={styles.detailedText}>
           {`Resets on ${moment.utc(quotas.monthlyResetDate).format("MMMM DD, YYYY")}`}
         </time>
@@ -56,21 +63,21 @@ export default function WorkflowQuotaModalContent({
       <hr className={styles.divider} />
       <QuotaSection
         description="Persistent storage size limit per Workflow"
-        title="Storage size capacity"
+        title="Workflow Storage size capacity"
+        value={quotas.maxWorkflowStorage}
+        valueUnit="GB"
+      />
+      <QuotaSection
+        description="Persistent storage size limit per Workflow run"
+        title="Run Storage size capacity"
         value={quotas.maxWorkflowStorage}
         valueUnit="GB"
       />
       <QuotaSection
         description="Maximum amount of time that a single Workflow can take for one execution."
-        title="Execution time"
-        value={quotas.maxWorkflowExecutionTime}
+        title="Run duration"
+        value={quotas.maxWorkflowRunDuration}
         valueUnit="minutes"
-      />
-      <QuotaSection
-        title="Concurrent Workflows"
-        description="Max number of Workflows able to run at the same time"
-        value={quotas.maxConcurrentWorkflows}
-        valueUnit="Workflows"
       />
     </ModalBody>
   );

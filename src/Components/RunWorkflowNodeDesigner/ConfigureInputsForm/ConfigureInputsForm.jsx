@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useQuery } from "react-query";
 import PropTypes from "prop-types";
 import * as Yup from "yup";
 import { useAppContext, useEditorContext } from "Hooks";
@@ -7,8 +6,6 @@ import {
   AutoSuggest,
   ComboBox,
   DynamicFormik,
-  ErrorMessage,
-  Loading,
   ModalForm,
   TextInput,
   TextArea,
@@ -16,7 +13,6 @@ import {
 import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import TextEditorModal from "Components/TextEditorModal";
 import { SUPPORTED_AUTOSUGGEST_TYPES, TEXT_AREA_TYPES } from "Constants/formInputTypes";
-import { serviceUrl, resolver } from "Config/servicesConfig";
 import styles from "./WorkflowTaskForm.module.scss";
 
 const AutoSuggestInput = (props) => {
@@ -79,17 +75,7 @@ const TaskNameTextInput = ({ formikProps, ...otherProps }) => {
   );
 };
 
-/**
- * @param {parameter} inputProperties - parameter object for workflow
- * {
- *   defaultValue: String
- *   description: String
- *   key: String
- *   label: String
- *   required: Bool
- *   type: String
- * }
- */
+
 function formatAutoSuggestProperties(inputProperties) {
   return inputProperties.map((parameter) => ({
     value: `$(${parameter})`,
@@ -113,35 +99,11 @@ function ConfigureInputsForm(props) {
   const { summaryData } = useEditorContext();
   const [activeWorkflowId, setActiveWorkflowId] = useState("");
   const { node, taskNames, nodeConfig } = props;
-  const scope = summaryData?.scope;
-  const isSystem = scope === "system";
-  const isUser = scope === "user";
-
-  const {
-    data: systemWorkflows,
-    error: systemWorkflowsError,
-    isLoading: systemWorkflowsIsLoading,
-  } = useQuery(serviceUrl.getSystemWorkflows(), resolver.query(serviceUrl.getSystemWorkflows()), { enabled: isSystem });
-  const {
-    data: userWorkflows,
-    error: userWorkflowsError,
-    isLoading: userWorkflowsIsLoading,
-  } = useQuery(serviceUrl.getUserWorkflows(), resolver.query(serviceUrl.getUserWorkflows()), { enabled: isUser });
-
-  const error = systemWorkflowsError || userWorkflowsError;
-  const isLoading = systemWorkflowsIsLoading || userWorkflowsIsLoading;
 
   let workflows = [];
-
-  if (isSystem) {
-    workflows = systemWorkflows?.filter((workflow) => workflow.id !== summaryData?.id);
-  } else if (isUser) {
-    workflows = userWorkflows?.workflows ?? [];
-  } else {
-    workflows = teams
-      .find((team) => team.id === summaryData?.flowTeamId)
-      ?.workflows.filter((workflow) => workflow.id !== summaryData?.id);
-  }
+  workflows = teams
+    .find((team) => team.name === summaryData?.flowTeamId)
+    ?.workflows.filter((workflow) => workflow.id !== summaryData?.id);
 
   const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.name, value: workflow.id })) ?? [];
   const workflowProperties =
@@ -156,14 +118,6 @@ function ConfigureInputsForm(props) {
         })
       : []
   );
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return <ErrorMessage />;
-  }
 
   const formikSetFieldValue = (value, id, setFieldValue) => {
     setFieldValue(id, value);
@@ -216,7 +170,6 @@ function ConfigureInputsForm(props) {
     return {
       autoSuggestions: formatAutoSuggestProperties(props.inputProperties),
       onChange: (value) => formikSetFieldValue(value, `['${key}']`, setFieldValue),
-      // initialValue: values[`['${key}']`],
       initialValue: values[key],
 
       inputProps: {

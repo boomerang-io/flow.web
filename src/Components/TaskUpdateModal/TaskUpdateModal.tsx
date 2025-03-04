@@ -1,27 +1,31 @@
-//@ts-nocheck
 import React from "react";
+import { Button, ModalBody, ModalFooter } from "@carbon/react";
+import { WarningFilled, WarningAlt, Checkmark } from "@carbon/react/icons";
+import { DataDrivenInput, DynamicFormik, Loading, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import cx from "classnames";
-import {
-  //AutoSuggest,
-  Button,
-  ModalBody,
-  ModalFooter,
-  //TextInput,
-} from "@carbon/react";
-import { DataDrivenInput, DynamicFormik, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
+import { useQuery } from "react-query";
 import EmptyState from "Components/EmptyState";
 import TextEditorModal from "Components/TextEditorModal";
 import { TEXT_AREA_TYPES } from "Constants/formInputTypes";
-import { WarningFilled, WarningAlt } from "@carbon/react/icons";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import { ObjectValues, Task, WorkflowNode } from "Types";
 import styles from "./taskUpdateModal.module.scss";
+
+interface TaskUpdateModalProps {
+  availableParameters?: Array<string>;
+  closeModal: () => void;
+  latestTaskTemplate: Task;
+  node: WorkflowNode["data"];
+  onSave: ({ inputs, version }: { inputs: Record<string, string>; version: number }) => void;
+}
 
 const UpdateType = {
   Add: "add",
   Remove: "remove",
   NoChange: "none",
-};
+} as const;
 
-const TextEditorInput = (props) => {
+const TextEditorInput = (props: any) => {
   return (
     <div key={props.id} style={{ position: "relative", cursor: "pointer", paddingBottom: "1rem" }}>
       <TextEditorModal {...props} {...props.item} />
@@ -29,58 +33,58 @@ const TextEditorInput = (props) => {
   );
 };
 
-/**
- * @param {parameter} inputProperties - parameter object for workflow
- * {
- *   defaultValue: String
- *   description: String
- *   key: String
- *   label: String
- *   required: Bool
- *   type: String
- * }
- */
-function formatAutoSuggestProperties(inputProperties) {
-  return inputProperties.map((parameter) => ({
+const formatAutoSuggestProperties = (availableParameters: Array<string> = []) => {
+  return availableParameters.map((parameter) => ({
     value: `$(${parameter})`,
     label: parameter,
   }));
-}
-
-const formikSetFieldValue = (value, id, setFieldValue) => {
-  setFieldValue(id, value);
 };
 
 const textAreaProps =
-  (inputProperties) =>
-  ({ input, formikProps }) => {
+  (availableParameters?: Array<string>) =>
+  ({ input, formikProps }: any) => {
     const { values, setFieldValue } = formikProps;
     const { key, type, ...rest } = input;
     const itemConfig = TEXT_AREA_TYPES[type];
 
     return {
-      autoSuggestions: formatAutoSuggestProperties(inputProperties),
-      formikSetFieldValue: (value) => formikSetFieldValue(value, key, setFieldValue),
+      autoSuggestions: formatAutoSuggestProperties(availableParameters),
+      formikSetFieldValue: (value: string) => setFieldValue(key, value),
       initialValue: values[key],
-      inputProperties: inputProperties,
+      availableParameters: availableParameters,
       item: input,
       ...itemConfig,
       ...rest,
     };
   };
 
-const toggleProps = ({ input, formikProps }) => {
+const toggleProps = () => {
   return {
     orientation: "vertical",
   };
 };
 
-export default function TaskUpdateModal({ closeModal, inputProperties, nodeConfig, onSave, task }) {
-  const currentTaskTemplateVersion = task.revisions.find((revision) => revision.version === nodeConfig.taskVersion);
-  const newTaskTemplateVersion = task.revisions[task.revisions.length - 1];
+export default function TaskUpdateModal(props: TaskUpdateModalProps) {
+  const { latestTaskTemplate, closeModal, availableParameters, node, onSave } = props;
+
+  const getTaskTemplateUrl = serviceUrl.task.getTask({ name: node.taskRef, version: node.taskRef });
+
+  const templateQuery = useQuery<Task>({
+    queryKey: getTaskTemplateUrl,
+    queryFn: resolver.query(getTaskTemplateUrl),
+  });
 
   // Handle edge case of not finding the versions for some reason
-  if (!currentTaskTemplateVersion?.config || !newTaskTemplateVersion?.config) {
+  if (templateQuery.isLoading) {
+    return (
+      <ModalForm>
+        <Loading />
+      </ModalForm>
+    );
+  }
+
+  // Handle edge case of not finding the versions for some reason
+  if (templateQuery.isError) {
     return (
       <ModalForm>
         <EmptyState
@@ -90,136 +94,148 @@ export default function TaskUpdateModal({ closeModal, inputProperties, nodeConfi
       </ModalForm>
     );
   }
+  if (templateQuery.data) {
+    const currentTaskTemplate = templateQuery.data;
 
-  const removedInputs = currentTaskTemplateVersion.config
-    .filter((input) => !newTaskTemplateVersion.config.find((newInput) => newInput.key === input.key))
-    .map((input) => input?.key);
+    const removedInputs = currentTaskTemplate.config
+      .filter((input) => !latestTaskTemplate.config.find((newInput) => newInput.key === input.key))
+      .map((input) => input?.key);
 
-  const addedInputs = newTaskTemplateVersion.config
-    .filter((input) => !currentTaskTemplateVersion.config.find((currentInput) => currentInput.key === input.key))
-    .map((input) => `['${input?.key}']`);
+    const addedInputs = latestTaskTemplate.config
+      .filter((input) => !currentTaskTemplate.config.find((currentInput) => currentInput.key === input.key))
+      .map((input) => `['${input?.key}']`);
 
-  const handleSubmit = (values) => {
-    onSave({ version: newTaskTemplateVersion.version, inputs: values });
-    closeModal();
-  };
-  const formatInitialValues = {};
-  newTaskTemplateVersion.config.forEach((input) => {
-    const initialValue = nodeConfig.inputs[input.key];
-    formatInitialValues[input.key] = Boolean(initialValue) ? initialValue : input.defaultValue;
-  });
-  return (
-    <DynamicFormik
-      allowCustomPropertySyntax
-      validateOnMount
-      initialValues={formatInitialValues}
-      inputs={newTaskTemplateVersion.config}
-      onSubmit={handleSubmit}
-      dataDrivenInputProps={{
-        TextEditor: TextEditorInput,
-      }}
-      textEditorProps={textAreaProps(inputProperties)}
-      toggleProps={toggleProps}
-    >
-      {({ inputs, formikProps }) => {
-        return (
-          <ModalForm noValidate onSubmit={formikProps.handleSubmit}>
-            <ModalBody ModalBody className={styles.versionsContainer}>
-              <VersionSection
-                description={currentTaskTemplateVersion.description}
-                name={currentTaskTemplateVersion.name}
-                subtitle="Current version in this workflow"
-                version={currentTaskTemplateVersion.version}
-              >
-                {currentTaskTemplateVersion.config.map((input) => (
-                  <StateHilighter
-                    key={input.key}
-                    type={removedInputs.includes(input.key) ? UpdateType.Remove : UpdateType.NoChange}
-                  >
-                    <DataDrivenInput
-                      {...input}
-                      readOnly
-                      value={Boolean(nodeConfig.inputs[input.key]) ? nodeConfig.inputs[input.key] : input.defaultValue}
-                      id={`${input.key}-current`}
-                      orientation={input.type === "boolean" ? "vertical" : undefined}
-                    />
-                  </StateHilighter>
-                ))}
-              </VersionSection>
-              <div style={{ width: "1rem" }} />
-              <VersionSection
-                latest
-                description={newTaskTemplateVersion.description}
-                name={newTaskTemplateVersion.name}
-                subtitle="Latest version available"
-                version={newTaskTemplateVersion.version}
-              >
-                {inputs.map((input) => (
-                  <StateHilighter
-                    key={input.props.id}
-                    type={addedInputs.includes(input.props.id) ? UpdateType.Add : UpdateType.NoChange}
-                  >
-                    {input}
-                  </StateHilighter>
-                ))}
-              </VersionSection>
-            </ModalBody>
-            <ModalFooter>
-              <Button kind="secondary" onClick={closeModal}>
-                Cancel
-              </Button>
-              <Button disabled={Boolean(Object.values(formikProps.errors).length)} type="submit">
-                Update task
-              </Button>
-            </ModalFooter>
-          </ModalForm>
-        );
-      }}
-    </DynamicFormik>
-  );
+    const handleSubmit = (values: Record<string, string>) => {
+      onSave({ version: latestTaskTemplate.version, inputs: values });
+      closeModal();
+    };
+
+    const initialValues = { taskName: node.name };
+    currentTaskTemplate.config.forEach((input) => {
+      const initialValue = node.params.find((param) => param.name === input.key)?.["value"] ?? "";
+      initialValues[input.key] = Boolean(initialValue) ? initialValue : input.defaultValue;
+    });
+
+    return (
+      <DynamicFormik
+        allowCustomPropertySyntax
+        validateOnMount
+        dataDrivenInputProps={{
+          TextEditor: TextEditorInput,
+        }}
+        initialValues={initialValues}
+        inputs={latestTaskTemplate.config}
+        onSubmit={handleSubmit}
+        textEditorProps={textAreaProps(availableParameters)}
+        toggleProps={toggleProps}
+      >
+        {({ inputs, formikProps }) => {
+          return (
+            <ModalForm noValidate onSubmit={formikProps.handleSubmit}>
+              <ModalBody ModalBody className={styles.versionsContainer}>
+                <VersionSection subtitle="Current version in this workflow" version={currentTaskTemplate.version}>
+                  {currentTaskTemplate.config.map((input) => (
+                    <StateHighlighter
+                      key={input.key}
+                      type={removedInputs.includes(input.key) ? UpdateType.Remove : UpdateType.NoChange}
+                    >
+                      <DataDrivenInput
+                        {...input}
+                        readOnly
+                        id={`${input.key}-current`}
+                        orientation={input.type === "boolean" ? "vertical" : undefined}
+                        value={Boolean(initialValues[input.key]) ? initialValues[input.key] : input.defaultValue}
+                      />
+                    </StateHighlighter>
+                  ))}
+                </VersionSection>
+                <div style={{ width: "1rem" }} />
+                <VersionSection latest subtitle="Latest version available" version={latestTaskTemplate.version}>
+                  {inputs.map((input) => (
+                    <StateHighlighter
+                      key={input.props.id}
+                      type={addedInputs.includes(input.props.id) ? UpdateType.Add : UpdateType.NoChange}
+                    >
+                      {input}
+                    </StateHighlighter>
+                  ))}
+                </VersionSection>
+              </ModalBody>
+              <ModalFooter>
+                <Button kind="secondary" onClick={closeModal}>
+                  Cancel
+                </Button>
+                <Button disabled={Boolean(Object.values(formikProps.errors).length)} type="submit">
+                  Update task
+                </Button>
+              </ModalFooter>
+            </ModalForm>
+          );
+        }}
+      </DynamicFormik>
+    );
+  }
+
+  return null;
 }
 
-function VersionSection({ children, description, latest, name, subtitle, version }) {
+interface VersionSectionProps {
+  children: React.ReactNode;
+  latest?: boolean;
+  subtitle: string;
+  version: number;
+}
+
+function VersionSection({ children, latest = false, subtitle, version }: VersionSectionProps) {
   return (
     <section className={styles.versionSection}>
       <header className={cx(styles.versionHeader, { [styles.latest]: latest })}>
         <h2 className={styles.versionSubtitle}>{`Version ${version}`}</h2>
         <h1 className={styles.versionTitle}>{subtitle}</h1>
       </header>
-      <div className={styles.versionInputsContainer}>
-        {/* <section className={styles.versionMetadata}>
-          <h1 className={styles.versionName}>{name}</h1>
-          <p className={styles.versionDescription}>{description}</p>
-        </section> */}
-        {children}
-      </div>
+      <div className={styles.versionInputsContainer}>{children}</div>
     </section>
   );
 }
 
-const ChangeToAppearanceMap = {
+const ChangeToAppearanceMap: Record<
+  ObjectValues<typeof UpdateType>,
+  { icon: React.ReactNode; className: string; text: string }
+> = {
   [UpdateType.Add]: {
-    icon: <WarningAlt fill="#DA1E28" />,
+    icon: <WarningFilled fill="#F1C21B" />,
     className: "add",
     text: "This field has been added.",
   },
   [UpdateType.Remove]: {
-    icon: <WarningFilled fill="#F1C21B" />,
+    icon: <WarningAlt fill="#DA1E28" />,
     className: "remove",
     text: "This field has been removed.",
   },
+  [UpdateType.NoChange]: {
+    icon: <Checkmark />,
+    className: "",
+    text: "This field has not changed",
+  },
 };
-function StateHilighter({ children, hidden, type }) {
+
+interface StateHighlighterProps {
+  children: React.ReactNode;
+  hidden?: boolean;
+  type: ObjectValues<typeof UpdateType>;
+}
+function StateHighlighter({ children, hidden = false, type }: StateHighlighterProps) {
   const { className, icon, text } = ChangeToAppearanceMap[type] ?? {};
 
   if (hidden) {
-    return <div className={styles.stateHilighter}>{children}</div>;
+    return <div className={styles.stateHighlighter}>{children}</div>;
   }
+
   return (
     <>
-      <div className={cx(styles.stateHilighter, styles[className])}>{children}</div>
+      <div className={cx(styles.stateHighlighter, styles[className])}>{children}</div>
       {text && (
-        <p className={styles.stateHilighterText}>
+        <p className={styles.stateHighlighterText}>
           {icon}
           <span>{text}</span>
         </p>

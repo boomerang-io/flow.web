@@ -1,6 +1,3 @@
-import React from "react";
-import { useQueryClient, useMutation } from "react-query";
-import ReactMarkdown from "react-markdown";
 import {
   ComposedModal,
   Loading,
@@ -8,17 +5,16 @@ import {
   notify,
   ToastNotification,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import {
-  Button,
-  InlineNotification,
-  ModalBody,
-  ModalFooter
-} from "@carbon/react";
-import EmptyGraphic from "Components/EmptyState/EmptyGraphic";
-import { resolver } from "Config/servicesConfig";
-import { Action, ApprovalStatus, ComposedModalChildProps, ModalTriggerProps } from "Types";
-import styles from "./ManualTask.module.scss";
+import { Button, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
+import React from "react";
+import ReactMarkdown from "react-markdown";
+import { useQueryClient, useMutation } from "react-query";
+import { useTeamContext } from "Hooks";
 import "Styles/markdown.css";
+import EmptyGraphic from "Components/EmptyState/EmptyGraphic";
+import styles from "./ManualTask.module.scss";
+import { resolver } from "Config/servicesConfig";
+import { Action, ApprovalStatus, ModalTriggerProps } from "Types";
 
 type ManualTaskProps = {
   action: Action;
@@ -28,8 +24,6 @@ type ManualTaskProps = {
 };
 
 function ManualTask({ action, handleCloseModal, modalTrigger, queryToRefetch }: ManualTaskProps) {
-  const cancelRequestRef = React.useRef<any>();
-
   return (
     <ComposedModal
       modalTrigger={modalTrigger}
@@ -39,56 +33,51 @@ function ManualTask({ action, handleCloseModal, modalTrigger, queryToRefetch }: 
       }}
       modalHeaderProps={{ title: "Action Manual Task", subtitle: action?.taskName }}
       onCloseModal={() => {
-        if (cancelRequestRef.current) cancelRequestRef.current();
         handleCloseModal && handleCloseModal();
       }}
     >
-      {(props: ComposedModalChildProps) => (
-        <Form action={action} cancelRequestRef={cancelRequestRef} queryToRefetch={queryToRefetch} {...props} />
-      )}
+      {(props) => <Form action={action} queryToRefetch={queryToRefetch} {...props} />}
     </ComposedModal>
   );
 }
 
 type FormProps = {
   action: Action;
-  cancelRequestRef: React.MutableRefObject<any>;
   closeModal: () => void;
   queryToRefetch: string;
 };
 
-function Form({ action, cancelRequestRef, closeModal, queryToRefetch }: FormProps) {
+function Form({ action, closeModal, queryToRefetch }: FormProps) {
   const queryClient = useQueryClient();
+  const { team } = useTeamContext();
   const { id, instructions, status } = action ?? {};
 
-  const { mutateAsync: approvalMutator, isLoading: approvalsIsLoading, error: approvalsError } = useMutation(
-    (args: { body: { id: string; approved: boolean } }) => {
-      const { promise, cancel } = resolver.putWorkflowAction(args);
-      if (cancelRequestRef?.current) {
-        cancelRequestRef.current = cancel;
-      }
-      return promise;
+  const {
+    mutateAsync: approvalMutator,
+    isLoading: approvalsIsLoading,
+    error: approvalsError,
+  } = useMutation(resolver.putAction, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(queryToRefetch);
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(queryToRefetch);
-      },
-    }
-  );
+  });
 
   const handleSubmit = async (isApproved: boolean) => {
-    const body = {
-      id,
-      approved: isApproved,
-    };
+    const body = [
+      {
+        id,
+        approved: isApproved,
+        comments: "",
+      },
+    ];
     try {
-      await approvalMutator({ body });
+      await approvalMutator({ team: team?.name, body });
       notify(
         <ToastNotification
           kind="success"
           title="Manual Task"
           subtitle="Successfully submitted manual task completion request"
-        />
+        />,
       );
       closeModal();
     } catch (err) {

@@ -4,31 +4,30 @@ import { notify, ToastNotification, ModalFlow } from "@boomerang-io/carbon-addon
 import ImportWorkflowContent from "./ImportWorkflowContent";
 import { serviceUrl, resolver } from "Config/servicesConfig";
 import { useMutation, useQueryClient } from "react-query";
-import { WorkflowExport } from "Types";
+import { Workflow } from "Types";
 import styles from "./updateWorkflow.module.scss";
 
 interface UpdateWorkflowProps {
-  teamId: string | null;
+  teamName: string | null;
   workflowId: string;
   onCloseModal: () => void;
-  scope: string;
   type: string;
 }
 
-const UpdateWorkflow: React.FC<UpdateWorkflowProps> = ({ teamId, workflowId, onCloseModal, scope, type }) => {
+const UpdateWorkflow: React.FC<UpdateWorkflowProps> = ({ teamName, workflowId, onCloseModal, type }) => {
   const queryClient = useQueryClient();
-  
-  const { mutateAsync: importWorkflowMutator, isLoading: isPosting } = useMutation(resolver.postImportWorkflow, {
-    onSuccess: async () => queryClient.invalidateQueries(serviceUrl.getTeams()),
-  });
-  const handleImportWorkflow = async (data: WorkflowExport, closeModal: () => void) => {
+
+  //TODO - update the query and mutator as post endpoint different
+  const { mutateAsync: importWorkflowMutator, isLoading: isPosting } = useMutation(resolver.postImportWorkflow);
+  const handleImportWorkflow = async (data: Workflow, closeModal: () => void) => {
     let query;
-    if (teamId) {
-      query = queryString.stringify({ update: true, flowTeamId: teamId, scope });
-    } else query = queryString.stringify({ update: true, scope });
+    if (teamName) {
+      query = queryString.stringify({ update: true, flowTeamId: teamName });
+    } else query = queryString.stringify({ update: true });
 
     try {
       await importWorkflowMutator({ query, body: data });
+      queryClient.invalidateQueries(serviceUrl.getMyTeams());
       notify(<ToastNotification kind="success" title={`Update ${type}`} subtitle={`${type} successfully updated`} />);
       closeModal();
     } catch {

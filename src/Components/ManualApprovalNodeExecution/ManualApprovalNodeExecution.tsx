@@ -1,9 +1,8 @@
 import React from "react";
-// import PropTypes from "prop-types";
 import cx from "classnames";
 import { useExecutionContext } from "Hooks";
 import WorkflowNode from "Components/WorkflowNode";
-import { ExecutionStatus } from "Types";
+import { RunStatus } from "Types";
 import styles from "./ManualApprovalNodeExecution.module.scss";
 
 import ManualApprovalNodeModel from "Utils/dag/manualApprovalNode/ManualApprovalNodeModel";
@@ -20,7 +19,7 @@ const ManualApprovalExecution: React.FC<ManualApprovalExecutionProps> = (props) 
   const stepTaskStatus = Array.isArray(workflowExecution?.steps)
     ? workflowExecution?.steps.find((step) => step.taskId === id)?.flowTaskStatus
     : null;
-  const flowTaskStatus = stepTaskStatus ? stepTaskStatus : ExecutionStatus.Skipped;
+  const flowTaskStatus = stepTaskStatus ? stepTaskStatus : RunStatus.Skipped;
 
   const scrollToTask = () => {
     const taskLogItem = document.getElementById(`task-${id}`);
@@ -33,7 +32,7 @@ const ManualApprovalExecution: React.FC<ManualApprovalExecutionProps> = (props) 
   return (
     <WorkflowNode
       category={task?.category}
-      className={cx(styles[flowTaskStatus], { [styles.disabled]: flowTaskStatus === ExecutionStatus.NotStarted })}
+      className={cx(styles[flowTaskStatus], { [styles.disabled]: flowTaskStatus === RunStatus.NotStarted })}
       icon={task?.icon}
       isExecution
       name={task?.name}

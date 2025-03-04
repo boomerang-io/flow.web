@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useAppContext } from "Hooks";
-import { useFeature } from "flagged";
-import { useMutation, useQueryClient } from "react-query";
-import { Link, useHistory } from "react-router-dom";
+//@ts-ignore
 import { Button, InlineLoading, OverflowMenu, OverflowMenuItem } from "@carbon/react";
+import { Run, Bee, CircleFill, InformationFilled } from "@carbon/react/icons";
 import {
   ConfirmModal,
   ComposedModal,
@@ -12,41 +9,40 @@ import {
   notify,
   TooltipHover,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import WorkflowWarningButton from "Components/WorkflowWarningButton";
-import UpdateWorkflow from "./UpdateWorkflow";
-import WorkflowInputModalContent from "./WorkflowInputModalContent";
-import WorkflowRunModalContent from "./WorkflowRunModalContent";
-import cloneDeep from "lodash/cloneDeep";
-import fileDownload from "js-file-download";
 import { formatErrorMessage } from "@boomerang-io/utils";
+import workflowIcons from "Assets/workflowIcons";
+import axios from "axios";
+import { useFeature } from "flagged";
+import fileDownload from "js-file-download";
+import cloneDeep from "lodash/cloneDeep";
+import { useMutation, useQueryClient } from "react-query";
+import { Link, useHistory } from "react-router-dom";
+import WorkflowWarningButton from "Components/WorkflowWarningButton";
+// @ts-ignore:next-line
+import { swapValue } from "Utils";
+import { WorkflowView } from "Constants";
 import { appLink, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
 import { BASE_URL } from "Config/servicesConfig";
-import { Run, Bee } from "@carbon/react/icons";
-import workflowIcons from "Assets/workflowIcons";
-import { ComposedModalChildProps, FlowTeamQuotas, ModalTriggerProps, WorkflowSummary } from "Types";
-import { WorkflowScope } from "Constants";
+import { FlowTeamQuotas, ModalTriggerProps, Workflow, WorkflowViewType, DataDrivenInput } from "Types";
+import UpdateWorkflow from "./UpdateWorkflow";
+import WorkflowInputModalContent from "./WorkflowInputModalContent";
+import WorkflowRunModalContent from "./WorkflowRunModalContent";
 import styles from "./workflowCard.module.scss";
-// @ts-ignore:next-line
-import { swapValue } from "Utils";
 
 interface WorkflowCardProps {
-  scope: string;
-  teamId: string | null;
+  teamName: string;
   quotas: FlowTeamQuotas | null;
-  workflow: WorkflowSummary;
+  workflow: Workflow;
+  viewType: WorkflowViewType;
+  getWorkflowsUrl: string;
 }
 
-type FunctionAnyReturn = () => any;
-
-const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, workflow }) => {
-  const { teams } = useAppContext();
+const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow, viewType, getWorkflowsUrl }) => {
   const queryClient = useQueryClient();
-  const type = scope === WorkflowScope.Template ? "Template" : "Workflow";
-  const cancelRequestRef = React.useRef<FunctionAnyReturn | null>();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateWorkflowModalOpen, setIsUpdateWorkflowModalOpen] = useState(false);
-  const workflowQuotasEnabled = useFeature(FeatureFlag.WorkflowQuotasEnabled);
+  const teamQuotasEnabled = useFeature(FeatureFlag.TeamQuotasEnabled);
   const activityEnabled = useFeature(FeatureFlag.ActivityEnabled);
 
   const history = useHistory();
@@ -58,14 +54,10 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
     mutateAsync: executeWorkflowMutator,
     error: executeError,
     isLoading: isExecuting,
-  } = useMutation((args: { id: string; properties: {} }) => {
-    const { promise, cancel } = resolver.postExecuteWorkflow(args);
-    cancelRequestRef.current = cancel;
-    return promise;
-  });
+  } = useMutation(resolver.postSubmitWorkflow);
 
   const { mutateAsync: duplicateWorkflowMutator, isLoading: duplicateWorkflowIsLoading } = useMutation(
-    resolver.postDuplicateWorkflow
+    resolver.postDuplicateWorkflow,
   );
 
   const isDuplicating = duplicateWorkflowIsLoading;
@@ -77,62 +69,47 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
    * @returns {Array}
    */
   const formatPropertiesForEdit = () => {
-    const { properties = [] } = workflow;
-    return properties.filter((property) => !property.readOnly);
+    const { config = [] } = workflow;
+    return config.filter((configParam: DataDrivenInput) => !configParam.readOnly);
   };
 
   const handleDeleteWorkflow = async () => {
     const workflowId = workflow.id;
     try {
-      await deleteWorkflowMutator({ id: workflowId });
-      notify(<ToastNotification kind="success" title={`Delete ${type}`} subtitle={`${type} successfully deleted`} />);
-      if (scope === WorkflowScope.Team) {
-        /**
-         * teams query takes a while. optomistic update here
-         */
-        const specificTeam = teams.find((team) => team.id === teamId);
-        const specificTeamIndex = teams.findIndex((team) => team.id === teamId);
-        const newTeamWorkflows = specificTeam?.workflows.filter((workflow) => workflow.id !== workflowId);
-        // @ts-ignore
-        teams[specificTeamIndex].workflows = newTeamWorkflows;
-        queryClient.setQueryData(serviceUrl.getTeams(), teams);
-        queryClient.invalidateQueries(serviceUrl.getTeams());
-      } else if (scope === WorkflowScope.System) {
-        queryClient.invalidateQueries(serviceUrl.getSystemWorkflows());
-      } else if (scope === WorkflowScope.Template) {
-        queryClient.invalidateQueries(serviceUrl.workflowTemplates());
+      await deleteWorkflowMutator({ team: teamName, id: workflowId });
+      notify(
+        <ToastNotification kind="success" title={`Delete ${viewType}`} subtitle={`${viewType} successfully deleted`} />,
+      );
+      if (viewType === WorkflowView.Template) {
+        queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
       } else {
-        queryClient.invalidateQueries(serviceUrl.getUserWorkflows());
+        queryClient.invalidateQueries(getWorkflowsUrl);
       }
     } catch {
       notify(
         <ToastNotification
           kind="error"
           title="Something's Wrong"
-          subtitle={`Request to delete ${type.toLowerCase()} failed`}
-        />
+          subtitle={`Request to delete ${viewType.toLowerCase()} failed`}
+        />,
       );
     }
   };
 
-  const handleDuplicateWorkflow = async (workflow: WorkflowSummary) => {
+  const handleDuplicateWorkflow = async (workflow: Workflow) => {
     try {
-      await duplicateWorkflowMutator({ workflowId: workflow.id });
+      await duplicateWorkflowMutator({ team: teamName, workflowId: workflow.id });
       notify(
         <ToastNotification
           kind="success"
-          title={`Duplicate ${type}`}
-          subtitle={`Successfully duplicated ${type.toLowerCase()}`}
-        />
+          title={`Duplicate ${viewType}`}
+          subtitle={`Successfully duplicated ${viewType.toLowerCase()}`}
+        />,
       );
-      if (scope === WorkflowScope.System) {
-        queryClient.invalidateQueries(serviceUrl.getSystemWorkflows());
-      } else if (scope === WorkflowScope.Team) {
-        queryClient.invalidateQueries(serviceUrl.getTeams());
-      } else if (scope === WorkflowScope.Template) {
-        queryClient.invalidateQueries(serviceUrl.workflowTemplates());
+      if (viewType === WorkflowView.Template) {
+        queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
       } else {
-        queryClient.invalidateQueries(serviceUrl.getUserWorkflows());
+        queryClient.invalidateQueries(getWorkflowsUrl);
       }
       return;
     } catch (e) {
@@ -140,27 +117,34 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
         <ToastNotification
           kind="error"
           title="Something's Wrong"
-          subtitle={`Request to duplicate ${type.toLowerCase()} failed`}
-        />
+          subtitle={`Request to duplicate ${viewType.toLowerCase()} failed`}
+        />,
       );
       return;
     }
   };
 
-  const handleExportWorkflow = (workflow: WorkflowSummary) => {
-    notify(<ToastNotification kind="info" title={`Export ${type}`} subtitle="Export starting soon" />);
+  const handleExportWorkflow = (workflow: Workflow) => {
+    notify(<ToastNotification kind="info" title={`Export ${viewType}`} subtitle="Export starting soon" />);
     axios
-      .get(`${BASE_URL}/workflow/export/${workflow.id}`)
+      .get(serviceUrl.team.workflow.getExportWorkflow({team: teamName, workflowId: workflow.id}))
       .then(({ data }) => {
         fileDownload(JSON.stringify(data, null, 4), `${workflow.name}.json`);
       })
       .catch((error) => {
         notify(
-          <ToastNotification kind="error" title="Something's Wrong" subtitle={`Export ${type.toLowerCase()} failed`} />
+          <ToastNotification
+            kind="error"
+            title="Something's Wrong"
+            subtitle={`Export ${viewType.toLowerCase()} failed`}
+          />,
         );
       });
   };
 
+  /*
+   * This function is used to handle the execution of a workflow. It only needs to work for WorkflowView.Workflow as Templates cant be executed
+   */
   const handleExecuteWorkflow = async (closeModal: () => void, redirect: boolean = false, properties: {} = {}) => {
     const { id: workflowId } = workflow;
     let newProperties = properties;
@@ -168,50 +152,56 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
       newProperties = cloneDeep(properties);
       swapValue(newProperties);
     }
+    const params = Object.entries(newProperties).map(([name, value]) => ({ name, value }));
+    const body = { params: params, trigger: "manual" };
     try {
       // @ts-ignore:next-line
-      const { data: execution } = await executeWorkflowMutator({ id: workflowId, properties: newProperties });
+      const { data: execution } = await executeWorkflowMutator({
+        team: teamName,
+        workflowId: workflowId,
+        body: body,
+      });
       notify(
         <ToastNotification
           kind="success"
-          title={`Run ${type}`}
-          subtitle={`Successfully started ${type.toLowerCase()} execution`}
-        />
+          title={`Run ${viewType}`}
+          subtitle={`Successfully started ${viewType.toLowerCase()} execution`}
+        />,
       );
       if (redirect) {
         history.push({
-          pathname: appLink.execution({ executionId: execution.id, workflowId }),
-          state: { fromUrl: appLink.workflows(), fromText: `${type}s` },
+          pathname: appLink.execution({ team: teamName, runId: execution.id, workflowId }),
+          state: { fromUrl: appLink.workflows({ team: teamName }), fromText: `${viewType}s` },
         });
       } else {
-        if (scope === WorkflowScope.System) {
-          queryClient.invalidateQueries(serviceUrl.getSystemWorkflows());
-        } else if (scope === WorkflowScope.Team) {
-          queryClient.invalidateQueries(serviceUrl.getTeams());
-        } else {
-          queryClient.invalidateQueries(serviceUrl.getUserWorkflows());
-        }
+        queryClient.invalidateQueries(getWorkflowsUrl);
         closeModal();
       }
     } catch (err) {
-      seterrorMessage(
-        formatErrorMessage({
-          error: err,
-          defaultMessage: "Run Workflow Failed",
-        })
-      );
-      //no-op
+      if (err.response?.status === 429) {
+        seterrorMessage({
+            "title": "Quota Exceeded",
+            "message": err.response?.data?.message,
+          });
+      } else {
+        seterrorMessage(
+          formatErrorMessage({
+            error: err,
+            defaultMessage: "Run Workflow Failed",
+          }),
+        );
+      }
     }
   };
 
   let menuOptions = [
     {
       itemText: "Edit",
-      onClick: () => history.push(appLink.editorDesigner({ workflowId: workflow.id })),
+      onClick: () => history.push(appLink.editorCanvas({ team: teamName, workflowId: workflow.id })),
     },
     {
       itemText: "View Activity",
-      onClick: () => history.push(appLink.workflowActivity({ workflowId: workflow.id })),
+      onClick: () => history.push(appLink.workflowActivity({ team: teamName, workflowId: workflow.id })),
     },
     {
       itemText: "Update",
@@ -238,18 +228,20 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
   }
 
   const formattedProperties = formatPropertiesForEdit();
-
   const { name, Icon = Bee } = workflowIcons.find((icon) => icon.name === workflow.icon) ?? {};
-
   let hasReachedMonthlyRunLimit = false;
+  let hasReachedConcurrentLimit = false;
 
   if (quotas) {
-    hasReachedMonthlyRunLimit = quotas?.maxWorkflowExecutionMonthly <= quotas?.currentWorkflowExecutionMonthly;
+    hasReachedMonthlyRunLimit = quotas?.maxWorkflowRunMonthly <= quotas?.currentRuns;
+    hasReachedConcurrentLimit = quotas?.maxConcurrentRuns <= quotas?.currentConcurrentRuns;
   }
 
-  const canRunManually = workflow?.triggers?.manual?.enable ?? false;
-
-  const isDisabled = workflowQuotasEnabled && (hasReachedMonthlyRunLimit || !canRunManually);
+  const canRunManually = workflow?.triggers?.manual?.enabled ?? false;
+  const isDisabledViaRunQuota = teamQuotasEnabled && hasReachedMonthlyRunLimit;
+  const isDisabledViaConcurrentQuota = teamQuotasEnabled && hasReachedConcurrentLimit;
+  const isDisabledViaTrigger = canRunManually === false;
+  const isDisabled = isDisabledViaRunQuota || isDisabledViaConcurrentQuota || isDisabledViaTrigger;
 
   let loadingText = "";
 
@@ -263,7 +255,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
 
   return (
     <div className={styles.container}>
-      <Link to={!isDeleting ? appLink.editorDesigner({ workflowId: workflow.id }) : ""}>
+      <Link to={!isDeleting ? appLink.editorCanvas({ team: teamName, workflowId: workflow.id }) : ""}>
         <section className={styles.details}>
           <div className={styles.iconContainer}>
             <Icon className={styles.icon} alt={`${name}`} />
@@ -272,36 +264,23 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
             <h1 title={workflow.name} className={styles.name} data-testid="workflow-card-title">
               {workflow.name}
             </h1>
-            <p title={workflow.shortDescription} className={styles.description}>
-              {workflow.shortDescription}
+            <p title={workflow.description} className={styles.description}>
+              {workflow.description}
             </p>
           </div>
         </section>
       </Link>
-      {/*<div className={styles.quotaDescriptionContainer}>
-        <h3
-          className={styles.teamQuotaText}
-        >{`Run quota - ${quotas.currentWorkflowExecutionMonthly} of ${quotas.maxWorkflowExecutionMonthly} this month`}</h3>
-        {hasReachedMonthlyRunLimit && (
-          <TooltipHover
-            direction="top"
-            tooltipText="This Workflow has reached the maximum number of executions allowed this month. Contact your Team administrator/owner to increase the quota, or wait until the quota resets next month."
-          >
-            <WarningAlt16 className={styles.warningIcon} />
-          </TooltipHover>
-        )}
-        </div>*/}
       <section className={styles.launch}>
         {Array.isArray(formattedProperties) && formattedProperties.length !== 0 ? (
           <ComposedModal
             modalHeaderProps={{
-              title: `${type} Parameters`,
-              subtitle: `Provide parameter values for your ${type.toLowerCase()}`,
+              title: `Workflow Parameters`,
+              subtitle: `Provide parameter values for your Workflow`,
             }}
             modalTrigger={({ openModal }: ModalTriggerProps) => (
               <Button
                 disabled={isDeleting || isDisabled}
-                iconDescription={`Run ${type}`}
+                iconDescription={`Run ${viewType}`}
                 renderIcon={Run}
                 size="md"
                 onClick={openModal}
@@ -309,11 +288,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
                 Run it
               </Button>
             )}
-            onCloseModal={() => {
-              if (cancelRequestRef.current) cancelRequestRef.current();
-            }}
           >
-            {({ closeModal }: ComposedModalChildProps) => (
+            {({ closeModal }) => (
               <WorkflowInputModalContent
                 closeModal={closeModal}
                 executeError={executeError}
@@ -321,6 +297,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
                 isExecuting={isExecuting}
                 /* @ts-ignore-next-line */
                 inputs={formattedProperties}
+                errorMessage={errorMessage}
               />
             )}
           </ComposedModal>
@@ -328,13 +305,13 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
           <ComposedModal
             composedModalProps={{ containerClassName: `${styles.executeWorkflow}` }}
             modalHeaderProps={{
-              title: `Execute ${type}`,
-              subtitle: `"Run and View" will navigate you to the ${type.toLowerCase()} exeuction view.`,
+              title: `Execute ${viewType}`,
+              subtitle: `"Run and View" will navigate you to the ${viewType.toLowerCase()} exeuction view.`,
             }}
             modalTrigger={({ openModal }: ModalTriggerProps) => (
               <Button
                 disabled={isDeleting || isDisabled}
-                iconDescription={`Run ${type}`}
+                iconDescription={`Run ${viewType}`}
                 renderIcon={Run}
                 size="md"
                 onClick={openModal}
@@ -343,7 +320,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
               </Button>
             )}
           >
-            {({ closeModal }: ComposedModalChildProps) => (
+            {({ closeModal }) => (
               <WorkflowRunModalContent
                 closeModal={closeModal}
                 executeError={executeError}
@@ -355,11 +332,11 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
           </ComposedModal>
         )}
       </section>
-      {workflow.templateUpgradesAvailable && (
+      {workflow.upgradesAvailable && (
         <div className={styles.templatesWarningIcon}>
           <TooltipHover
             direction="top"
-            tooltipContent={`New version of a task available! To update, edit your ${type.toLowerCase()}.`}
+            tooltipContent={`New version of a task available! To update, edit your ${viewType.toLowerCase()}.`}
           >
             <div>
               <WorkflowWarningButton />
@@ -370,27 +347,59 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
       {isDuplicating || isDeleting || isExecuting ? (
         <InlineLoading
           description={loadingText}
-          style={{ position: "absolute", right: "0.5rem", top: "0", width: "fit-content" }}
+          style={{ position: "absolute", left: "0.5rem", top: "0", width: "fit-content" }}
         />
       ) : (
-        <OverflowMenu
-          flipped
-          ariaLabel="Overflow card menu"
-          iconDescription="Overflow menu icon"
-          style={{ position: "absolute", right: "0" }}
-        >
+        <div className={styles.status}>
+          {isDisabledViaRunQuota ? (
+            <TooltipHover
+              direction="top"
+              tooltipText="This team has reached the maximum number of runs (executions) allowed this month. Contact your administrator or team owner to increase the quota, or wait until the quota resets next month."
+            >
+              <InformationFilled className={styles.warningIcon} style={{ fill: "#ff832b" }} />
+            </TooltipHover>
+          ) : isDisabledViaConcurrentQuota ? (
+            <TooltipHover
+              direction="top"
+              tooltipText="This team has reached the maximum number of concurrent runs (executions) allowed. Contact your administrator or team owner to increase the quota, or wait until a run has completed execution."
+            >
+              <InformationFilled className={styles.warningIcon} style={{ fill: "#ff832b" }} />
+            </TooltipHover>
+          ) : isDisabledViaTrigger ? (
+            <TooltipHover direction="top" tooltipText="Trigger disabled">
+              <InformationFilled className={styles.warningIcon} style={{ fill: "#ff832b" }} />
+            </TooltipHover>
+          ) : workflow.status === "active" ? (
+            <TooltipHover direction="top" tooltipText="Active">
+              <CircleFill className={styles.warningIcon} style={{ fill: "#009d9a" }} />
+            </TooltipHover>
+          ) : (
+            <TooltipHover direction="top" tooltipText="Inactive">
+              <CircleFill className={styles.warningIcon} style={{ fill: "#da1e28" }} />
+            </TooltipHover>
+          )}
+          {/* <p className={styles.statusText}>{workflow.status === "active" ? "Active" : "Inactive"}</p> */}
+        </div>
+      )}
+      <div style={{ position: "absolute", right: "0" }}>
+        <OverflowMenu flipped ariaLabel="Overflow card menu" iconDescription="Overflow menu icon" size="sm">
           {menuOptions.map(({ onClick, itemText, ...rest }, index) => (
-            <OverflowMenuItem onClick={onClick} itemText={itemText} key={`${itemText}-${index}`} {...rest} />
+            <OverflowMenuItem
+              onClick={onClick}
+              itemText={itemText}
+              key={`${itemText}-${index}`}
+              disabled={isDuplicating || isDeleting || isExecuting}
+              {...rest}
+            />
           ))}
         </OverflowMenu>
-      )}
+      </div>
       {isUpdateWorkflowModalOpen && (
         <UpdateWorkflow
           onCloseModal={() => setIsUpdateWorkflowModalOpen(false)}
-          teamId={teamId}
           workflowId={workflow.id}
-          scope={scope}
-          type={type}
+          teamName={teamName}
+          type={viewType}
         />
       )}
       {isDeleteModalOpen && (
@@ -406,9 +415,9 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, work
           onCloseModal={() => {
             setIsDeleteModalOpen(false);
           }}
-          title={`Delete ${type}`}
+          title={`Delete ${viewType}`}
         >
-          {`Are you sure you want to delete this ${type.toLowerCase()}? There's no going back from this decision.`}
+          {`Are you sure you want to delete this ${viewType.toLowerCase()}? There's no going back from this decision.`}
         </ConfirmModal>
       )}
     </div>

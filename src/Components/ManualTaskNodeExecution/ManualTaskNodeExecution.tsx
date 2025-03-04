@@ -1,12 +1,10 @@
 import React from "react";
-// import PropTypes from "prop-types";
 import cx from "classnames";
-import { useExecutionContext } from "Hooks";
 import WorkflowNode from "Components/WorkflowNode";
-import { ExecutionStatus } from "Types";
-import styles from "./ManualTaskNodeExecution.module.scss";
-
+import { useExecutionContext } from "Hooks";
 import ManualTaskNodeModel from "Utils/dag/manualTaskNode/ManualTaskNodeModel";
+import { RunStatus } from "Types";
+import styles from "./ManualTaskNodeExecution.module.scss";
 
 interface ManualTaskNodeExecutionProps {
   node: ManualTaskNodeModel;
@@ -20,20 +18,12 @@ const ManualTaskNodeExecution: React.FC<ManualTaskNodeExecutionProps> = (props) 
   const stepTaskStatus = Array.isArray(workflowExecution?.steps)
     ? workflowExecution?.steps.find((step) => step.taskId === id)?.flowTaskStatus
     : null;
-  const flowTaskStatus = stepTaskStatus ? stepTaskStatus : ExecutionStatus.Skipped;
-
-  const scrollToTask = () => {
-    const taskLogItem = document.getElementById(`task-${id}`);
-    if (taskLogItem) {
-      taskLogItem.scrollIntoView();
-      taskLogItem.focus();
-    }
-  };
+  const flowTaskStatus = stepTaskStatus ? stepTaskStatus : RunStatus.Skipped;
 
   return (
     <WorkflowNode
       category={task?.category}
-      className={cx(styles[flowTaskStatus], { [styles.disabled]: flowTaskStatus === ExecutionStatus.NotStarted })}
+      className={cx(styles[flowTaskStatus], { [styles.disabled]: flowTaskStatus === RunStatus.NotStarted })}
       icon={task?.icon}
       isExecution
       name={task?.name}

@@ -1,39 +1,35 @@
-//@ts-nocheck
 import React from "react";
-import PropTypes from "prop-types";
 import cx from "classnames";
-import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
+import { WorkflowEngineMode } from "Constants";
+import { WorkflowEngineModeType } from "Types";
 import styles from "./TaskLinkExecutionConditionSwitcher.module.scss";
 
-const TaskLinkExecutionConditionSwitcher = React.memo(function TaskLinkExecutionConditionSwitcher({
-  disabled,
+interface TaskLinkExecutionConditionSwitcherProps {
+  disabled?: boolean;
+  executionCondition: {
+    name: string;
+    Icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+  };
+  kind?: WorkflowEngineModeType;
+  onClick?: () => void;
+}
+
+function TaskLinkExecutionConditionSwitcher({
+  disabled = false,
   executionCondition,
-  kind,
+  kind = WorkflowEngineMode.Edit,
   onClick,
-  status,
-}) {
+}: TaskLinkExecutionConditionSwitcherProps) {
   const { name, Icon } = executionCondition;
   if (disabled) {
-    return <Icon className={cx(styles.container, styles[kind], styles[name])} key={name} />;
+    return <Icon className={cx(styles.container, styles[kind], styles[name], { [styles.disabled]: disabled })} />;
   } else {
     return (
-      <Icon
-        className={cx(styles.container, styles[kind], styles[name])}
-        key={name}
-        onClick={onClick}
-        onKeyDown={(e) => isAccessibleKeyboardEvent(e) && onClick(e)}
-        role="button"
-        tabIndex={0}
-      />
+      <button onClick={onClick} style={{ lineHeight: 1 }}>
+        <Icon className={cx(styles.container, styles[kind], styles[name])} />
+      </button>
     );
   }
-});
-
-TaskLinkExecutionConditionSwitcher.propTypes = {
-  disabled: PropTypes.bool,
-  executionCondition: PropTypes.object.isRequired,
-  kind: PropTypes.oneOf(["designer", "execution"]),
-  onClick: PropTypes.func,
-};
+}
 
 export default TaskLinkExecutionConditionSwitcher;

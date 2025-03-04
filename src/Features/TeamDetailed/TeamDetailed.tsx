@@ -1,10 +1,4 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import { useQuery } from "react-query";
-import { useFeature } from "flagged";
-import { Switch, Route, useRouteMatch } from "react-router-dom";
-import { useAppContext } from "Hooks";
-import { Box } from "reflexbox";
 import {
   ErrorMessage,
   FeatureHeader,
@@ -12,13 +6,21 @@ import {
   FeatureHeaderSubtitle as HeaderSubtitle,
   Loading,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import Header from "./Header";
-import Members from "./Members";
-import Settings from "./Settings";
-import Labels from "./Labels";
-import Workflows from "./Workflows";
+import { useFeature } from "flagged";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+import { Switch, Route, useRouteMatch } from "react-router-dom";
+import { Box } from "reflexbox";
+import { useAppContext } from "Hooks";
 import { AppPath, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
+import ApproverGroups from "./ApproverGroups";
+import Header from "./Header";
+import Members from "./Members";
+import Quotas from "./Quotas";
+import Settings from "./Settings";
+import Tokens from "./Tokens";
+import Workflows from "./Workflows";
 import styles from "./teamDetailed.module.scss";
 
 const FeatureLayout: React.FC = ({ children }) => {
@@ -32,7 +34,7 @@ const FeatureLayout: React.FC = ({ children }) => {
         header={
           <>
             <HeaderTitle style={{ margin: "0" }}>Teams</HeaderTitle>
-            <HeaderSubtitle>View and manage Flow teams</HeaderSubtitle>
+            <HeaderSubtitle>View and manage your teams</HeaderSubtitle>
           </>
         }
       />
@@ -43,54 +45,59 @@ const FeatureLayout: React.FC = ({ children }) => {
 
 function TeamDetailedContainer() {
   const teamManagementEnabled = useFeature(FeatureFlag.TeamManagementEnabled);
-  const match: { params: { teamId: string } } = useRouteMatch();
-  const teamId = match?.params?.teamId;
+  const match: { params: { team: string } } = useRouteMatch();
+  const team = match?.params?.team;
   const { user } = useAppContext();
 
-  const teamDetailsUrl = serviceUrl.getManageTeam({ teamId });
+  const teamDetailsUrl = serviceUrl.resourceTeam({ team: team });
 
-  const { data: teamDetailsData, error: teamDetailsError, isLoading: teamDetailsIsLoading } = useQuery({
+  const teamDetailsQuery = useQuery({
     queryKey: teamDetailsUrl,
     queryFn: resolver.query(teamDetailsUrl),
   });
 
-  if (teamDetailsIsLoading)
+  if (teamDetailsQuery.isLoading)
     return (
       <FeatureLayout>
         <Loading />
       </FeatureLayout>
     );
-  if (teamDetailsError)
+
+  if (teamDetailsQuery.error)
     return (
       <FeatureLayout>
         <ErrorMessage />
       </FeatureLayout>
     );
 
-  if (teamDetailsData) {
+  if (teamDetailsQuery.data) {
+    const canEdit = teamManagementEnabled && teamDetailsQuery.data.status === "active";
     // const teamOwnerIdList = teamDetailsData?.owners?.map((owner) => owner.ownerId);
-    const { isActive } = teamDetailsData;
     return (
       <div className={styles.container}>
-        <Header isActive={isActive} team={teamDetailsData} teamManagementEnabled={teamManagementEnabled} />
+        <Header team={teamDetailsQuery.data} />
         <Switch>
-          <Route exact path={AppPath.Team}>
-            <Members
-              isActive={isActive}
-              team={teamDetailsData}
-              memberList={teamDetailsData.users}
-              user={user}
-              teamManagementEnabled={teamManagementEnabled}
+          <Route exact path={AppPath.ManageTeam}>
+            <Members canEdit={canEdit} team={teamDetailsQuery.data} user={user} teamDetailsUrl={teamDetailsUrl} />
+          </Route>
+          <Route exact path={AppPath.ManageTeamWorkflows}>
+            <Workflows team={teamDetailsQuery.data} />
+          </Route>
+          <Route exact path={AppPath.ManageTeamApprovers}>
+            <ApproverGroups team={teamDetailsQuery.data} canEdit={canEdit} teamDetailsUrl={teamDetailsUrl} />
+          </Route>
+          <Route exact path={AppPath.ManageTeamQuotas}>
+            <Quotas
+              team={teamDetailsQuery.data}
+              canEdit={canEdit && user?.type === "admin"}
+              teamDetailsUrl={teamDetailsUrl}
             />
           </Route>
-          <Route exact path={AppPath.TeamWorkflows}>
-            <Workflows team={teamDetailsData} />
+          <Route exact path={AppPath.ManageTeamTokens}>
+            <Tokens team={teamDetailsQuery.data} canEdit={canEdit} />
           </Route>
-          <Route exact path={AppPath.TeamLabels}>
-            <Labels isActive={isActive} team={teamDetailsData} teamManagementEnabled={teamManagementEnabled} />
-          </Route>
-          <Route exact path={AppPath.TeamSettings}>
-            <Settings team={teamDetailsData} teamManagementEnabled={teamManagementEnabled} />
+          <Route exact path={AppPath.ManageTeamSettings}>
+            <Settings team={teamDetailsQuery.data} canEdit={canEdit} />
           </Route>
         </Switch>
       </div>

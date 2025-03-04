@@ -110,7 +110,6 @@ class WorkflowTaskForm extends Component {
     closeModal: PropTypes.func,
     inputProperties: PropTypes.array,
     node: PropTypes.object.isRequired,
-    nodeConfig: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired,
     textEditorProps: PropTypes.object,
     task: PropTypes.object.isRequired,
@@ -126,7 +125,6 @@ class WorkflowTaskForm extends Component {
   };
 
   handleOnSave = (values) => {
-    this.props.node.taskName = values.taskName;
     this.props.onSave(values);
     this.props.closeModal();
   };
@@ -190,17 +188,11 @@ class WorkflowTaskForm extends Component {
   };
 
   render() {
-    const { additionalConfig = [], node, task, taskNames, nodeConfig } = this.props;
-    const taskRevisions = task?.revisions ?? [];
-    // Find the matching task config for the version
-    const taskVersionConfig = nodeConfig
-      ? taskRevisions.find((revision) => nodeConfig.taskVersion === revision.version)?.config ?? []
-      : [];
-    const takenTaskNames = taskNames.filter((name) => name !== node.taskName);
+    const { additionalConfig = [], node, task, taskNames } = this.props;
+    const taskVersionConfig = task.config;
+    const takenTaskNames = taskNames.filter((name) => name !== node.name);
 
-    const taskResults = nodeConfig
-      ? taskRevisions.find((revision) => nodeConfig.taskVersion === revision.version)?.results ?? []
-      : [];
+    const taskResults = task.results;
 
     // Add the name input
     const inputs = [
@@ -222,6 +214,12 @@ class WorkflowTaskForm extends Component {
       },
     ];
 
+    const initValues = { taskName: node.name };
+    task.config.forEach((input) => {
+      const initialValue = node.params.find((param) => param.name === input.key)?.["value"] ?? "";
+      initValues[input.key] = Boolean(initialValue) ? initialValue : input.defaultValue;
+    });
+
     return (
       <DynamicFormik
         allowCustomPropertySyntax
@@ -231,7 +229,7 @@ class WorkflowTaskForm extends Component {
             .required("Enter a task name")
             .notOneOf(takenTaskNames, "Enter a unique value for task name"),
         })}
-        initialValues={{ taskName: node.taskName, ...nodeConfig.inputs }}
+        initialValues={initValues}
         inputs={inputs}
         onSubmit={this.handleOnSave}
         dataDrivenInputProps={{

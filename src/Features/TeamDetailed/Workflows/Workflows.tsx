@@ -2,6 +2,7 @@ import React from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import queryString from "query-string";
+import { useQuery } from "react-query";
 import {
   Search,
   StructuredListWrapper,
@@ -12,20 +13,29 @@ import {
 } from "@carbon/react";
 import EmptyState from "Components/EmptyState";
 import { matchSorter as ms } from "match-sorter";
+import moment from "moment";
 import sortBy from "lodash/sortBy";
 import { appLink } from "Config/appConfig";
-import { FlowTeam } from "Types";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import { FlowTeam, PaginatedWorkflowResponse } from "Types";
 import styles from "./Workflows.module.scss";
 
 function Workflows({ team }: { team: FlowTeam }) {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const { workflows } = team;
+
+  const getWorkflowsUrl = serviceUrl.team.workflow.getWorkflows({ team: team?.name });
+  const workflowsQuery = useQuery<PaginatedWorkflowResponse, string>({
+    queryKey: getWorkflowsUrl,
+    queryFn: resolver.query(getWorkflowsUrl),
+  });
+
+  const workflows = workflowsQuery.data?.content || [];
   const filteredWorkflowsList = searchQuery ? ms(workflows, searchQuery, { keys: ["name", "description"] }) : workflows;
 
   return (
-    <section aria-label={`${team.name} Team Workflows`} className={styles.container}>
+    <section aria-label={`${team.displayName} Team Workflows`} className={styles.container}>
       <Helmet>
-        <title>{`Workflows - ${team.name}`}</title>
+        <title>{`Workflows - ${team.displayName}`}</title>
       </Helmet>
       <section className={styles.actionsContainer}>
         <div className={styles.leftActions}>
@@ -47,8 +57,9 @@ function Workflows({ team }: { team: FlowTeam }) {
           <StructuredListHead>
             <StructuredListRow head>
               <StructuredListCell head>Name</StructuredListCell>
-              <StructuredListCell head>Summary</StructuredListCell>
-              <StructuredListCell head>Revision Count</StructuredListCell>
+              <StructuredListCell head>Date Created</StructuredListCell>
+              <StructuredListCell head>Description</StructuredListCell>
+              <StructuredListCell head>Version</StructuredListCell>
               <StructuredListCell head />
               <StructuredListCell head />
             </StructuredListRow>
@@ -63,15 +74,16 @@ function Workflows({ team }: { team: FlowTeam }) {
                     </div>
                   </StructuredListCell>
                   <StructuredListCell>
-                    {workflow.shortDescription !== "" ? workflow.shortDescription : "---"}
+                    <time>{moment(workflow.creationDate).format("YYYY-MM-DD hh:mm A")}</time>
                   </StructuredListCell>
-                  <StructuredListCell>{workflow.revisionCount}</StructuredListCell>
+                  <StructuredListCell>{workflow.description !== "" ? workflow.description : "---"}</StructuredListCell>
+                  <StructuredListCell>{workflow.version}</StructuredListCell>
                   <StructuredListCell>
                     <Link
                       className={styles.viewWorkflowLink}
                       to={{
-                        pathname: appLink.editorDesigner({ workflowId: workflow.id }),
-                        state: { fromTeam: { id: team.id, name: team.name } },
+                        pathname: appLink.editorCanvas({ workflowId: workflow.id }),
+                        state: { fromTeam: team.name },
                       }}
                     >
                       View/edit
@@ -81,9 +93,9 @@ function Workflows({ team }: { team: FlowTeam }) {
                     <Link
                       className={styles.viewWorkflowLink}
                       to={{
-                        pathname: appLink.activity(),
+                        pathname: appLink.activity({ team: team.name }),
                         search: queryString.stringify({ page: 0, size: 10, workflowIds: workflow.id }),
-                        state: { fromTeam: { id: team.id, name: team.name } },
+                        state: { fromTeam: team.name },
                       }}
                     >
                       Activity

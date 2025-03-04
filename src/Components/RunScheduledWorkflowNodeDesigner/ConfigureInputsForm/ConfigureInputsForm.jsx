@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useQuery } from "react-query";
 import PropTypes from "prop-types";
 import * as Yup from "yup";
 import { useAppContext, useEditorContext } from "Hooks";
@@ -7,8 +6,6 @@ import {
   AutoSuggest,
   ComboBox,
   DynamicFormik,
-  ErrorMessage,
-  Loading,
   ModalForm,
   TextInput,
   TextArea,
@@ -17,7 +14,6 @@ import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import TextEditorModal from "Components/TextEditorModal";
 import { timezoneOptions, defaultTimeZone, transformTimeZone } from "Utils/dateHelper";
 import { SUPPORTED_AUTOSUGGEST_TYPES, TEXT_AREA_TYPES } from "Constants/formInputTypes";
-import { serviceUrl, resolver } from "Config/servicesConfig";
 import styles from "./WorkflowTaskForm.module.scss";
 
 const AutoSuggestInput = (props) => {
@@ -80,17 +76,6 @@ const TaskNameTextInput = ({ formikProps, ...otherProps }) => {
   );
 };
 
-/**
- * @param {parameter} inputProperties - parameter object for workflow
- * {
- *   defaultValue: String
- *   description: String
- *   key: String
- *   label: String
- *   required: Bool
- *   type: String
- * }
- */
 
 function formatAutoSuggestProperties(inputProperties) {
   return inputProperties.map((parameter) => ({
@@ -111,34 +96,19 @@ ConfigureInputsForm.propTypes = {
 };
 
 function ConfigureInputsForm(props) {
-  const { teams, userWorkflows } = useAppContext();
+  const { teams } = useAppContext();
   const { summaryData } = useEditorContext();
   const [activeWorkflowId, setActiveWorkflowId] = useState("");
   const { node, taskNames, nodeConfig } = props;
 
-  const isSystem = summaryData?.scope === "system";
-  const isUser = summaryData?.scope === "user";
-
-  const systemWorkflowsQuery = useQuery(
-    serviceUrl.getSystemWorkflows(),
-    resolver.query(serviceUrl.getSystemWorkflows()),
-    { enabled: isSystem }
-  );
-
   let workflows = [];
-
-  if (isSystem) {
-    workflows = systemWorkflowsQuery.data;
-  } else if (isUser) {
-    workflows = userWorkflows?.workflows;
-  } else {
-    workflows = teams.find((team) => team.id === summaryData?.flowTeamId)?.workflows;
-  }
+  workflows = teams.find((team) => team.id === summaryData?.flowTeamId)?.workflows;
 
   const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.name, value: workflow.id })) ?? [];
   const workflowProperties = nodeConfig?.inputs?.workflowId
     ? workflows.find((workflow) => workflow.id === nodeConfig?.inputs?.workflowId).properties
     : null;
+    
   const [activeProperties, setActiveProperties] = useState(
     workflowProperties
       ? workflowProperties.map((property) => {
@@ -147,14 +117,6 @@ function ConfigureInputsForm(props) {
         })
       : []
   );
-
-  if (systemWorkflowsQuery.isLoading) {
-    return <Loading />;
-  }
-
-  if (systemWorkflowsQuery.isError) {
-    return <ErrorMessage />;
-  }
 
   const formikSetFieldValue = (value, id, setFieldValue) => {
     setFieldValue(id, value);

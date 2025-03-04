@@ -2,7 +2,8 @@ import React from "react";
 import { ModalForm, RadioGroup } from "@boomerang-io/carbon-addons-boomerang-react";
 import CreateWorkflowContent from "../CreateWorkflowContent";
 import ImportWorkflowContent from "../ImportWorkflowContent";
-import { FlowTeam, CreateWorkflowSummary, WorkflowExport, WorkflowSummary } from "Types";
+import { WorkflowView } from "Constants";
+import { FlowTeam, CreateWorkflowSummary, Workflow } from "Types";
 import styles from "./createWorkflowContainer.module.scss";
 
 const NEW_WORKFLOW = "Start from scratch";
@@ -12,14 +13,12 @@ interface CreateWorkflowContainerProps {
   createError: any;
   createWorkflow: (workflowData: CreateWorkflowSummary) => Promise<void>;
   isLoading: boolean;
-  scope: string;
   importError: any;
-  importWorkflow: (workflowData: WorkflowExport, closeModal: () => void, team: FlowTeam) => Promise<void>;
-  team?: FlowTeam | null;
-  teams?: FlowTeam[] | null;
+  importWorkflow: (workflowData: Workflow, closeModal: () => void, team: FlowTeam) => Promise<void>;
+  team?: FlowTeam;
   type: string;
-  workflows?: WorkflowSummary[];
-  workflowQuotasEnabled: boolean;
+  workflows: Array<Workflow>;
+  teamQuotasEnabled: boolean;
 }
 
 const CreateWorkflowContainer: React.FC<CreateWorkflowContainerProps> = ({
@@ -29,12 +28,10 @@ const CreateWorkflowContainer: React.FC<CreateWorkflowContainerProps> = ({
   importError,
   importWorkflow,
   isLoading,
-  scope,
   team,
-  teams,
   type,
   workflows,
-  workflowQuotasEnabled,
+  teamQuotasEnabled,
 }) => {
   const [selectedOption, setSelectedOption] = React.useState(NEW_WORKFLOW);
   const radioWorkflowOptions = [
@@ -66,11 +63,11 @@ const CreateWorkflowContainer: React.FC<CreateWorkflowContainerProps> = ({
           closeModal={closeModal}
           createWorkflow={createWorkflow}
           createError={createError}
+          existingWorkflowNames={existingWorkflowNames}
           isLoading={isLoading}
-          scope={scope}
           team={team}
-          teams={teams}
-          workflowQuotasEnabled={workflowQuotasEnabled}
+          teamQuotasEnabled={teamQuotasEnabled}
+          viewType={WorkflowView.Workflow}
         />
       ) : (
         <ImportWorkflowContent
@@ -79,9 +76,7 @@ const CreateWorkflowContainer: React.FC<CreateWorkflowContainerProps> = ({
           importError={importError}
           importWorkflow={importWorkflow}
           isLoading={isLoading}
-          scope={scope}
           team={team}
-          teams={teams}
           type={type}
         />
       )}

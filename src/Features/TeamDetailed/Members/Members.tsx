@@ -1,6 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import moment from "moment";
+import { useMutation, useQueryClient } from "react-query";
+import { resolver } from "Config/servicesConfig";
 import { matchSorter as ms } from "match-sorter";
 import sortBy from "lodash/sortBy";
 import { Link } from "react-router-dom";
@@ -12,37 +13,55 @@ import {
   StructuredListRow,
   StructuredListCell,
 } from "@carbon/react";
+import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import { appLink } from "Config/appConfig";
-import { FlowTeam, FlowUser } from "Types";
+import { FlowTeam, FlowUser, Member } from "Types";
 import EmptyState from "Components/EmptyState";
 import AddMember from "./AddMember";
+import AddMemberSearch from "./AddMemberSearch";
 import RemoveMember from "./RemoveMember";
 import styles from "./Members.module.scss";
 
 interface MemberProps {
-  isActive: boolean;
-  memberList: FlowUser[];
+  canEdit: boolean;
   team: FlowTeam;
-  teamManagementEnabled: any;
   user: FlowUser;
+  teamDetailsUrl: string;
 }
 
-const Members: React.FC<MemberProps> = ({ isActive, memberList = [], team, teamManagementEnabled, user }) => {
+const Members: React.FC<MemberProps> = ({ canEdit, team, user, teamDetailsUrl }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredMemberList = searchQuery ? ms(memberList, searchQuery, { keys: ["name", "email"] }) : memberList;
+  const filteredMemberList = searchQuery ? ms(team.members, searchQuery, { keys: ["name", "email"] }) : team.members;
+  const memberMutator = useMutation(resolver.patchTeam);
+  const queryClient = useQueryClient();
 
-  const memberIdList = memberList?.map((member) => member.id);
+  const handleSubmit = async (request: Array<Member>) => {
+    try {
+      await memberMutator.mutateAsync({ team: team.name, body: { members: request } });
+      queryClient.invalidateQueries([teamDetailsUrl]);
+      request.forEach((user: Member) => {
+        return notify(
+          <ToastNotification
+            title="Add User"
+            subtitle={`Request to add ${user.email} to ${team.displayName} submitted`}
+            kind="success"
+          />,
+        );
+      });
+    } catch (error) {
+      // noop
+    }
+  };
 
-  const canEdit = isActive && teamManagementEnabled;
-
+  const isAdmin = user?.type === "admin";
   return (
-    <section aria-label={`${team.name} Team Members`} className={styles.container}>
+    <section aria-label={`${team.displayName} Team Members`} className={styles.container}>
       <Helmet>
-        <title>{`Members - ${team.name}`}</title>
+        <title>{`Members - ${team.displayName}`}</title>
       </Helmet>
       <section className={styles.actionsContainer}>
         <div className={styles.leftActions}>
-          <p className={styles.featureDescription}>These are the people who have access to workflows for this Team.</p>
+          <p className={styles.featureDescription}>These are the people who have access to this Team.</p>
           <p className={styles.memberCountText}>
             Showing {filteredMemberList.length} member{filteredMemberList.length !== 1 ? "s" : ""}
           </p>
@@ -55,7 +74,20 @@ const Members: React.FC<MemberProps> = ({ isActive, memberList = [], team, teamM
         </div>
         {canEdit && (
           <div className={styles.rightActions}>
-            <AddMember teamId={team.id} teamName={team.name} memberList={memberList} memberIdList={memberIdList} />
+            {isAdmin && (
+              <AddMemberSearch
+                memberList={team.members}
+                handleSubmit={handleSubmit}
+                isSubmitting={memberMutator.isLoading}
+                error={memberMutator.error}
+              />
+            )}
+            <AddMember
+              memberList={team.members}
+              handleSubmit={handleSubmit}
+              isSubmitting={memberMutator.isLoading}
+              error={memberMutator.error}
+            />
           </div>
         )}
       </section>
@@ -65,9 +97,7 @@ const Members: React.FC<MemberProps> = ({ isActive, memberList = [], team, teamM
             <StructuredListRow head>
               <StructuredListCell head>Name</StructuredListCell>
               <StructuredListCell head>Email</StructuredListCell>
-
-              <StructuredListCell head>Added on</StructuredListCell>
-              <StructuredListCell head />
+              <StructuredListCell head>Role</StructuredListCell>
               <StructuredListCell head />
               <StructuredListCell head />
             </StructuredListRow>
@@ -82,28 +112,20 @@ const Members: React.FC<MemberProps> = ({ isActive, memberList = [], team, teamM
                     </div>
                   </StructuredListCell>
                   <StructuredListCell>{member.email}</StructuredListCell>
-                  <StructuredListCell>{moment(member.firstLoginDate).format("MMMM D, YYYY")}</StructuredListCell>
-                  <StructuredListCell>
-                    {canEdit && (
-                      <RemoveMember
-                        member={member}
-                        memberIdList={memberIdList}
-                        teamId={team.id}
-                        teamName={team.name}
-                        userId={user.id}
-                      />
-                    )}
-                  </StructuredListCell>
+                  <StructuredListCell>{member.role}</StructuredListCell>
                   <StructuredListCell>
                     <Link
                       className={styles.viewMemberLink}
                       to={{
                         pathname: appLink.user({ userId: member.id }),
-                        state: { fromTeam: { id: team.id, name: team.name } },
+                        state: { fromTeam: team.name },
                       }}
                     >
                       View user
                     </Link>
+                  </StructuredListCell>
+                  <StructuredListCell>
+                    {canEdit && <RemoveMember member={member} teamName={team.name} userId={user.id} />}
                   </StructuredListCell>
                 </StructuredListRow>
               );

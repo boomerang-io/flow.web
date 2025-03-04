@@ -1,8 +1,8 @@
 //@ts-nocheck
-import PropTypes from "prop-types";
-import cx from "classnames";
-import EditButton from "./EditButton";
 import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
+import cx from "classnames";
+import PropTypes from "prop-types";
+import EditButton from "./EditButton";
 import styles from "./WorkflowEditButton.module.scss";
 
 WorkflowEditButton.propTypes = {

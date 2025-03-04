@@ -2,7 +2,7 @@ import React from "react";
 import { useQueryClient, useMutation } from "react-query";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useAppContext } from "Hooks";
+import { useAppContext, useTeamContext } from "Hooks";
 import {
   ComposedModal,
   Loading,
@@ -52,8 +52,6 @@ function ApproveRejectActions({
   onSuccessfulApprovalRejection,
   type,
 }: ApproveRejectActionsProps) {
-  const cancelRequestRef = React.useRef<any>();
-
   let title = "Approve selected actions";
   let subtitle = `You have selected ${actions.length} action${
     actions.length > 1 ? "s" : ""
@@ -75,14 +73,12 @@ function ApproveRejectActions({
       composedModalProps={{ containerClassName: styles.modalContainer, shouldCloseOnOverlayClick: false }}
       modalHeaderProps={{ title, subtitle }}
       onCloseModal={() => {
-        if (cancelRequestRef.current) cancelRequestRef.current();
         handleCloseModal && handleCloseModal();
       }}
     >
       {(props: any) => (
         <Form
           actions={actions}
-          cancelRequestRef={cancelRequestRef}
           isAlreadyApproved={isAlreadyApproved}
           onSuccessfulApprovalRejection={onSuccessfulApprovalRejection}
           queryToRefetch={queryToRefetch}
@@ -96,7 +92,6 @@ function ApproveRejectActions({
 
 type FormProps = {
   actions: Action[];
-  cancelRequestRef: any;
   closeModal: (args?: any) => void;
   isAlreadyApproved: boolean;
   onSuccessfulApprovalRejection: () => any;
@@ -106,7 +101,6 @@ type FormProps = {
 
 function Form({
   actions,
-  cancelRequestRef,
   closeModal,
   isAlreadyApproved,
   onSuccessfulApprovalRejection,
@@ -114,6 +108,7 @@ function Form({
   type,
 }: FormProps) {
   const { user } = useAppContext();
+  const { team } = useTeamContext();
   const queryClient = useQueryClient();
   const [approveLoading, setApproveLoading] = React.useState(false);
   const [rejectLoading, setRejectLoading] = React.useState(false);
@@ -123,11 +118,7 @@ function Form({
     mutateAsync: actionsMutation,
     isLoading: actionsIsLoading,
     isError: actionsPutError,
-  } = useMutation((args: { body: any }) => {
-    const { promise, cancel } = resolver.putWorkflowAction(args);
-    cancelRequestRef.current = cancel;
-    return promise;
-  });
+  } = useMutation(resolver.putAction);
 
   const handleActions =
     ({ approved, notificationSubtitle, notificationTitle, setLoading, values }: any) =>
@@ -140,7 +131,7 @@ function Form({
       });
 
       try {
-        await actionsMutation({ body: request });
+        await actionsMutation({ team: team?.name, body: request });
         typeof setLoading === "function" && setLoading(false);
         onSuccessfulApprovalRejection();
         queryClient.invalidateQueries(queryToRefetch);

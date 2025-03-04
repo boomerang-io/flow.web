@@ -1,7 +1,8 @@
 const profile = {
   id: "59aebd0c7424530fce952fde",
-  email: "trbula@us.ibm.com",
-  name: "Timothy Bula",
+  email: "tyson@flowabl.io",
+  name: "Tyson Lawrie",
+  displayName: "TL",
   isFirstVisit: false,
   type: "admin",
   isShowHelp: true,
@@ -32,7 +33,44 @@ const profile = {
   notificationSettings: {},
   status: "active",
   projects: null,
-  teams: null,
+  teams: [
+      {
+          name: "tyson-team",
+          displayName: "Tyson Team",
+          creationDate: "2023-07-20T06:31:56.322+00:00",
+          status: "active",
+          externalRef: null,
+          labels: {},
+          insights: {
+              "workflows": 3,
+              "members": 1
+          }
+      },
+      {
+          name: "admin-flowabl-io-personal-team",
+          displayName: "admin-flowabl-io Personal Team",
+          creationDate: "2023-07-20T06:35:17.481+00:00",
+          status: "active",
+          externalRef: null,
+          labels: {},
+          insights: {
+              "workflows": 1,
+              "members": 12
+          }
+      },
+      {
+          name: "system",
+          displayName: "System and Administration",
+          creationDate: "2023-07-20T06:37:47.889+00:00",
+          status: "active",
+          externalRef: null,
+          labels: {},
+          insights: {
+              "workflows": 7,
+              "members": 1
+          }
+      }
+  ],
   hasConsented: true,
 };
 

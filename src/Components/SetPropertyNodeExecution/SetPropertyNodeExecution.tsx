@@ -1,9 +1,8 @@
 import React from "react";
-// import PropTypes from "prop-types";
 import cx from "classnames";
 import { useExecutionContext } from "Hooks";
 import WorkflowNode from "Components/WorkflowNode";
-import { ExecutionStatus } from "Types";
+import { RunStatus } from "Types";
 import styles from "./SetPropertyNodeExecution.module.scss";
 
 import SetPropertyNodeModel from "Utils/dag/setPropertyNode/setPropertyNodeModel";
@@ -22,7 +21,7 @@ const CustomTaskNodeExecution: React.FC<SetPropertyExecutionProps> = (props) => 
     ? workflowExecution?.steps.find((step) => step.taskId === id)?.flowTaskStatus
     : null;
   // const flowTaskStatus = stepTaskStatus ?? ExecutionStatus.Skipped;
-  const flowTaskStatus = stepTaskStatus ? stepTaskStatus : ExecutionStatus.Skipped;
+  const flowTaskStatus = stepTaskStatus ? stepTaskStatus : RunStatus.Skipped;
 
   const scrollToTask = () => {
     const taskLogItem = document.getElementById(`task-${id}`);
@@ -35,7 +34,7 @@ const CustomTaskNodeExecution: React.FC<SetPropertyExecutionProps> = (props) => 
   return (
     <WorkflowNode
       category={task?.category}
-      className={cx(styles[flowTaskStatus], { [styles.disabled]: flowTaskStatus === ExecutionStatus.NotStarted })}
+      className={cx(styles[flowTaskStatus], { [styles.disabled]: flowTaskStatus === RunStatus.NotStarted })}
       icon={task?.icon}
       isExecution
       name={task?.name}

@@ -2,20 +2,8 @@ import React, { useState, useEffect } from "react";
 import useAxios from "axios-hooks";
 import queryString from "query-string";
 import { useMutation, useQueryClient } from "react-query";
-import {
-  Button,
-  InlineNotification,
-  ModalBody,
-  ModalFooter,
-  Search,
-} from "@carbon/react";
-import {
-  Error,
-  Loading,
-  ModalFlowForm,
-  notify,
-  ToastNotification,
-} from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button, InlineNotification, ModalBody, ModalFooter, Search } from "@carbon/react";
+import { Error, Loading, ModalForm, notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import { resolver, serviceUrl } from "Config/servicesConfig";
 import { FlowUser } from "Types";
 import MemberBar from "./MemberBar";
@@ -25,28 +13,22 @@ interface AddMemberContentProps {
   closeModal: Function;
   memberList: FlowUser[];
   memberIdList: string[];
-  teamId: string;
   teamName: string;
 }
-const AddMemberContent: React.FC<AddMemberContentProps> = ({
-  closeModal,
-  memberList,
-  memberIdList,
-  teamId,
-  teamName,
-}) => {
+const AddMemberContent: React.FC<AddMemberContentProps> = ({ closeModal, memberList, memberIdList, teamName }) => {
   const [{ data: usersList, error }, fetchUsersList] = useAxios({ method: "get" }, { manual: true });
   const [selectedUsers, setSelectedUsers] = useState<FlowUser[]>([]);
   const [usersListOpen, setUsersListOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  const { mutateAsync: addMemberMutator, isLoading: addMemberisLoading, error: addMemberError } = useMutation(
-    resolver.patchManageTeamUser,
-    {
-      onSuccess: () => queryClient.invalidateQueries(serviceUrl.getManageTeam({ teamId })),
-    }
-  );
+  const {
+    mutateAsync: addMemberMutator,
+    isLoading: addMemberisLoading,
+    error: addMemberError,
+  } = useMutation(resolver.patchTeam, {
+    onSuccess: () => queryClient.invalidateQueries(serviceUrl.resourceTeam({ team: teamName })),
+  });
 
   const searchRef = React.useRef<HTMLDivElement | null>();
 
@@ -69,7 +51,7 @@ const AddMemberContent: React.FC<AddMemberContentProps> = ({
     if (searchQuery) {
       const queryStr = queryString.stringify({ page: 0, size: 20, query: searchQuery });
 
-      fetchUsersList({ url: serviceUrl.getManageUsers({ query: queryStr }) });
+      fetchUsersList({ url: serviceUrl.getUsers({ query: queryStr }) });
       setSearchQuery(searchQuery);
       setUsersListOpen(true);
     } else {
@@ -97,7 +79,7 @@ const AddMemberContent: React.FC<AddMemberContentProps> = ({
     const addUserRequestData = memberIdList.concat(selectedUsers.map((user) => user.id));
 
     try {
-      await addMemberMutator({ teamId, body: addUserRequestData });
+      await addMemberMutator({ team: teamName, body: addUserRequestData });
       selectedUsers.forEach((user) => {
         return notify(
           <ToastNotification
@@ -142,7 +124,7 @@ const AddMemberContent: React.FC<AddMemberContentProps> = ({
   };
 
   return (
-    <ModalFlowForm onSubmit={handleSubmit}>
+    <ModalForm onSubmit={handleSubmit}>
       <ModalBody>
         {addMemberisLoading && <Loading />}
         <div ref={searchRef as React.RefObject<HTMLDivElement>} className={styles.search}>
@@ -182,7 +164,7 @@ const AddMemberContent: React.FC<AddMemberContentProps> = ({
           {addMemberisLoading ? "Adding..." : addMemberError ? "Try Again" : "Add to team"}
         </Button>
       </ModalFooter>
-    </ModalFlowForm>
+    </ModalForm>
   );
 };
 
