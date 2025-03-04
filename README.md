@@ -8,7 +8,7 @@ View current project work in our [community roadmap repo](https://github.com/boo
 
 ## Getting Started with Vite
 
-This project was bootstrapped with [Vite](https://github.com/vitejs/vite).
+This project is built with [Vite](https://vitejs.dev/).
 
 ## Local Development
 
