@@ -5,6 +5,7 @@ import { Draggable as DraggableIcon, TrashCan, Bee } from "@carbon/react/icons";
 import { Loading, notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import { formatErrorMessage } from "@boomerang-io/utils";
 import { sentenceCase } from "change-case";
+import { log } from "console";
 import { Formik } from "formik";
 import fileDownload from "js-file-download";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -27,7 +28,6 @@ import { DataDrivenInput, Task } from "Types";
 import Header from "../Header";
 import { TemplateRequestType, FieldTypes } from "../constants";
 import styles from "./TaskTemplateOverview.module.scss";
-import { log } from "console";
 
 interface DetailDataElementsProps {
   label: string;
@@ -115,7 +115,7 @@ const Field: React.FC<FieldProps> = ({
         data-testid={field.label}
         style={{ marginLeft: `${isOldVersion || !isActive ? "1.5rem" : "0"}` }}
       >
-        {`${FieldTypes[field.type]} | ${field.label} - ${field.key}`}
+        {`${FieldTypes[field.type]} | ${field.label} - ${field.name}`}
       </dd>
       <div className={styles.actions}>
         <TemplateConfigModal
@@ -263,8 +263,8 @@ export function TaskTemplateOverview({
   const isActive = selectedTaskTemplate.status === TaskTemplateStatus.Active;
   // params.version is a string, getChangelogQuery.data.length is a number
   const isOldVersion = Boolean(params.version < getChangelogQuery.data.length);
-  const fieldKeys = selectedTaskTemplate.config?.map((input: DataDrivenInput) => input.key) ?? [];
-  const resultKeys = selectedTaskTemplate.result?.map((input: DataDrivenInput) => input.key) ?? [];
+  const fieldKeys = selectedTaskTemplate.spec.params?.map((input: DataDrivenInput) => input.name) ?? [];
+  const resultKeys = selectedTaskTemplate.spec.results?.map((input: DataDrivenInput) => input.name) ?? [];
 
   const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -275,22 +275,27 @@ export function TaskTemplateOverview({
 
   const handleSaveTaskTemplate = async (values, resetForm, requestType, setRequestError, closeModal) => {
     setIsSaving(true);
-    console.log('Request Type:', requestType);
+    console.log("Request Type:", requestType);
     let newVersion =
       requestType === TemplateRequestType.Overwrite ? selectedTaskTemplate.version : getChangelogQuery.data.length + 1;
     let changeReason =
       requestType === TemplateRequestType.Copy
         ? `Version copied from ${values.currentConfig.version}`
         : values.comments;
-    let newEnvs = values.envs ? values.envs.map((env) => {
-      let index = env.indexOf(":");
-      return { name: env.substring(0, index), value: env.substring(index + 1, env.length) };
-    }) : selectedTaskTemplate.spec.envs;
+    let newEnvs = values.envs
+      ? values.envs.map((env) => {
+          let index = env.indexOf(":");
+          return { name: env.substring(0, index), value: env.substring(index + 1, env.length) };
+        })
+      : selectedTaskTemplate.spec.envs;
     const spec = {
-      arguments: Boolean(values.arguments) ? values.arguments.trim().split(/\n{1,}/) : selectedTaskTemplate.spec.arguments,
+      arguments: Boolean(values.arguments)
+        ? values.arguments.trim().split(/\n{1,}/)
+        : selectedTaskTemplate.spec.arguments,
       command: Boolean(values.command) ? values.command.trim().split(/\n{1,}/) : selectedTaskTemplate.spec.command,
       envs: newEnvs,
       image: values.image ? values.image : selectedTaskTemplate.spec.image,
+      params: Boolean(values.currentConfig) ? values.currentConfig : selectedTaskTemplate.spec.params,
       results: Boolean(values.result) ? values.result : selectedTaskTemplate.spec.results,
       script: values.script ? values.script : selectedTaskTemplate.spec.script,
       workingDir: values.workingDir ? values.workingDir : selectedTaskTemplate.spec.workingDir,
@@ -305,15 +310,20 @@ export function TaskTemplateOverview({
       icon: values.icon ? values.icon : selectedTaskTemplate.icon,
       type: "template",
       changelog: { reason: changeReason },
-      config: Boolean(values.currentConfig) ? values.currentConfig : [],
       spec: spec,
     };
 
     try {
       let replace = requestType === TemplateRequestType.Overwrite ? "true" : "false";
       let response;
+      console.log("Name:", params.name);
       if (params.team) {
-        response = await applyTeamTaskTemplateMutation.mutateAsync({ name: params.name, team: params.team, replace, body });
+        response = await applyTeamTaskTemplateMutation.mutateAsync({
+          name: params.name,
+          team: params.team,
+          replace,
+          body,
+        });
       } else {
         response = await applyTaskTemplateMutation.mutateAsync({ name: params.name, replace, body });
       }
@@ -374,10 +384,11 @@ export function TaskTemplateOverview({
         await applyTeamTaskTemplateMutation.mutateAsync({
           replace: "true",
           team: params.team,
+          name: params.name,
           body: selectedTaskTemplate,
         });
       } else {
-        await applyTaskTemplateMutation.mutateAsync({ replace: "true", body: selectedTaskTemplate });
+        await applyTaskTemplateMutation.mutateAsync({ replace: "true", name: params.name, body: selectedTaskTemplate });
       }
       await queryClient.invalidateQueries(getTaskTemplateUrl);
       await queryClient.invalidateQueries(getChangelogUrl);
@@ -386,7 +397,7 @@ export function TaskTemplateOverview({
         <ToastNotification
           kind="success"
           title={"Successfully Archived Task Template"}
-          subtitle={`Request to archive ${selectedTaskTemplate.name} succeeded`}
+          subtitle={`Request to archive ${params.name} succeeded`}
           data-testid="archive-task-template-notification"
         />,
       );
@@ -409,10 +420,11 @@ export function TaskTemplateOverview({
         await applyTeamTaskTemplateMutation.mutateAsync({
           replace: "true",
           team: params.team,
+          name: params.name,
           body: selectedTaskTemplate,
         });
       } else {
-        await applyTaskTemplateMutation.mutateAsync({ replace: "true", body: selectedTaskTemplate });
+        await applyTaskTemplateMutation.mutateAsync({ replace: "true", name: params.name, body: selectedTaskTemplate });
       }
       await queryClient.invalidateQueries(getTaskTemplateUrl);
       await queryClient.invalidateQueries(getChangelogUrl);
@@ -471,7 +483,7 @@ export function TaskTemplateOverview({
         icon: selectedTaskTemplate.icon,
         category: selectedTaskTemplate.category,
         image: selectedTaskTemplate.spec.image,
-        currentConfig: selectedTaskTemplate.config ?? [],
+        currentConfig: selectedTaskTemplate.spec.params ?? [],
         arguments: Array.isArray(selectedTaskTemplate.spec.arguments)
           ? selectedTaskTemplate.spec.arguments?.join("\n")
           : selectedTaskTemplate.spec.arguments ?? "",
@@ -490,7 +502,7 @@ export function TaskTemplateOverview({
         const { setFieldValue, values, dirty: isDirty, isSubmitting } = formikProps;
 
         function deleteConfiguration(selectedField) {
-          const configIndex = values.currentConfig.findIndex((field) => field.key === selectedField.key);
+          const configIndex = values.currentConfig.findIndex((field) => field.name === selectedField.name);
           let newProperties = [].concat(values.currentConfig);
           newProperties.splice(configIndex, 1);
           setFieldValue("currentConfig", newProperties);
@@ -608,7 +620,7 @@ export function TaskTemplateOverview({
                         <div className={styles.fieldsContainer} ref={provided.innerRef}>
                           {values.currentConfig?.length > 0 ? (
                             values.currentConfig.map((field, index) => (
-                              <Draggable key={field.key} draggableId={field.key} index={index}>
+                              <Draggable key={field.name} draggableId={field.name} index={index}>
                                 {(provided) => (
                                   <Field
                                     field={field}

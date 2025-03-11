@@ -24,7 +24,7 @@ function TaskTemplatesContainer() {
   const match = useRouteMatch();
   const editVerifiedTasksEnabled = useFeature(FeatureFlag.EditVerifiedTasksEnabled);
   const getTeamTaskTemplatesUrl = serviceUrl.team.task.queryTasks({
-    query: queryString.stringify({ statuses: 'active,inactive' }),
+    query: queryString.stringify({ statuses: "active,inactive" }),
     team: team.name,
   });
   const {

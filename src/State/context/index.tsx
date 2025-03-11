@@ -4,7 +4,7 @@ import {
   FlowUser,
   PaginatedWorkflowResponse,
   Task,
-  WorkflowEditor,
+  WorkflowCanvas,
   WorkflowEngineModeType,
   WorkflowRun,
 } from "Types";
@@ -38,7 +38,7 @@ interface WorkflowContext {
 export const [useWorkflowContext, WorkflowProvider] = createContext<WorkflowContext>();
 
 interface RunContext {
-  workflow: WorkflowEditor;
+  workflow: WorkflowCanvas;
   workflowRun: WorkflowRun;
 }
 export const [useRunContext, RunContextProvider] = createContext<RunContext>();
@@ -46,7 +46,7 @@ export const [useRunContext, RunContextProvider] = createContext<RunContext>();
 interface EditorContext {
   availableParameters: Array<string>;
   revisionDispatch?: Function;
-  revisionState: WorkflowEditor;
+  revisionState: WorkflowCanvas;
   workflowsQueryData: PaginatedWorkflowResponse;
 }
 

@@ -24,7 +24,7 @@ import { WorkflowView } from "Constants";
 import { appLink, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
 import { BASE_URL } from "Config/servicesConfig";
-import { FlowTeamQuotas, ModalTriggerProps, Workflow, WorkflowViewType, DataDrivenInput } from "Types";
+import { FlowTeamQuotas, ModalTriggerProps, Workflow, WorkflowViewType, DataDrivenInput, Parameter } from "Types";
 import UpdateWorkflow from "./UpdateWorkflow";
 import WorkflowInputModalContent from "./WorkflowInputModalContent";
 import WorkflowRunModalContent from "./WorkflowRunModalContent";
@@ -69,8 +69,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
    * @returns {Array}
    */
   const formatPropertiesForEdit = () => {
-    const { config = [] } = workflow;
-    return config.filter((configParam: DataDrivenInput) => !configParam.readOnly);
+    const { params = [] } = workflow;
+    return params.filter((param: DataDrivenInput) => !param.readOnly);
   };
 
   const handleDeleteWorkflow = async () => {
@@ -127,7 +127,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
   const handleExportWorkflow = (workflow: Workflow) => {
     notify(<ToastNotification kind="info" title={`Export ${viewType}`} subtitle="Export starting soon" />);
     axios
-      .get(serviceUrl.team.workflow.getExportWorkflow({team: teamName, workflowId: workflow.id}))
+      .get(serviceUrl.team.workflow.getExportWorkflow({ team: teamName, workflowId: workflow.id }))
       .then(({ data }) => {
         fileDownload(JSON.stringify(data, null, 4), `${workflow.name}.json`);
       })
@@ -180,9 +180,9 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
     } catch (err) {
       if (err.response?.status === 429) {
         seterrorMessage({
-            "title": "Quota Exceeded",
-            "message": err.response?.data?.message,
-          });
+          title: "Quota Exceeded",
+          message: err.response?.data?.message,
+        });
       } else {
         seterrorMessage(
           formatErrorMessage({

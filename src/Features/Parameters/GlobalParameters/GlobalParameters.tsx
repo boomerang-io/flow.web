@@ -1,8 +1,4 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import { useQuery, useQueryClient, useMutation } from "react-query";
-import ParametersTable from "../ParametersTable";
-import { serviceUrl, resolver } from "Config/servicesConfig";
 import {
   notify,
   ToastNotification,
@@ -10,8 +6,12 @@ import {
   FeatureHeaderTitle as HeaderTitle,
   FeatureHeaderSubtitle as HeaderSubtitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { DataDrivenInput } from "Types";
 import { formatErrorMessage } from "@boomerang-io/utils";
+import { Helmet } from "react-helmet";
+import { useQuery, useQueryClient, useMutation } from "react-query";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import { DataDrivenInput } from "Types";
+import ParametersTable from "../ParametersTable";
 import styles from "./globalParameters.module.scss";
 
 function GlobalParameters() {
@@ -26,7 +26,7 @@ function GlobalParameters() {
   const updateParameterMutation = useMutation(resolver.patchGlobalParameter);
   const deleteParameterMutation = useMutation(resolver.deleteGlobalParameter);
 
-  const handleSubmit = async (isEdit: boolean, parameter: DataDrivenInput) => {
+  const handleSubmit = async (isEdit: boolean, parameter: DataDrivenInput, closeModal: () => void) => {
     if (isEdit) {
       try {
         const response = await updateParameterMutation.mutateAsync({
@@ -40,7 +40,7 @@ function GlobalParameters() {
             title={"Parameter Updated"}
             subtitle={`Request to update ${response.data.label} succeeded`}
             data-testid="create-update-parameter-notification"
-          />
+          />,
         );
       } catch (err) {}
     } else {
@@ -53,17 +53,18 @@ function GlobalParameters() {
             title={"Parameter Created"}
             subtitle={`Request to create ${response.data.label} succeeded`}
             data-testid="create-update-parameter-notification"
-          />
+          />,
         );
       } catch (err) {
         //no-op
       }
+      closeModal();
     }
   };
 
   const handleDelete = async (parameter: DataDrivenInput) => {
     try {
-      await deleteParameterMutation.mutateAsync({ key: parameter.key });
+      await deleteParameterMutation.mutateAsync({ name: parameter.name });
       queryClient.invalidateQueries([parametersUrl]);
       notify(
         <ToastNotification
@@ -71,7 +72,7 @@ function GlobalParameters() {
           title={"Parameter Deleted"}
           subtitle={`Successfully deleted ${parameter.label}`}
           data-testid="delete-parameter-notification"
-        />
+        />,
       );
     } catch (err) {
       const errorMessages = formatErrorMessage({ error: err, defaultMessage: "Delete Parameter Failed" });
@@ -81,7 +82,7 @@ function GlobalParameters() {
           title={errorMessages.title}
           subtitle={errorMessages.message}
           data-testid="delete-parameter-notification"
-        />
+        />,
       );
     }
   };

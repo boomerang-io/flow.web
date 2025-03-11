@@ -1,11 +1,4 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import { useHistory, Link } from "react-router-dom";
-import { useMutation } from "react-query";
-import { useTeamContext } from "Hooks";
-import ParametersTable from "../ParametersTable";
-import { resolver } from "Config/servicesConfig";
-import { appLink } from "Config/appConfig";
 import { Breadcrumb, BreadcrumbItem } from "@carbon/react";
 import {
   notify,
@@ -14,18 +7,27 @@ import {
   FeatureHeaderTitle as HeaderTitle,
   FeatureHeaderSubtitle as HeaderSubtitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { DataDrivenInput } from "Types";
 import { formatErrorMessage } from "@boomerang-io/utils";
+import { paramCase } from "change-case";
+import { Helmet } from "react-helmet";
+import { useMutation, useQueryClient } from "react-query";
+import { useHistory, Link } from "react-router-dom";
+import { useTeamContext } from "Hooks";
+import { appLink } from "Config/appConfig";
+import { resolver, serviceUrl } from "Config/servicesConfig";
+import { DataDrivenInput } from "Types";
+import ParametersTable from "../ParametersTable";
 
 function TeamParameters() {
   const history = useHistory();
+  const queryClient = useQueryClient();
   const { team } = useTeamContext();
 
   /** Add / Update / Delete Team parameter */
   const parameterMutation = useMutation(resolver.patchTeam);
-  const deleteParameterMutation = useMutation(resolver.deleteTeamParameters);
+  const deleteParameterMutation = useMutation(resolver.deleteTeamParameter);
 
-  const handleSubmit = async (isEdit: boolean, parameter: DataDrivenInput) => {
+  const handleSubmit = async (isEdit: boolean, parameter: DataDrivenInput, closeModal: () => void) => {
     try {
       await parameterMutation.mutateAsync({
         team: team?.name,
@@ -38,7 +40,7 @@ function TeamParameters() {
             title={"Parameter Updated"}
             subtitle={`Request to update ${parameter.label} succeeded`}
             data-testid="create-update-team-prop-notification"
-          />
+          />,
         );
       } else {
         notify(
@@ -47,25 +49,38 @@ function TeamParameters() {
             title={"Parameter Created"}
             subtitle={`Request to create ${parameter.label} succeeded`}
             data-testid="create-update-team-prop-notification"
-          />
+          />,
         );
       }
+      queryClient.invalidateQueries([serviceUrl.resourceTeam({ team: team?.name })]);
+      closeModal();
     } catch (err) {
-      //no-op
+      //TODO switch this to an inline
+      const errorMessages = formatErrorMessage({ error: err, defaultMessage: "Delete Configuration Failed" });
+      notify(
+        <ToastNotification
+          kind="error"
+          title={errorMessages.title}
+          subtitle={errorMessages.message}
+          data-testid="create-param-notification"
+        />,
+      );
+      closeModal();
     }
   };
 
   const handleDelete = async (parameter: DataDrivenInput) => {
     try {
-      await deleteParameterMutation.mutateAsync({ team: team?.name, body: [parameter.key] });
+      await deleteParameterMutation.mutateAsync({ team: team?.name, name: parameter.name });
       notify(
         <ToastNotification
           kind="success"
-          title={"Team Configuration Deleted"}
+          title={"Parameter Deleted"}
           subtitle={`Request to delete ${parameter.label} succeeded`}
-          data-testid="delete-team-prop-notification"
-        />
+          data-testid="delete-team-param-notification"
+        />,
       );
+      queryClient.invalidateQueries([serviceUrl.resourceTeam({ team: team?.name })]);
     } catch (err) {
       const errorMessages = formatErrorMessage({ error: err, defaultMessage: "Delete Configuration Failed" });
       notify(
@@ -73,8 +88,8 @@ function TeamParameters() {
           kind="error"
           title={errorMessages.title}
           subtitle={errorMessages.message}
-          data-testid="delete-team-prop-notification"
-        />
+          data-testid="delete-team-param-notification"
+        />,
       );
     }
   };

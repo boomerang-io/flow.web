@@ -49,12 +49,12 @@ function AddTaskTemplate({ taskNames, history, getTaskTemplatesUrl }: AddTaskTem
         params.team
           ? appLink.manageTasksEdit({
               team: params.team,
-              name: task.name,
-              version: task.version.toString(),
+              name: name,
+              version: "1",
             })
           : appLink.adminTasksDetail({
-              name: task.name,
-              version: task.version.toString(),
+              name: name,
+              version: "1",
             }),
       );
       setIsSubmitting(false);
@@ -76,7 +76,12 @@ function AddTaskTemplate({ taskNames, history, getTaskTemplatesUrl }: AddTaskTem
         }
       } else {
         if (params.team) {
-          response = await createTeamTaskTemplateYAMLMutation.mutateAsync({ team: params.team, name: name, replace, body });
+          response = await createTeamTaskTemplateYAMLMutation.mutateAsync({
+            team: params.team,
+            name: name,
+            replace,
+            body,
+          });
         } else {
           response = await createTaskTemplateYAMLMutation.mutateAsync({ name: name, replace, body });
         }

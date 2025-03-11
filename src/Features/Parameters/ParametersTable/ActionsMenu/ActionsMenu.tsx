@@ -10,7 +10,7 @@ interface OverflowMenuComponentProps {
   isSubmitting: boolean;
   errorSubmitting: boolean;
   handleDelete: (parameter: DataDrivenInput) => Promise<void>;
-  handleSubmit: (isEdit: boolean, parameter: any) => Promise<void>;
+  handleSubmit: (isEdit: boolean, parameter: any, closeModal: () => void) => Promise<void>;
 }
 
 const OverflowMenuComponent: React.FC<OverflowMenuComponentProps> = ({

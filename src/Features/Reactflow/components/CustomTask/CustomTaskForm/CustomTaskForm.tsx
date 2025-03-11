@@ -40,12 +40,12 @@ function CustomTaskForm(props: CustomTaskFormProps) {
     props.closeModal();
   };
 
-  const taskVersionConfig = task.config;
+  const taskVersionConfig = task.spec.params ?? [];
 
   // Add the name and future inputs
   const inputs = [
     {
-      key: "taskName",
+      name: "taskName",
       id: "taskName",
       label: "Task Name",
       placeholder: "Enter a task name",
@@ -56,7 +56,7 @@ function CustomTaskForm(props: CustomTaskFormProps) {
     ...taskVersionConfig,
     {
       results: node?.results,
-      key: "results",
+      name: "results",
       type: "custom",
       customComponent: ResultsInput,
     },

@@ -60,10 +60,11 @@ export const ExecutionStatusCopy: Record<RunStatus, string> = {
 } as const;
 
 export const InputProperty = {
-  DefaultValue: "defaultValue",
+  DefaultValue: "default",
   Description: "description",
   HelperText: "helperText",
-  Key: "key",
+  Key: "name",
+  Name: "name",
   Label: "label",
   Options: "options",
   Placeholder: "placeholder",
@@ -241,8 +242,8 @@ export const executionStatusList = [
 ];
 
 export const FlowTeamStatus = {
-  Active:"active",
-  Inactive:"inactive",
+  Active: "active",
+  Inactive: "inactive",
 } as const;
 
 export const WorkflowView = {
@@ -276,7 +277,7 @@ export const TokenType = {
   User: "user",
   Workflow: "workflow",
   Team: "team",
-  Global: "global"
+  Global: "global",
 } as const;
 
 export const elevatedUserRoles = [PlatformRole.Admin, PlatformRole.Operator];
@@ -318,13 +319,13 @@ export const yamlInstructions = `  # Getting started
   boomerang.io/icon: Add
   \`\`\`
   ### Params
-  The following definition will match the \`key\` element with the \`name\` element in the params specification of the task. Additional parameter types are supported for the experience including texteditor, boolean, and options. For more detailed information on the available parameters please see [Boomerang Flow Tasks](https://www.useboomerang.io/docs/boomerang-flow/3.1.0/getting-to-know/tasks).
+  The following definition will match the \`name\` element with the \`name\` element in the params specification of the task. Additional parameter types are supported for the experience including texteditor, boolean, and options. For more detailed information on the available parameters please see [Boomerang Flow Tasks](https://www.useboomerang.io/docs/boomerang-flow/3.1.0/getting-to-know/tasks).
   \`\`\`
       boomerang.io/params:
       - required: true
         placeholder: ""
         readOnly: false
-        key: folderId
+        name: folderId
         label: Folder Id
         type: text
         helperText: Box folder id

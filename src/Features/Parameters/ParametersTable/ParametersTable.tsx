@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { DataTable, Pagination, DataTableSkeleton } from "@carbon/react";
+import { Checkmark, Close } from "@carbon/react/icons";
 import { Error } from "@boomerang-io/carbon-addons-boomerang-react";
-import CreateEditParametersModal from "../CreateEditParametersModal";
-import ActionsMenu from "./ActionsMenu";
 import EmptyState from "Components/EmptyState";
 import { InputType, PASSWORD_CONSTANT } from "Constants";
 import { DataDrivenInput } from "Types";
-import { Checkmark, Close } from "@carbon/react/icons";
+import CreateEditParametersModal from "../CreateEditParametersModal";
+import ActionsMenu from "./ActionsMenu";
 import styles from "./parametersTable.module.scss";
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -18,8 +18,8 @@ const headers = [
     sortable: true,
   },
   {
-    header: "Key",
-    key: "key",
+    header: "Name",
+    key: "name",
     sortable: true,
   },
   {
@@ -50,7 +50,7 @@ interface ParametersTableProps {
   errorLoading: boolean;
   errorSubmitting: boolean;
   handleDelete: (parameter: DataDrivenInput) => Promise<void>;
-  handleSubmit: (isEdit: boolean, parameter: DataDrivenInput) => Promise<void>;
+  handleSubmit: (isEdit: boolean, parameter: DataDrivenInput, closeModal: () => void) => Promise<void>;
 }
 
 const ParametersTable: React.FC<ParametersTableProps> = ({
@@ -175,7 +175,7 @@ const ParametersTable: React.FC<ParametersTableProps> = ({
           </>
         ) : (
           <>
-            <EmptyState title="No team parameters" message={null} />
+            <EmptyState title="No parameters found" message={null} />
           </>
         )}
       </div>

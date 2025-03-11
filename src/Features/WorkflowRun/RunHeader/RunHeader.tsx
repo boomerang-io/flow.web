@@ -20,11 +20,11 @@ import ErrorModal from "Components/ErrorModal";
 import { useTeamContext } from "Hooks";
 import { appLink } from "Config/appConfig";
 import { resolver, serviceUrl } from "Config/servicesConfig";
-import { RunStatus, WorkflowEditor, WorkflowRun } from "Types";
+import { RunStatus, WorkflowCanvas, WorkflowRun } from "Types";
 import styles from "./RunHeader.module.scss";
 
 type Props = {
-  workflow: WorkflowEditor;
+  workflow: WorkflowCanvas;
   workflowRun: WorkflowRun;
   version: number;
 };
@@ -214,7 +214,7 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
   );
 }
 
-function WorkflowAdvancedDetail({ workflow }: { workflow: WorkflowEditor }) {
+function WorkflowAdvancedDetail({ workflow }: { workflow: WorkflowCanvas }) {
   const { workflowId, runId }: { workflowId: string; runId: string } = useParams();
   const [copyTokenText, setCopyTokenText] = React.useState("Copy");
 

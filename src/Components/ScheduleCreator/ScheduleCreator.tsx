@@ -69,9 +69,14 @@ export default function CreateSchedule(props: CreateScheduleProps) {
     // }
 
     // Undo the namespacing of parameter keys and add to parameter object
-    const resetParameters: { [key: string]: any } = {};
+    const resetParameters: ScheduleUnion["params"] = [];
     Object.keys(parameters).forEach((paramKey) => {
-      resetParameters[paramKey.replace("$parameter:", "")] = parameters[paramKey];
+      const key = paramKey.replace("$parameter:", "");
+      const param = {
+        name: key,
+        value: parameters[paramKey],
+      };
+      resetParameters.push(param);
     });
 
     const schedule: Partial<ScheduleUnion> = {
@@ -80,7 +85,7 @@ export default function CreateSchedule(props: CreateScheduleProps) {
       type,
       timezone: timezone.value,
       labels: scheduleLabels,
-      parameters: resetParameters,
+      params: resetParameters,
       workflowRef: workflow.id,
     };
 

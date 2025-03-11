@@ -1,9 +1,9 @@
-import { ComposedModal, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import React from "react";
 import { Button } from "@carbon/react";
 import { Add, Edit } from "@carbon/react/icons";
-import React from "react";
-import TemplateConfigModalContent from "./TemplateConfigModalContent";
+import { ComposedModal, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import { DataDrivenInput, ModalTriggerProps } from "Types";
+import TemplateConfigModalContent from "./TemplateConfigModalContent";
 
 interface TemplateConfigModalProps {
   field: DataDrivenInput;

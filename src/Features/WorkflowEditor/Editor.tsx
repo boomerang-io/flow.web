@@ -22,7 +22,7 @@ import {
   PaginatedWorkflowResponse,
   Task,
   Workflow,
-  WorkflowEditor,
+  WorkflowCanvas,
   FlowTeam,
 } from "Types";
 import ChangeLog from "./ChangeLog";
@@ -72,7 +72,7 @@ export default function EditorContainer() {
   /**
    * Queries
    */
-  const workflowQuery = useQuery<WorkflowEditor>(getWorkflowUrl);
+  const workflowQuery = useQuery<WorkflowCanvas>(getWorkflowUrl);
   const workflowsQuery = useQuery<PaginatedWorkflowResponse>(getWorkflowsUrl);
   const changeLogQuery = useQuery<ChangeLogType>(getChangelogUrl);
   const availableParametersQuery = useQuery<Array<string>>(getAvailableParametersUrl);
@@ -156,7 +156,7 @@ interface EditorStateContainerProps {
   setRevisionNumber: React.Dispatch<React.SetStateAction<string | number>>;
   taskList: Array<Task>;
   workflowQueryUrl: string;
-  workflowQueryData: WorkflowEditor;
+  workflowQueryData: WorkflowCanvas;
   workflowsQueryData: PaginatedWorkflowResponse;
   workflowId: string;
   team: FlowTeam;
@@ -378,7 +378,7 @@ const EditorStateContainer: React.FC<EditorStateContainerProps> = ({
  * Format the form configure values into something that the API accepts
  * Update the `workspaces` and `labels` to be in the right format
  */
-function formatConfigureValues(configureValues: ConfigureWorkflowFormValues): Partial<WorkflowEditor> {
+function formatConfigureValues(configureValues: ConfigureWorkflowFormValues): Partial<WorkflowCanvas> {
   const optionalConfigureValues: Partial<ConfigureWorkflowFormValues> = configureValues;
 
   // Format labels
@@ -409,11 +409,11 @@ function formatConfigureValues(configureValues: ConfigureWorkflowFormValues): Pa
       }
     : null;
 
-  const workspaces = [workflowStorageConfig, workflowRunStorageConfig].filter(Boolean) as WorkflowEditor["workspaces"];
+  const workspaces = [workflowStorageConfig, workflowRunStorageConfig].filter(Boolean) as WorkflowCanvas["workspaces"];
 
   delete optionalConfigureValues["storage"];
 
-  const formattedWorkflowConfig: Partial<WorkflowEditor> = {
+  const formattedWorkflowConfig: Partial<WorkflowCanvas> = {
     ...optionalConfigureValues,
     workspaces,
     labels: labelsKVObject,

@@ -34,7 +34,7 @@ const workflowsCompose = [
       github: {
         type: "github",
         enabled: false,
-        conditions: []
+        conditions: [],
       },
     },
     config: [],

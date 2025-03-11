@@ -11,7 +11,7 @@ import { useTeamContext, RunContextProvider } from "State/context";
 import { groupTasksByName } from "Utils";
 import { WorkflowEngineMode } from "Constants";
 import { serviceUrl } from "Config/servicesConfig";
-import { FlowTeam, PaginatedTaskResponse, RunStatus, Task, WorkflowEditor, WorkflowRun } from "Types";
+import { FlowTeam, PaginatedTaskResponse, RunStatus, Task, WorkflowCanvas, WorkflowRun } from "Types";
 import RunHeader from "./RunHeader";
 import RunTaskLog from "./TaskRunList";
 import WorkflowActions from "./WorkflowActions";
@@ -91,7 +91,7 @@ function RevisionContainer({ team, workflowRun, tasksData, workflowId }: Revisio
   });
 
   const groupedTasks = groupTasksByName(tasksData);
-  const workflowQuery = useQuery<WorkflowEditor>(getWorkflowUrl);
+  const workflowQuery = useQuery<WorkflowCanvas>(getWorkflowUrl);
 
   if (workflowQuery.isLoading) {
     return (
@@ -133,7 +133,7 @@ function RevisionContainer({ team, workflowRun, tasksData, workflowId }: Revisio
 
 type MainProps = {
   tasks: Record<string, Array<Task>>;
-  workflow: WorkflowEditor;
+  workflow: WorkflowCanvas;
   workflowRun: WorkflowRun;
   version: number;
 };

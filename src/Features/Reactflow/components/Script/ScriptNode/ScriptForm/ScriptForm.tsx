@@ -41,12 +41,12 @@ function ScriptForm(props: ScriptFormProps) {
     props.closeModal();
   };
 
-  const taskVersionConfig = task.config;
+  const taskVersionConfig = task.spec.params ?? [];
 
   // Add the name and future inputs
   const inputs: Array<any> = [
     {
-      key: "taskName",
+      name: "taskName",
       id: "taskName",
       label: "Task Name",
       placeholder: "Enter a task name",
@@ -57,7 +57,7 @@ function ScriptForm(props: ScriptFormProps) {
     ...taskVersionConfig,
     {
       results: node.results,
-      key: "results",
+      name: "results",
       type: "custom",
       customComponent: ResultsInput,
     },

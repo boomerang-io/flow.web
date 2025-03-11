@@ -21,13 +21,13 @@ import type {
   CalendarEntry,
   ScheduleDate,
   ScheduleUnion,
-  Workflow,
   PaginatedSchedulesResponse,
+  WorkflowCanvas,
 } from "Types";
 import styles from "./Schedule.module.scss";
 
 interface ScheduleProps {
-  workflow: Workflow;
+  workflow: WorkflowCanvas;
 }
 
 export default function ScheduleView(props: ScheduleProps) {
