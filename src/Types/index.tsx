@@ -280,7 +280,7 @@ export interface WorkflowParameter {
   type: string;
 }
 
-export interface WorkflowEditor extends Workflow {
+export interface WorkflowCanvas extends Workflow {
   edges: Array<WorkflowEdge>;
   nodes: Array<Node<WorkflowNodeData>>;
   config?: Array<DataDrivenInput>;
@@ -659,7 +659,7 @@ export interface MultiSelectItems<Type = MultiSelectItem> {
   selectedItems: Array<Type>;
 }
 
-export type WorkflowEditorState = WorkflowEditor & { hasUnsavedUpdates?: boolean };
+export type WorkflowEditorState = WorkflowCanvas & { hasUnsavedUpdates?: boolean };
 export type WorkflowEngineModeType = ObjectValues<typeof WorkflowEngineMode>;
 export type WorkflowPropertyActionType = ObjectValues<typeof WorkflowPropertyAction>;
 export type UserRoleType = ObjectValues<typeof UserRole>;

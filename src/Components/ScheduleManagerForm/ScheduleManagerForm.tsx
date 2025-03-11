@@ -1,5 +1,19 @@
 import React from "react";
-import { Button, InlineNotification, ModalBody, ModalFooter, RadioButtonGroup, RadioButton } from "@carbon/react";
+import {
+  Button,
+  InlineNotification,
+  ModalBody,
+  ModalFooter,
+  RadioButtonGroup,
+  RadioButton,
+  Accordion,
+  AccordionItem,
+  StructuredListWrapper,
+  StructuredListHead,
+  StructuredListRow,
+  StructuredListCell,
+  StructuredListBody,
+} from "@carbon/react";
 import {
   Creatable,
   CheckboxList,
@@ -18,7 +32,14 @@ import { cronToDateTime, daysOfWeekCronList } from "Utils/cronHelper";
 import { DATETIME_LOCAL_INPUT_FORMAT, defaultTimeZone, timezoneOptions, transformTimeZone } from "Utils/dateHelper";
 import { scheduleTypeLabelMap } from "Constants";
 import { serviceUrl } from "Config/servicesConfig";
-import { DataDrivenInput, DayOfWeekKey, ScheduleManagerFormInputs, ScheduleUnion, Workflow } from "Types";
+import {
+  DataDrivenInput,
+  DayOfWeekKey,
+  ScheduleManagerFormInputs,
+  ScheduleUnion,
+  Workflow,
+  WorkflowCanvas,
+} from "Types";
 import styles from "./ScheduleManagerForm.module.scss";
 
 interface CreateEditFormProps {
@@ -29,13 +50,13 @@ interface CreateEditFormProps {
   modalProps: any;
   schedule?: ScheduleUnion;
   type: "create" | "edit";
-  workflow?: Workflow;
+  workflow?: WorkflowCanvas;
   workflowOptions?: Array<Workflow>;
 }
 
 export default function CreateEditForm(props: CreateEditFormProps) {
   const [workflowProperties, setWorkflowProperties] = React.useState<Array<DataDrivenInput> | undefined>(
-    props.workflow?.config.map((property) => ({ ...property, name: `$parameter:${property.name}` })),
+    props.workflow?.config?.map((property) => ({ ...property, name: `$parameter:${property.name}` })) ?? [],
   );
   let initFormValues: Partial<ScheduleManagerFormInputs> = {
     id: props.schedule?.id,
@@ -373,6 +394,7 @@ class CronJobConfig extends React.Component<Props, State> {
       <>
         {values.type === "advancedCron" ? (
           <>
+            <CronInfoSection />
             <div className={styles.cronContainer}>
               <div className={styles.inputContainer}>
                 <TextInput
@@ -450,3 +472,60 @@ class CronJobConfig extends React.Component<Props, State> {
     );
   }
 }
+
+const CronInfoSection: React.FC = () => {
+  return (
+    <Accordion>
+      <AccordionItem title="Cron Expression Information & Examples">
+        <p>The cron expression is made of five fields. Each field can have the following values:</p>
+        <StructuredListWrapper className={styles.cronStructuredList}>
+          <StructuredListHead>
+            <StructuredListRow head>
+              <StructuredListCell head></StructuredListCell>
+              <StructuredListCell head>minute (0-59)</StructuredListCell>
+              <StructuredListCell head>hour (0-23)</StructuredListCell>
+              <StructuredListCell head>day of the month (1-31)</StructuredListCell>
+              <StructuredListCell head>month (1-12)</StructuredListCell>
+              <StructuredListCell head>day of the week (0-6)</StructuredListCell>
+            </StructuredListRow>
+          </StructuredListHead>
+          <StructuredListBody>
+            <StructuredListRow></StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Every minute</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+            </StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Every hour</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+            </StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Every day at 12:00 AM</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+            </StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Fridays at 1:00 am</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>1</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>5</StructuredListCell>
+            </StructuredListRow>
+          </StructuredListBody>
+        </StructuredListWrapper>
+      </AccordionItem>
+    </Accordion>
+  );
+};

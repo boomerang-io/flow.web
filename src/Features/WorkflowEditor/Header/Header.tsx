@@ -14,7 +14,7 @@ import { UseMutationResult } from "react-query";
 import { Link, useRouteMatch } from "react-router-dom";
 import { WorkflowView } from "Constants";
 import { appLink } from "Config/appConfig";
-import { ModalTriggerProps, WorkflowEditor, WorkflowViewType, ChangeLog } from "Types";
+import { ModalTriggerProps, WorkflowCanvas, WorkflowViewType, ChangeLog } from "Types";
 import VersionCommentForm from "./VersionCommentForm";
 import VersionSwitcher from "./VersionSwitcher";
 import styles from "./header.module.scss";
@@ -31,7 +31,7 @@ interface DesignerHeaderProps {
     { team: any; workflowId: any; body: any },
     unknown
   >;
-  revisionState: WorkflowEditor;
+  revisionState: WorkflowCanvas;
 
   viewType: WorkflowViewType;
 }

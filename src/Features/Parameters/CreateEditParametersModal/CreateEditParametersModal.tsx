@@ -1,24 +1,24 @@
 //@ts-nocheck
 import React from "react";
-import { Formik } from "formik";
-import * as Yup from "yup";
 import { Button, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
 import { Add } from "@carbon/react/icons";
 import { ComposedModal, ModalFlowForm, TextInput, Toggle } from "@boomerang-io/carbon-addons-boomerang-react";
+import { updatedDiff } from "deep-object-diff";
+import { Formik } from "formik";
+import * as Yup from "yup";
 import { InputType, PROPERTY_KEY_REGEX, PASSWORD_CONSTANT } from "Constants";
 import { Property } from "Types";
-import { updatedDiff } from "deep-object-diff";
 import styles from "./createEditParametersModal.module.scss";
 
 type Props = {
   handleClose?: () => void;
-  handleSubmit: (isEdit: boolean, values: any) => Promise<void>;
+  handleSubmit: (isEdit: boolean, values: any, closeModal: () => void) => Promise<void>;
   isEdit?: boolean;
   isOpen?: boolean;
   isSubmitting?: boolean;
   error: boolean;
-  parameter?: Property;
-  parameters: Property[];
+  parameter?: AbstractParam;
+  parameters: AbstractParam[];
 };
 
 function CreateEditParametersModal({
@@ -37,30 +37,30 @@ function CreateEditParametersModal({
    */
   let parameterKeys: string[] | [] = [];
   if (Array.isArray(parameters)) {
-    parameterKeys = parameters.map((configurationObj) => configurationObj.key);
+    parameterKeys = parameters.map((p) => p.name);
     if (isEdit && parameter) {
-      parameterKeys = parameterKeys.filter((item) => item !== parameter.key);
+      parameterKeys = parameterKeys.filter((item) => item !== parameter.name);
     }
   }
 
   const initialState = {
     label: parameter?.label ?? "",
     description: parameter?.description ?? "",
-    key: parameter?.key ?? "",
+    name: parameter?.name ?? "",
     value: parameter?.value ?? "",
     secured: parameter?.type === InputType.Password ?? false,
   };
 
-  const handleInternalSubmit = async (values: any) => {
+  const handleInternalSubmit = async (values: any, closeModal: () => void) => {
     const type = values.secured ? InputType.Password : InputType.Text;
     const newParameter = isEdit ? { ...values, type, id: parameter.id } : { ...values, type };
     delete newParameter.secured;
 
     if (isEdit) {
       const updatedFields = updatedDiff(initialState, newParameter);
-      handleSubmit(true, updatedFields);
+      handleSubmit(true, updatedFields, closeModal);
     } else {
-      handleSubmit(false, newParameter);
+      handleSubmit(false, newParameter, closeModal);
     }
   };
 
@@ -108,7 +108,7 @@ function CreateEditParametersModal({
 
 type FormProps = {
   closeModal: () => void;
-  handleSubmit: (values: any) => void;
+  handleSubmit: (values: any, closeModal: () => void) => void;
   isSubmitting: boolean;
   isEdit: boolean;
   error: boolean;
@@ -124,18 +124,18 @@ function Form({ closeModal, handleSubmit, isSubmitting, isEdit, error, initialSt
   return (
     <Formik
       initialValues={initialState}
-      onSubmit={handleSubmit}
+      onSubmit={(values) => handleSubmit(values, closeModal)}
       validateOnMount
       validationSchema={Yup.object().shape({
         label: Yup.string().required("Enter a label"),
-        key: Yup.string()
-          .required("Enter a key")
-          .max(128, "Key must not be greater than 128 characters")
-          .notOneOf(parameterKeys || [], "Enter a unique key value for this parameter")
+        name: Yup.string()
+          .required("Enter a Name")
+          .max(128, "Name must not be greater than 128 characters")
+          .notOneOf(parameterKeys || [], "Enter a unique name value for this parameter")
           .test(
             "is-valid-key",
             "Only alphanumeric, hyphen and underscore characters allowed. Must begin with a letter or underscore",
-            validateKey
+            validateKey,
           ),
         value: Yup.string().when("secured", {
           is: (value: boolean) => value && isEdit,
@@ -152,15 +152,15 @@ function Form({ closeModal, handleSubmit, isSubmitting, isEdit, error, initialSt
           <ModalFlowForm onSubmit={handleSubmit}>
             <ModalBody aria-label="inputs">
               <TextInput
-                id="key"
-                labelText="Key"
-                placeholder="Key"
-                name="key"
-                value={values.key}
+                id="name"
+                labelText="Name"
+                placeholder="Name"
+                name="name"
+                value={values.name}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                invalid={Boolean(errors.key && touched.key)}
-                invalidText={errors.key}
+                invalid={Boolean(errors.name && touched.name)}
+                invalidText={errors.name}
               />
               <TextInput
                 id="label"
