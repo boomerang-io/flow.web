@@ -1,10 +1,10 @@
 import React from "react";
 import { AutoSuggest, TextInput, TextArea, Creatable } from "@boomerang-io/carbon-addons-boomerang-react";
+import { FormikProps } from "formik";
 import TextEditorModal from "Components/TextEditorModal";
 import { INPUT_TYPES, TEXT_AREA_TYPES, SUPPORTED_AUTOSUGGEST_TYPES } from "Constants/formInputTypes";
 import { DataDrivenInput } from "Types";
 import styles from "./inputs.module.scss";
-import { FormikProps } from "formik";
 
 export const AutoSuggestInput = (props: any) => {
   if (!SUPPORTED_AUTOSUGGEST_TYPES.includes(props.type)) {
@@ -83,17 +83,17 @@ export const textAreaProps =
   (availableParameters: Array<string>) =>
   ({ input, formikProps }: { formikProps: FormikProps<any>; input: DataDrivenInput }) => {
     const { errors, handleBlur, touched, values, setFieldValue } = formikProps;
-    const { key, type, ...rest } = input;
+    const { name, type, ...rest } = input;
     const itemConfig = TEXT_AREA_TYPES[type];
-    const safeKey = `['${key}']`;
+    const safeKey = `['${name}']`;
     return {
       autoSuggestions: formatAutoSuggestParameters(availableParameters),
       onChange: (value: React.FormEvent<HTMLInputElement>) => setFieldValue(safeKey, value),
-      initialValue: values[key] || values[safeKey],
+      initialValue: values[name] || values[safeKey],
       inputProps: {
         onBlur: handleBlur,
-        invalid: touched[key] && Boolean(errors[key]),
-        invalidText: errors[key],
+        invalid: touched[name] && Boolean(errors[name]),
+        invalidText: errors[name],
         ...itemConfig,
         ...rest,
         name: safeKey,
@@ -106,14 +106,14 @@ export const textEditorProps =
   (availableParameters: Array<string>, textEditorProps: any) =>
   ({ input, formikProps }: { formikProps: FormikProps<any>; input: DataDrivenInput }) => {
     const { values, setFieldValue } = formikProps;
-    const { key, type, ...rest } = input;
+    const { name, type, ...rest } = input;
     const itemConfig = TEXT_AREA_TYPES[type];
-    const safeKey = `['${key}']`;
+    const safeKey = `['${name}']`;
 
     return {
       autoSuggestions: formatAutoSuggestParameters(availableParameters),
       formikSetFieldValue: (value: React.FormEvent<HTMLInputElement>) => setFieldValue(safeKey, value),
-      initialValue: values[key] || values[safeKey],
+      initialValue: values[name] || values[safeKey],
       ...rest,
       ...itemConfig,
       ...textEditorProps,
@@ -127,17 +127,17 @@ export const textInputProps =
   (availableParameters: Array<string>) =>
   ({ formikProps, input }: { formikProps: FormikProps<any>; input: DataDrivenInput }) => {
     const { errors, handleBlur, touched, setFieldValue, values } = formikProps;
-    const { key, type, ...rest } = input;
+    const { name, type, ...rest } = input;
     const itemConfig = INPUT_TYPES[type];
-    const safeKey = `['${key}']`;
+    const safeKey = `['${name}']`;
     return {
       autoSuggestions: formatAutoSuggestParameters(availableParameters),
       onChange: (value: React.FormEvent<HTMLInputElement>) => setFieldValue(safeKey, value),
-      initialValue: values[key] || values[safeKey],
+      initialValue: values[name] || values[safeKey],
       inputProps: {
         onBlur: handleBlur,
-        invalid: touched[key] && Boolean(errors[key]),
-        invalidText: errors[key],
+        invalid: touched[name] && Boolean(errors[name]),
+        invalidText: errors[name],
         ...itemConfig,
         ...rest,
         name: safeKey,

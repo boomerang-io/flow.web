@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { Component } from "react";
+import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import {
   ComboBox,
   Creatable,
@@ -8,10 +9,9 @@ import {
   TextInput,
   Toggle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import { Formik, FormikProps } from "formik";
-import * as Yup from "yup";
 import clonedeep from "lodash/cloneDeep";
+import * as Yup from "yup";
 import { validateUrlWithProperties } from "Utils/urlPropertySyntaxHelper";
 import {
   InputProperty,
@@ -115,7 +115,7 @@ class PropertiesModalContent extends Component<PropertiesModalContentProps> {
               this.handleOnFieldValueChange(value.toString(), InputProperty.DefaultValue, setFieldValue)
             }
             orientation="vertical"
-            toggled={values?.defaultValue === "true"}
+            toggled={values?.default === "true"}
           />
         );
       case InputType.Select:
@@ -138,7 +138,7 @@ class PropertiesModalContent extends Component<PropertiesModalContentProps> {
                 this.handleOnFieldValueChange(selectedItem, InputProperty.DefaultValue, setFieldValue)
               }
               items={options || []}
-              initialSelectedItem={values.defaultValue || {}}
+              initialSelectedItem={values.default || {}}
               label="Default Option"
               placeholder="Select option"
             />
@@ -154,7 +154,7 @@ class PropertiesModalContent extends Component<PropertiesModalContentProps> {
             onChange={handleChange}
             placeholder="Default Value"
             style={{ resize: "none" }}
-            value={values.defaultValue || ""}
+            value={values.default || ""}
           />
         );
       default:
@@ -170,7 +170,7 @@ class PropertiesModalContent extends Component<PropertiesModalContentProps> {
               this.props.isEdit && values.type.value === InputType.Password ? PASSWORD_CONSTANT : "Default Value"
             }
             type={values.type.value}
-            value={values.defaultValue || ""}
+            value={values.default || ""}
             helperText={
               values.type.value === InputType.Password
                 ? "Passwords are saved securely in our database. To update the saved value, provide a new default value."
@@ -216,24 +216,24 @@ class PropertiesModalContent extends Component<PropertiesModalContentProps> {
           [InputProperty.Description]: property?.description ?? "",
           [InputProperty.Required]: property?.required ?? false,
           [InputProperty.Type]: property ? inputTypeItems.find((type) => type.value === property.type) : textInputItem,
-          [InputProperty.DefaultValue]: property?.defaultValue ?? "",
+          [InputProperty.DefaultValue]: property?.default ?? "",
           // Read in values as an array of strings. Service returns object { key, value }
           [InputProperty.Options]:
             property?.options?.map((option) => (typeof option === "object" ? option.key : option)) ?? [],
         }}
         validationSchema={Yup.object().shape({
-          [InputProperty.Key]: Yup.string()
-            .required("Enter a key")
-            .max(128, "Key must not be greater than 128 characters")
-            .notOneOf(propertyKeys || [], "Enter a unique key value for this workflow")
+          [InputProperty.Name]: Yup.string()
+            .required("Enter a Name")
+            .max(128, "Name must not be greater than 128 characters")
+            .notOneOf(propertyKeys || [], "Enter a unique name value for this workflow")
             .test(
               "is-valid-key",
               "Only alphanumeric, hyphen and underscore characters allowed. Must begin with a letter or underscore",
-              this.validateKey
+              this.validateKey,
             ),
           [InputProperty.Label]: Yup.string()
-            .required("Enter a Name")
-            .max(128, "Name must not be greater than 128 characters"),
+            .required("Enter a Label")
+            .max(128, "Label must not be greater than 128 characters"),
           [InputProperty.Description]: Yup.string().max(128, "Description must not be greater than 128 characters"),
           [InputProperty.Required]: Yup.boolean(),
           [InputProperty.Type]: Yup.object({ label: Yup.string().required(), value: Yup.string().required() }),
@@ -253,21 +253,21 @@ class PropertiesModalContent extends Component<PropertiesModalContentProps> {
                 <TextInput
                   readOnly={isEdit}
                   helperText="Reference value for parameter in workflow. It can't be changed after parameter creation."
-                  id={InputProperty.Key}
-                  invalid={Boolean(errors.key && touched.key)}
-                  invalidText={errors.key}
-                  labelText={isEdit ? "Key (read-only)" : "Key"}
+                  id={InputProperty.Name}
+                  invalid={Boolean(errors.name && touched.name)}
+                  invalidText={errors.name}
+                  labelText={isEdit ? "Name (read-only)" : "Name"}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   placeholder=".e.g. token"
-                  value={values.key}
+                  value={values.name}
                 />
                 <ComboBox
                   id={InputProperty.Type}
                   onChange={({ selectedItem }: any) =>
                     this.handleOnTypeChange(
                       selectedItem !== null ? selectedItem : { label: "", value: "" },
-                      setFieldValue
+                      setFieldValue,
                     )
                   }
                   items={inputTypeItems}

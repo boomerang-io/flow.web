@@ -111,13 +111,13 @@ export interface ApproverGroup {
 
 export interface DataDrivenInput {
   id: string;
-  defaultValue?: string;
+  default: string | Array<string> | Array<{ key: string; value: string }> | Object;
   description?: string;
   helperText?: string;
   language?: string;
-  name?: string;
+  name: string;
+  key?: string; //TODO: remove - for backwards compatability with other param layers
   disabled?: boolean;
-  key: string;
   label?: string;
   onChange?: (args: any) => void;
   onBlur?: (args: any) => void;
@@ -125,8 +125,7 @@ export interface DataDrivenInput {
   placeholder?: string;
   readOnly?: boolean;
   required?: boolean;
-  value: string;
-  values?: Array<string> | Array<{ key: string; value: string }>;
+  value: string | Array<string> | Array<{ key: string; value: string }> | Object;
   type: string;
   min?: number;
   max?: number;
@@ -177,19 +176,13 @@ export interface Workflow {
   labels?: Record<string, string>;
   annotations?: Record<string, object>;
   markdown?: string;
-  params?: Array<{
-    name: string;
-    type: string;
-    description?: string;
-    defaultValue?: object;
-  }>;
+  params?: Array<DataDrivenInput>;
   tasks: Array<any>; //TODO: what should this type be
   changelog: {
     author: string;
     reason: string;
     date: string;
   };
-  config: Array<DataDrivenInput>;
   triggers: {
     event: WorkflowTrigger;
     github: WorkflowTrigger;
@@ -290,6 +283,7 @@ export interface WorkflowParameter {
 export interface WorkflowEditor extends Workflow {
   edges: Array<WorkflowEdge>;
   nodes: Array<Node<WorkflowNodeData>>;
+  config?: Array<DataDrivenInput>;
 }
 
 export enum ApprovalStatus {
@@ -321,14 +315,13 @@ export interface Task {
   type: string;
   changelog: ChangeLog;
   verified: boolean;
-  config: Array<DataDrivenInput>;
   spec: TaskSpec;
 }
 
 export interface TaskSpec {
   arguments?: Array<string>;
   command?: Array<string>;
-  params?: any;
+  params?: Array<DataDrivenInput>;
   envs?: any;
   image?: string;
   results?: Array<{ name: string; description: string }>;
@@ -673,7 +666,7 @@ export type UserRoleType = ObjectValues<typeof UserRole>;
 export type NodeTypeType = ObjectValues<typeof NodeType>;
 
 export interface ConfigureWorkflowFormValues {
-  config: Workflow["config"];
+  params: Workflow["params"];
   description: string;
   icon: string;
   labels: Array<{ key: string; value: string }>;

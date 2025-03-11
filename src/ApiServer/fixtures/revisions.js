@@ -196,7 +196,7 @@ export default [
         ],
       },
     },
-    config: [
+    params: [
       {
         key: "token",
         description: "enter a token please",

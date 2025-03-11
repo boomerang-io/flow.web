@@ -49,9 +49,9 @@ function TaskTemplateNodeEditor(props: TaskTemplateNodeEditorProps) {
   const otherTaskNames = nodes.map((node) => node.data.name).filter((name) => name !== props.data.name);
 
   props.formInputsToMerge?.forEach((input) => {
-    const foundConfigItemIdx = taskTemplate.config.findIndex((configItem) => configItem.key === input.key);
-    if (foundConfigItemIdx >= 0) {
-      taskTemplate.config[foundConfigItemIdx] = { ...taskTemplate.config[foundConfigItemIdx], ...input };
+    const foundConfigItemIdx = taskTemplate.spec.params?.findIndex((param) => param.name === input.name) ?? -1;
+    if (foundConfigItemIdx >= 0 && taskTemplate.spec.params) {
+      taskTemplate.spec.params[foundConfigItemIdx] = { ...taskTemplate.spec.params[foundConfigItemIdx], ...input };
     }
   });
 

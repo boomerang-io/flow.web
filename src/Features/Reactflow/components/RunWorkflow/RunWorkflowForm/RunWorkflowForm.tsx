@@ -35,12 +35,12 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
 
   const workflows = workflowsQueryData.content;
   const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.name, value: workflow.id })) ?? [];
-  const selectedWorkflowConfg = workflows.find((workflow) => workflow.id === selectedWorkflowId)?.config ?? [];
+  const selectedWorkflowConfg = workflows.find((workflow) => workflow.id === selectedWorkflowId)?.params ?? [];
 
   const activeInputs: Record<string, string> = {};
   if (selectedWorkflowConfg) {
     selectedWorkflowConfg.forEach((item) => {
-      const name = item.key;
+      const name = item.name;
       if (name) {
         //@ts-ignore
         activeInputs[name] = item.defaultValue;
@@ -88,7 +88,7 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
   // Add the name and future inputs
   const inputs: Array<any> = [
     {
-      key: "taskName",
+      name: "taskName",
       id: "taskName",
       label: "Task Name",
       placeholder: "Enter a task name",
@@ -97,7 +97,7 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
       customComponent: TaskNameTextInput,
     },
     {
-      key: "workflowId",
+      name: "workflowId",
       id: "workflowId",
       type: "custom",
       required: true,

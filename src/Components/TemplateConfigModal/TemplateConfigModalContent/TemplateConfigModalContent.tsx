@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { Component } from "react";
+import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import {
   ComboBox,
   Creatable,
@@ -8,14 +9,13 @@ import {
   TextInput,
   Toggle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import { Formik } from "formik";
-import * as Yup from "yup";
-import clonedeep from "lodash/cloneDeep";
-import TextEditorModal from "Components/TextEditorModal";
-import { InputProperty, InputType, PROPERTY_KEY_REGEX } from "Constants";
-import { validateUrlWithProperties } from "Utils/urlPropertySyntaxHelper";
 import { FormikProps } from "formik";
+import clonedeep from "lodash/cloneDeep";
+import * as Yup from "yup";
+import TextEditorModal from "Components/TextEditorModal";
+import { validateUrlWithProperties } from "Utils/urlPropertySyntaxHelper";
+import { InputProperty, InputType, PROPERTY_KEY_REGEX } from "Constants";
 import { DataDrivenInput } from "Types";
 import styles from "./TemplateConfigModalContent.module.scss";
 
@@ -78,8 +78,8 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
   };
 
   // Check if key contains alpahanumeric, underscore, dash, and period chars
-  validateKey = (key: string) => {
-    return PROPERTY_KEY_REGEX.test(key);
+  validateKey = (name: string) => {
+    return PROPERTY_KEY_REGEX.test(name);
   };
 
   handleConfirm = (values: any) => {
@@ -97,7 +97,7 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
       if (!field.defaultValue) field.defaultValue = false;
     }
     if (this.props.isEdit) {
-      const fieldIndex = templateFields.findIndex((field) => field.key === this.props.field.key);
+      const fieldIndex = templateFields.findIndex((field) => field.name === this.props.field.name);
       let newProperties = [...templateFields];
       newProperties.splice(fieldIndex, 1, field);
       setFieldValue("currentConfig", newProperties);
@@ -111,7 +111,7 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
   };
 
   renderDefaultValue = (formikProps: FormikProps<{ [x: string]: string | boolean | string[] }>) => {
-    const { values, handleBlur, handleChange, setFieldValue } = formikProps;
+    const { values, handleBlur, handleChange, setFieldValue, errors, touched } = formikProps;
     switch (values?.type) {
       case InputType.Boolean:
         return (
@@ -122,7 +122,7 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
             helperText="Initial value that can be changed"
             onToggle={(value: any) => setFieldValue(InputProperty.DefaultValue, value.toString())}
             orientation="vertical"
-            toggled={values.defaultValue === "true"}
+            toggled={values.default === "true"}
           />
         );
       case InputType.Select:
@@ -145,7 +145,7 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
                 setFieldValue(InputProperty.DefaultValue, selectedItem)
               }
               items={options || []}
-              initialSelectedItem={values.defaultValue || {}}
+              initialSelectedItem={values.default || {}}
               label="Default Option"
             />
           </>
@@ -160,7 +160,9 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
             onBlur={handleBlur}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
             style={{ resize: "none" }}
-            value={values.defaultValue || ""}
+            value={values.default || ""}
+            invalid={Boolean(errors.label && touched.label)}
+            invalidText={errors.label}
           />
         );
       case InputType.TextEditor:
@@ -178,10 +180,12 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
             onBlur={handleBlur}
             style={{ resize: "none" }}
             autoSuggestions={[]}
-            formikSetFieldValue={(value: string) => setFieldValue("defaultValue", value)}
-            initialValue={values.defaultValue}
+            formikSetFieldValue={(value: string) => setFieldValue(InputProperty.DefaultValue, value)}
+            initialValue={values.default}
             type={values.type}
-            value={values.defaultValue}
+            value={values.default}
+            invalid={Boolean(errors.label && touched.label)}
+            invalidText={errors.label}
           />
         );
       default:
@@ -195,7 +199,9 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
             onBlur={handleBlur}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
             type={values.type}
-            value={values.defaultValue || ""}
+            value={values.default || ""}
+            invalid={Boolean(errors.label && touched.label)}
+            invalidText={errors.label}
           />
         );
     }
@@ -212,6 +218,8 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
         return Yup.boolean();
       case InputType.Number:
         return Yup.number();
+      case InputType.Email:
+        return Yup.string().email();
       case InputType.URL:
         return Yup.string().test("hasValidUrlPropSyntax", "", (value: string) => {
           return validateUrlWithProperties({ value });
@@ -229,7 +237,7 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
         validateOnMount
         onSubmit={this.handleConfirm}
         initialValues={{
-          [InputProperty.Key]: field?.key ?? "",
+          [InputProperty.Name]: field?.name ?? "",
           [InputProperty.Label]: field?.label ?? "",
           [InputProperty.Description]: field?.description ?? "",
           [InputProperty.Placeholder]: field?.placeholder ?? "",
@@ -237,24 +245,24 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
           [InputProperty.ReadOnly]: field?.readOnly ?? false,
           [InputProperty.Required]: field?.required ?? false,
           [InputProperty.Type]: field?.type ?? "",
-          [InputProperty.DefaultValue]: field?.defaultValue ?? "",
+          [InputProperty.DefaultValue]: field?.default ?? "",
           // Read in values as an array of strings. Service returns object { key, value }
           [InputProperty.Options]:
             field?.options?.map((option) => (typeof option === "object" ? option.key : option)) ?? [],
         }}
         validationSchema={Yup.object().shape({
-          [InputProperty.Key]: Yup.string()
-            .required("Enter a key")
-            .max(64, "Key must not be greater than 64 characters")
-            .notOneOf(fieldKeys || [], "Enter a unique key value for this field")
+          [InputProperty.Name]: Yup.string()
+            .required("Enter a Name")
+            .max(64, "Name must not be greater than 64 characters")
+            .notOneOf(fieldKeys || [], "Enter a unique name value for this field")
             .test(
               "is-valid-key",
               "Only alphanumeric, hyphen and underscore characters allowed. Must begin with a letter or underscore",
-              this.validateKey
+              this.validateKey,
             ),
           [InputProperty.Label]: Yup.string()
-            .required("Enter a Name")
-            .max(64, "Name must not be greater than 64 characters"),
+            .required("Enter a Label")
+            .max(64, "Label must not be greater than 64 characters"),
           [InputProperty.Description]: Yup.string().max(200, "Description must not be greater than 200 characters"),
           [InputProperty.Placeholder]: Yup.string().max(100, "Placeholder must not be greater than 100 characters"),
           [InputProperty.HelperText]: Yup.string().max(50, "Helper Text must not be greater than 50 characters"),
@@ -288,15 +296,15 @@ class TemplateConfigModalContent extends Component<TemplateConfigModalContentPro
                 />
                 <TextInput
                   helperText="Reference value for field in task template config"
-                  id={InputProperty.Key}
-                  invalid={Boolean(errors.key && touched.key)}
-                  invalidText={errors.key}
-                  labelText="Key"
+                  id={InputProperty.Name}
+                  invalid={Boolean(errors.name && touched.name)}
+                  invalidText={errors.name}
+                  labelText="Name"
                   disabled={isEdit}
                   onBlur={handleBlur}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
                   placeholder="e.g. email"
-                  value={values.key}
+                  value={values.name}
                 />
                 <TextInput
                   id={InputProperty.Label}

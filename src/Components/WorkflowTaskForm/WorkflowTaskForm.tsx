@@ -1,7 +1,6 @@
 //@ts-nocheck
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import * as Yup from "yup";
+import { Button, ModalBody, ModalFooter, Tag } from "@carbon/react";
 import {
   AutoSuggest,
   DynamicFormik,
@@ -9,7 +8,8 @@ import {
   TextInput,
   TextArea,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Button, ModalBody, ModalFooter, Tag } from "@carbon/react";
+import PropTypes from "prop-types";
+import * as Yup from "yup";
 import TextEditorModal from "Components/TextEditorModal";
 import { SUPPORTED_AUTOSUGGEST_TYPES, TEXT_AREA_TYPES } from "Constants/formInputTypes";
 import styles from "./WorkflowTaskForm.module.scss";
@@ -189,7 +189,7 @@ class WorkflowTaskForm extends Component {
 
   render() {
     const { additionalConfig = [], node, task, taskNames } = this.props;
-    const taskVersionConfig = task.config;
+    const taskVersionParams = task.spec.params;
     const takenTaskNames = taskNames.filter((name) => name !== node.name);
 
     const taskResults = task.results;
@@ -197,27 +197,27 @@ class WorkflowTaskForm extends Component {
     // Add the name input
     const inputs = [
       {
-        key: "taskName",
+        name: "taskName",
         label: "Task Name",
         placeholder: "Enter a task name",
         type: "custom",
         required: true,
         customComponent: TaskNameTextInput,
       },
-      ...taskVersionConfig,
+      ...taskVersionParams,
       ...additionalConfig,
       {
         outputs: taskResults,
-        key: "outputs",
+        name: "outputs",
         type: "custom",
         customComponent: ResultsInput,
       },
     ];
 
     const initValues = { taskName: node.name };
-    task.config.forEach((input) => {
-      const initialValue = node.params.find((param) => param.name === input.key)?.["value"] ?? "";
-      initValues[input.key] = Boolean(initialValue) ? initialValue : input.defaultValue;
+    task.params.forEach((p) => {
+      const initialValue = node.params.find((param) => param.name === p.name)?.["value"] ?? "";
+      initValues[p.name] = Boolean(initialValue) ? initialValue : p.default;
     });
 
     return (

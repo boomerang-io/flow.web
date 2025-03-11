@@ -106,6 +106,7 @@ function AddTaskTemplateForm({
       command: Boolean(values.command) ? values.command.trim().split(/\n{1,}/) : [],
       envs: newEnvs,
       image: values.image,
+      // params: hasFile && Boolean(values.config) ? values.config : [],
       results:
         hasFile && Boolean(values.currentRevision) && Boolean(values.currentRevision.results)
           ? values.currentRevision.results
@@ -123,7 +124,6 @@ function AddTaskTemplateForm({
       icon: values.icon.value,
       type: "template",
       changelog: { reason: "Add new task" },
-      config: hasFile && Boolean(values.config) ? values.config : [],
       spec: newTaskTemplateSpec,
     };
     await handleAddTaskTemplate({ name: values.name, replace: "false", body, closeModal });
@@ -442,7 +442,7 @@ function AddTaskTemplateForm({
                   lowContrast
                   kind="error"
                   title="Failed Creating Task Template"
-                  subtitle={`Unable to create the task template. ${sentenceCase(createError)}. Please contact support.`}
+                  subtitle={`Unable to create the task template. Please contact support.`}
                 />
               )}
             </ModalBody>

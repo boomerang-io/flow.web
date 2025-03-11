@@ -35,7 +35,7 @@ interface CreateEditFormProps {
 
 export default function CreateEditForm(props: CreateEditFormProps) {
   const [workflowProperties, setWorkflowProperties] = React.useState<Array<DataDrivenInput> | undefined>(
-    props.workflow?.config.map((property) => ({ ...property, key: `$parameter:${property.key}` })),
+    props.workflow?.config.map((property) => ({ ...property, name: `$parameter:${property.name}` })),
   );
   let initFormValues: Partial<ScheduleManagerFormInputs> = {
     id: props.schedule?.id,

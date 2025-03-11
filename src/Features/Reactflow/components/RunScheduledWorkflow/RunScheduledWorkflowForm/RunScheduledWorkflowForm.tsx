@@ -96,7 +96,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
 
   const workflows = workflowsQueryData.content;
   const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.name, value: workflow.id })) ?? [];
-  const selectedWorkflowConfg = workflows.find((workflow) => workflow.id === selectedWorkflowId)?.config ?? [];
+  const selectedWorkflowConfg = workflows.find((workflow) => workflow.id === selectedWorkflowId)?.params ?? [];
 
   const handleOnSave = (values: { taskName: string; timezone: { value: string } }) => {
     props.node.name = values.taskName;
@@ -107,7 +107,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
   const activeInputs: Record<string, string> = {};
   if (selectedWorkflowConfg) {
     selectedWorkflowConfg.forEach((item) => {
-      const key = item.key;
+      const key = item.name;
       if (key) {
         //@ts-ignore
         activeInputs[key] = item.defaultValue;
@@ -150,7 +150,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
   // Add the name and future inputs
   const inputs: Array<any> = [
     {
-      key: "taskName",
+      name: "taskName",
       id: "taskName",
       label: "Task Name",
       placeholder: "Enter a task name",
@@ -159,7 +159,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
       customComponent: TaskNameTextInput,
     },
     {
-      key: "futureIn",
+      name: "futureIn",
       id: "futureIn",
       label: "Interval",
       helperText: "Length of the selected interval period",
@@ -169,7 +169,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
       min: 1,
     },
     {
-      key: "futurePeriod",
+      name: "futurePeriod",
       id: "futurePeriod",
       label: "Interval Period",
       placeholder: "e.g. Days",
@@ -184,7 +184,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
       required: true,
     },
     {
-      key: "time",
+      name: "time",
       id: "time",
       label: "At Time",
       helperText: "When in the future you want the Workflow to execute",
@@ -193,7 +193,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
       customComponent: TimeInput,
     },
     {
-      key: "timezone",
+      name: "timezone",
       id: "timezone",
       required: true,
       type: "custom",
@@ -201,7 +201,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
       customComponent: TimeZoneInput,
     },
     {
-      key: "workflowId",
+      name: "workflowId",
       id: "workflowId",
       type: "custom",
       required: true,

@@ -63,7 +63,7 @@ function WorkflowTaskForm(props: WorkflowTaskFormProps) {
       required: true,
       customComponent: TaskNameTextInput,
     },
-    ...task.config,
+    ...(task.spec.params ?? []),
     ...additionalFormInputs,
     {
       key: "results",
