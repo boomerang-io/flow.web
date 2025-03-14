@@ -5,11 +5,10 @@ import {
   FeatureHeaderTitle as HeaderTitle,
   FeatureHeaderSubtitle as HeaderSubtitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import CreateTemplateWorkflow from "Components/CreateTemplateWorkflow";
-import { WorkflowView } from "Constants";
-import { FlowTeam, WorkflowViewType, Workflow } from "Types";
 import { Link } from "react-router-dom";
+import { WorkflowView } from "Constants";
 import { appLink } from "Config/appConfig";
+import { FlowTeam, WorkflowViewType, Workflow } from "Types";
 import styles from "./workflowsHeader.module.scss";
 
 interface WorkflowsHeaderProps {
@@ -67,7 +66,6 @@ const WorkflowsHeader: React.FC<WorkflowsHeaderProps> = ({
       }
       actions={
         <ActionsBar>
-          {viewType === WorkflowView.Workflow ? <CreateTemplateWorkflow team={team!} workflowList={[]} /> : null}
           <Layer className={styles.search}>
             <Search
               disabled={!workflowsCount || workflowsCount === 0}

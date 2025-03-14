@@ -25,7 +25,7 @@ const AutoSuggestInput = (props) => {
     <div key={props.id}>
       <AutoSuggest
         {...props}
-        initialValue={Boolean(props?.initialValue) ? props?.initialValue : props?.inputProps?.defaultValue}
+        initialValue={Boolean(props?.initialValue) ? props?.initialValue : props?.inputProps?.default}
       >
         <TextInput tooltipContent={props.tooltipContent} disabled={props?.inputProps?.readOnly} />
       </AutoSuggest>
@@ -38,7 +38,7 @@ const TextAreaSuggestInput = (props) => {
     <div key={props.id}>
       <AutoSuggest
         {...props}
-        initialValue={props?.initialValue !== "" ? props?.initialValue : props?.item?.defaultValue}
+        initialValue={props?.initialValue !== "" ? props?.initialValue : props?.item?.default}
       >
         <TextArea
           disabled={props?.item?.readOnly}
@@ -192,8 +192,7 @@ function ConfigureInputsForm(props) {
 
   const activeInputs = {};
   activeProperties.forEach((prop) => {
-    // activeInputs[prop.key] = props?.value ? props.value : prop.defaultValue;
-    activeInputs[prop?.key] = props?.value ? props.value : prop.defaultValue;
+    activeInputs[prop?.key] = props?.value ? props.value : prop.default;
   });
 
   const WorkflowSelectionInput = ({ formikProps, ...otherProps }) => {

@@ -1,41 +1,33 @@
 import React, { useRef } from "react";
-import { InlineNotification } from "@carbon/react";
-import { Button, ModalBody, ModalFooter } from "@carbon/react";
-import { Loading, TextArea, TextInput, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button, Dropdown, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
+import { Loading, TextArea, TextInput } from "@boomerang-io/carbon-addons-boomerang-react";
+import { ModalFlowForm, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import workflowIcons from "Assets/workflowIcons";
 import classNames from "classnames/bind";
 import { Formik } from "formik";
 import capitalize from "lodash/capitalize";
 import * as Yup from "yup";
-import { FlowTeam, CreateWorkflowSummary, WorkflowViewType } from "Types";
+import { FlowTeam, Workflow, WorkflowTemplate } from "Types";
 import styles from "./createWorkflow.module.scss";
 
 let classnames = classNames.bind(styles);
 
 interface CreateWorkflowContentProps {
-  closeModal: () => void;
-  createError: object;
-  createWorkflow: (workflowSummary: CreateWorkflowSummary) => Promise<void>;
+  template: WorkflowTemplate;
+  createError: any;
+  createWorkflow: (team: string, requestBody: { name: string; description: string; icon: string }) => Promise<void>;
   isLoading: boolean;
-  team?: FlowTeam;
-  existingWorkflowNames: string[];
-  teamQuotasEnabled: boolean;
-  viewType: WorkflowViewType;
+  teams: Array<FlowTeam>;
 }
 
 const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
-  closeModal,
+  template,
   createError,
   createWorkflow,
   isLoading,
-  team,
-  existingWorkflowNames,
-  teamQuotasEnabled,
-  viewType,
+  teams,
 }) => {
   const formikRef = useRef<any>();
-  const hasReachedWorkflowLimit = team.quotas.maxWorkflowCount <= team.quotas.currentWorkflowCount;
-  const createWorkflowsDisabled = teamQuotasEnabled && hasReachedWorkflowLimit;
 
   const handleSubmit = (values: any) => {
     const requestBody = {
@@ -43,39 +35,54 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
       description: values.description,
       icon: values.icon,
     };
-    createWorkflow(requestBody);
+    //@ts-ignore
+    createWorkflow(values.team, requestBody);
   };
+
+  const teamOptions = teams?.map((t) => ({ id: t.name, text: t.displayName }));
 
   return (
     <Formik
+      validateOnMount
       innerRef={formikRef}
-      initialErrors={{ name: "Name is required" }}
       initialValues={{
-        name: "",
-        description: "",
-        icon: workflowIcons[2].name,
+        name: template.name,
+        description: template.description ?? "",
+        icon: template.icon,
+        team: "",
       }}
       onSubmit={handleSubmit}
       validationSchema={Yup.object().shape({
-        name: Yup.string()
-          .required("Name is required")
-          .max(64, "Name must not be greater than 64 characters")
-          .notOneOf(existingWorkflowNames, "This name already exists"),
+        team: Yup.string().required("Team is required"),
+        name: Yup.string().required("Name is required").max(64, "Name must not be greater than 64 characters"),
         description: Yup.string().max(250, "Description must not be greater than 250 characters"),
       })}
     >
       {(props) => {
         const { values, touched, errors, isValid, handleChange, handleBlur, handleSubmit, setFieldValue } = props;
-
         return (
-          <>
+          <ModalFlowForm>
             {isLoading && <Loading />}
             <ModalBody aria-label="inputs" className={styles.formBody}>
+              <Dropdown
+                id="team"
+                type="default"
+                label="Team"
+                ariaLabel="Dropdown"
+                light={false}
+                items={teamOptions}
+                itemToString={(item) => (item ? item.text : "")}
+                value={values.team}
+                className={styles.field}
+                invalid={Boolean(errors.team && touched.team)}
+                onChange={({ selectedItem }: any) => {
+                  console.log(selectedItem);
+                  setFieldValue("team", selectedItem.id);
+                }}
+              />
               <TextInput
                 id="name"
-                labelText="Name"
-                placeholder="e.g. My Amazing Workflow"
-                helperText="Enter a unique name for your workflow"
+                labelText="Workflow Name"
                 value={values.name}
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -119,31 +126,20 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
                   lowContrast
                   kind="error"
                   title="Something's Wrong"
-                  subtitle={`Request to create ${viewType} failed`}
-                />
-              )}
-              {createWorkflowsDisabled && (
-                <InlineNotification
-                  lowContrast
-                  kind="error"
-                  title="Quotas exceeded"
-                  subtitle="You cannot create new workflows for this team."
+                  subtitle="Request to create workflow failed"
                 />
               )}
             </ModalBody>
             <ModalFooter>
-              <Button kind="secondary" onClick={closeModal} type="button">
-                Cancel
-              </Button>
               <Button
                 data-testid="workflows-create-workflow-submit"
-                disabled={!isValid || isLoading || createWorkflowsDisabled}
+                disabled={!isValid || isLoading}
                 onClick={handleSubmit}
               >
-                {isLoading ? "Creating..." : "Create"}
+                {isLoading ? "Creating..." : "Create and View"}
               </Button>
             </ModalFooter>
-          </>
+          </ModalFlowForm>
         );
       }}
     </Formik>

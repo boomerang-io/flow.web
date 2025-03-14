@@ -63,7 +63,6 @@ export const InputProperty = {
   DefaultValue: "default",
   Description: "description",
   HelperText: "helperText",
-  Key: "name",
   Name: "name",
   Label: "label",
   Options: "options",

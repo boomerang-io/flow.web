@@ -21,7 +21,7 @@ import { AppContextProvider, TeamContextProvider, useAppContext } from "State/co
 import { elevatedUserRoles } from "Constants";
 import { AppPath, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
-import { FlowFeatures, FlowNavigationItem, FlowTeam, FlowUser, ContextConfig } from "Types";
+import { FlowFeatures, FlowNavigationItem, FlowTeam, FlowUser, ContextConfig, WorkflowTemplate } from "Types";
 import Navbar from "./Navbar";
 import UnsupportedBrowserPrompt from "./UnsupportedBrowserPrompt";
 import styles from "./app.module.scss";
@@ -52,6 +52,7 @@ const Home = lazy(() => import("Features/Home"));
 const getUserUrl = serviceUrl.getUserProfile();
 const getContextUrl = serviceUrl.getContext();
 const featureFlagsUrl = serviceUrl.getFeatureFlags();
+const workflowTemplatesUrl = serviceUrl.template.getWorkflowTemplates();
 const browser = detect();
 const supportedBrowsers = ["chrome", "firefox", "safari", "edge"];
 
@@ -113,10 +114,24 @@ export default function App() {
     enabled: Boolean(userQuery.data?.id),
   });
 
-  const isLoading =
-    userQuery.isLoading || contextQuery.isLoading || featureQuery.isLoading || navigationQuery.isLoading;
+  const workflowTemplatesQuery = useQuery({
+    queryKey: workflowTemplatesUrl,
+    queryFn: resolver.query(workflowTemplatesUrl),
+  });
 
-  const hasError = userQuery.isError || contextQuery.isError || featureQuery.isError || navigationQuery.isError;
+  const isLoading =
+    userQuery.isLoading ||
+    contextQuery.isLoading ||
+    featureQuery.isLoading ||
+    navigationQuery.isLoading ||
+    workflowTemplatesQuery.isLoading;
+
+  const hasError =
+    userQuery.isError ||
+    contextQuery.isError ||
+    featureQuery.isError ||
+    navigationQuery.isError ||
+    workflowTemplatesQuery.isError;
 
   const handleSetActivationCode = (code: string) => {
     setActivationCode(code);
@@ -183,6 +198,7 @@ export default function App() {
             setShouldShowBrowserWarning={setShouldShowBrowserWarning}
             shouldShowBrowserWarning={shouldShowBrowserWarning}
             userData={userQuery.data}
+            workflowTemplatesData={workflowTemplatesQuery.data.content}
           />
         </ErrorBoundary>
       </FlagsProvider>
@@ -198,6 +214,7 @@ interface MainProps {
   setShouldShowBrowserWarning: (shouldShowBrowserWarning: boolean) => void;
   shouldShowBrowserWarning: boolean;
   userData: FlowUser;
+  workflowTemplatesData: Array<WorkflowTemplate>;
 }
 
 function Main({
@@ -207,6 +224,7 @@ function Main({
   setShouldShowBrowserWarning,
   shouldShowBrowserWarning,
   userData,
+  workflowTemplatesData,
 }: MainProps) {
   const { id: userId, type: platformRole } = userData;
 
@@ -228,6 +246,7 @@ function Main({
         name: contextData?.platform?.name ?? "",
         teams: sortBy(userData.teams, "name"),
         user: userData,
+        workflowTemplates: workflowTemplatesData,
       }}
     >
       <AppFeatures platformRole={platformRole} />

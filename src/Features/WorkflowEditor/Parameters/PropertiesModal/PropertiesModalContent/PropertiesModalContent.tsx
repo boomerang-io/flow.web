@@ -211,7 +211,7 @@ class PropertiesModalContent extends Component<PropertiesModalContentProps> {
         validateOnMount
         onSubmit={this.handleConfirm}
         initialValues={{
-          [InputProperty.Key]: property?.key ?? "",
+          [InputProperty.Name]: property?.name ?? "",
           [InputProperty.Label]: property?.label ?? "",
           [InputProperty.Description]: property?.description ?? "",
           [InputProperty.Required]: property?.required ?? false,

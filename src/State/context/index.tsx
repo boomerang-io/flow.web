@@ -7,6 +7,7 @@ import {
   WorkflowCanvas,
   WorkflowEngineModeType,
   WorkflowRun,
+  WorkflowTemplate,
 } from "Types";
 
 export function createContext<ContextType>() {
@@ -28,6 +29,7 @@ type AppContext = {
   teams: FlowTeam[] | null; // TODO - check if we need this
   user: FlowUser;
   name: string;
+  workflowTemplates: Array<WorkflowTemplate>;
 };
 
 interface WorkflowContext {

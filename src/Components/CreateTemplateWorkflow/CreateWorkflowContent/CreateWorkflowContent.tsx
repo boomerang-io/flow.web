@@ -15,30 +15,12 @@ let classnames = classNames.bind(styles);
 interface CreateWorkflowContentProps {
   closeModal: () => void;
   createError: any;
-  createWorkflow: (selectedTemplateId: string, requestBody: any) => Promise<void>;
+  createWorkflow: (team: string, requestBody: any) => Promise<void>;
   isLoading: boolean;
-  team: FlowTeam;
-  formData: any;
-  saveValues: any;
-  requestPreviousStep: any;
-  teamQuotasEnabled: boolean;
-  workflowList: Array<Workflow>;
 }
 
-const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
-  formData,
-  requestPreviousStep,
-  createError,
-  createWorkflow,
-  isLoading,
-  team,
-  teamQuotasEnabled,
-  workflowList,
-}) => {
+const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({ createError, createWorkflow, isLoading }) => {
   const formikRef = useRef<any>();
-  const hasReachedWorkflowLimit = team.quotas.maxWorkflowCount <= team.quotas.currentWorkflowCount;
-  const createWorkflowsDisabled = teamQuotasEnabled && hasReachedWorkflowLimit;
-  const existingWorkflowNames = workflowList.map((workflow) => workflow.name) ?? [];
 
   const handleSubmit = (values: any) => {
     const requestBody = {

@@ -1,24 +1,26 @@
-import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Gear, PlanningAnalytics, PlayerFlow, Workflows } from "@carbon/pictograms-react";
+import React, { useMemo } from "react";
 import { Layer } from "@carbon/react";
-import React from "react";
-import { useMutation, useQueryClient } from "react-query";
-import { useHistory, useLocation } from "react-router-dom";
+import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import { formatErrorMessage } from "@boomerang-io/utils";
+import { Gear, PlanningAnalytics, PlayerFlow, Workflows } from "@carbon/pictograms-react";
 import cx from "classnames";
 import kebabcase from "lodash/kebabCase";
+import sortBy from "lodash/sortBy";
 import queryString from "query-string";
+import { useMutation, useQueryClient } from "react-query";
+import { useHistory, useLocation } from "react-router-dom";
 import HomeBanner from "Components/HomeBanner";
 import LearnCard from "Components/LearnCard";
 import TeamCard from "Components/TeamCard";
 import TeamCardCreate from "Components/TeamCardCreate";
+import WorkflowTemplateCard from "Components/WorkflowTemplateCard";
 import { useAppContext } from "Hooks";
-import styles from "./home.module.scss";
 import { resolver, serviceUrl } from "Config/servicesConfig";
 import { MemberRole } from "Types";
+import styles from "./home.module.scss";
 
 export default function Home() {
-  const { teams, name, user } = useAppContext();
+  const { teams, name, user, workflowTemplates } = useAppContext();
   const queryClient = useQueryClient();
   const location = useLocation();
   const history = useHistory();
@@ -67,6 +69,8 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const sortedTeams = useMemo(() => sortBy(teams, ["name"]), [teams]);
+
   return (
     <>
       <HomeBanner name={name} />
@@ -77,7 +81,7 @@ export default function Home() {
         <Layer>
           <Section title="Your Teams">
             <nav className={styles.sectionLinks}>
-              {teams ? teams?.map((team) => <TeamCard key={team.name} team={team} />) : null}
+              {sortedTeams ? sortedTeams?.map((team) => <TeamCard key={team.name} team={team} />) : null}
               <TeamCardCreate
                 createTeam={createTeam}
                 isError={createTeamMutator.isError}
@@ -86,6 +90,13 @@ export default function Home() {
             </nav>
           </Section>
         </Layer>
+        <Section title="Get Started With A Template" hasBorder>
+          <nav className={styles.sectionLinks}>
+            {workflowTemplates
+              ? workflowTemplates?.map((template) => <WorkflowTemplateCard template={template} teams={sortedTeams} />)
+              : null}
+          </nav>
+        </Section>
         <Section title="Explore and learn" hasBorder>
           <nav className={styles.sectionLinks}>
             <LearnCard

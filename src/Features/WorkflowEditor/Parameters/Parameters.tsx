@@ -1,12 +1,12 @@
 import React from "react";
-import { Helmet } from "react-helmet";
 import { ConfirmModal } from "@boomerang-io/carbon-addons-boomerang-react";
-import WorkflowCloseButton from "./WorkflowCloseButton";
-import WorkflowPropertiesModal from "./PropertiesModal";
-import { InputType, WorkflowPropertyAction } from "Constants";
-import { DataDrivenInput, ModalTriggerProps, Workflow, WorkflowPropertyActionType } from "Types";
+import { Helmet } from "react-helmet";
 import { stringToPassword } from "Utils/stringHelper";
+import { InputType, WorkflowPropertyAction } from "Constants";
+import { DataDrivenInput, ModalTriggerProps, WorkflowCanvas, WorkflowPropertyActionType } from "Types";
 import styles from "./Parameters.module.scss";
+import WorkflowPropertiesModal from "./PropertiesModal";
+import WorkflowCloseButton from "./WorkflowCloseButton";
 
 function formatDefaultValue({ type, value }: { type?: string; value?: string }) {
   if (!value) {
@@ -48,12 +48,12 @@ const WorkflowPropertyHeader: React.FC<WorkflowPropertyHeaderProps> = ({ label, 
 
 interface ParametersProps {
   handleUpdateParams: (parameters: Array<DataDrivenInput>, removedParameters: Array<DataDrivenInput>) => void;
-  workflow: Workflow;
+  workflow: WorkflowCanvas;
 }
 
 function Parameters({ workflow, handleUpdateParams }: ParametersProps) {
   const handleUpdateProperties = ({ param, type }: { param: DataDrivenInput; type: WorkflowPropertyActionType }) => {
-    let parameters = [...workflow.config];
+    let parameters = workflow.config ? [...workflow.config] : [];
     let removedParameters: Array<DataDrivenInput> = [];
 
     if (type === WorkflowPropertyAction.Update) {
@@ -94,11 +94,11 @@ function Parameters({ workflow, handleUpdateParams }: ParametersProps) {
         config.map((configParam: DataDrivenInput, index: number) => (
           <section key={`${configParam.id}-${index}`} className={styles.property}>
             <WorkflowPropertyHeader label={configParam.label} description={configParam.description} />
-            <WorkflowPropertyRow title="Key" value={configParam.key} />
+            <WorkflowPropertyRow title="Name" value={configParam.name} />
             <WorkflowPropertyRow title="Type" value={configParam.type} />
             <WorkflowPropertyRow
               title="Default value"
-              value={formatDefaultValue({ type: configParam.type, value: configParam.defaultValue })}
+              value={formatDefaultValue({ type: configParam.type, value: configParam.default })}
             />
             <WorkflowPropertyRow
               title="Options"
@@ -115,7 +115,7 @@ function Parameters({ workflow, handleUpdateParams }: ParametersProps) {
               <>
                 <WorkflowPropertiesModal
                   isEdit
-                  propertyKeys={paramKeys.filter((propertyName: string) => propertyName !== configParam.key)}
+                  propertyKeys={paramKeys.filter((name: string) => name !== configParam.name)}
                   property={configParam}
                   updateWorkflowProperties={handleUpdateProperties}
                 />

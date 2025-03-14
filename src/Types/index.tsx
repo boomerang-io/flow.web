@@ -466,12 +466,7 @@ export interface WorkflowTemplate {
   version: Number;
   labels?: Record<string, string>;
   annotations?: Record<string, object>;
-  params?: Array<{
-    name: string;
-    type: string;
-    description?: string;
-    defaultValue?: object;
-  }>;
+  params?: Array<DataDrivenInput>;
   tasks: Array<any>; //TODO: what should this be
   changelog: {
     author: string;
