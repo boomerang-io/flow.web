@@ -133,11 +133,6 @@
     "typescript-plugin-css-modules": "^3.4.0",
     "uuid": "^8.3.2"
   },
-    "pnpm": {
-    "overrides": {
-      "cross-spawn": "^7.0.5"
-    }
-  },
   "browserslist": {
     "production": [
       ">0.2%",
