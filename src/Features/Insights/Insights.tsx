@@ -201,9 +201,14 @@ function Selects(props: SelectsProps) {
     userWorkflowsData: userWorkflows.workflows,
   });
 
-  const workflowScopeOptions = [
-    { label: "User", value: WorkflowScope.User },
-    { label: "Team", value: WorkflowScope.Team },
+  // const workflowScopeOptions = [
+  //   { label: "User", value: WorkflowScope.User },
+  //   { label: "Team", value: WorkflowScope.Team },
+  // ];
+
+  const workflowScopeOptions: { label: string; value: string }[] = [
+    { label: "User", value: "user" },
+    { label: "Team", value: "team" },
   ];
 
   if (isSystemWorkflowsEnabled) {

@@ -186,7 +186,6 @@ export default function Schedules() {
     setActiveSchedule({ ...schedule, workflow });
   }
 
-
   if (teams || systemWorkflowsQuery.data || userWorkflows.workflows) {
     const { workflowIds = "", scopes = "", statuses = "", teamIds = "" } = queryString.parse(
       location.search,
@@ -210,9 +209,14 @@ export default function Schedules() {
       userWorkflowsData: userWorkflows.workflows,
     });
 
-    const workflowScopeOptions = [
-      { label: "User", value: WorkflowScope.User },
-      { label: "Team", value: WorkflowScope.Team },
+    // const workflowScopeOptions = [
+    //   { label: "User", value: WorkflowScope.User },
+    //   { label: "Team", value: WorkflowScope.Team },
+    // ];
+
+    const workflowScopeOptions: { label: string; value: string }[] = [
+      { label: "User", value: "user" },
+      { label: "Team", value: "team" },
     ];
 
     if (isSystemWorkflowsEnabled) {
@@ -456,7 +460,6 @@ interface GetWorkflowOptionsArgs {
   userWorkflowsData: Array<WorkflowSummary>;
 }
 
-
 function getWorkflowOptions({
   isSystemWorkflowsEnabled,
   scopes,
@@ -488,4 +491,3 @@ function getWorkflowOptions({
   let workflowsFilter = sortByProp(workflowsList, "name", "ASC");
   return workflowsFilter;
 }
-

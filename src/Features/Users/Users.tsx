@@ -96,7 +96,7 @@ const UserList: React.FC = () => {
    *
    */
   function updateHistorySearch({
-    order = DEFAULT_ORDER,
+    order = "ASC",
     page = DEFAULT_PAGE,
     size = DEFAULT_SIZE,
     sort = DEFAULT_SORT,
@@ -128,7 +128,7 @@ const UserList: React.FC = () => {
 
   function handleSort(e: React.SyntheticEvent, sort: { sortHeaderKey: string }) {
     const { property, direction } = usersQuery.data.sort[0];
-    let order = SortDirection.Asc;
+    let order: "ASC" | "DESC" = SortDirection.Asc;
 
     if (sort.sortHeaderKey === property && direction === SortDirection.Asc) {
       order = SortDirection.Desc;
