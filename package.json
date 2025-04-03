@@ -135,6 +135,7 @@
   },
   "pnpm": {
     "overrides": {
+      "axios": "^0.27.2",
       "json5": "^1.0.2",
       "ws": "^8.17.1",
       "decode-uri-component": "^0.2.1",
@@ -143,7 +144,8 @@
       "ejs": "3.1.10",
       "dompurify": "^3.2.4",
       "cross-spawn": "^7.0.5",
-      "braces": "^3.0.3"
+      "braces": "^3.0.3",
+      "validator": "^13.7.0"
     }
   },
   "browserslist": {

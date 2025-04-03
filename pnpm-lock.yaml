@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  axios: ^0.27.2
   json5: ^1.0.2
   ws: ^8.17.1
   decode-uri-component: ^0.2.1
@@ -14,6 +15,7 @@ overrides:
   dompurify: ^3.2.4
   cross-spawn: ^7.0.5
   braces: ^3.0.3
+  validator: ^13.7.0
 
 importers:
 
@@ -21,13 +23,13 @@ importers:
     dependencies:
       '@boomerang-io/carbon-addons-boomerang-react':
         specifier: 2.0.5
-        version: 2.0.5(@carbon/icons-react@10.49.0(react@16.14.0))(axios@0.26.1)(carbon-components-react@7.56.0(carbon-components@10.56.0)(carbon-icons@7.0.7)(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(carbon-components@10.56.0)(carbon-icons@7.0.7)(formik@2.4.6(react@16.14.0))(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)
+        version: 2.0.5(@carbon/icons-react@10.49.0(react@16.14.0))(axios@0.27.2)(carbon-components-react@7.56.0(carbon-components@10.56.0)(carbon-icons@7.0.7)(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(carbon-components@10.56.0)(carbon-icons@7.0.7)(formik@2.4.6(react@16.14.0))(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)
       '@boomerang-io/styles':
         specifier: 1.0.0
         version: 1.0.0
       '@boomerang-io/utils':
         specifier: 1.0.3
-        version: 1.0.3(axios@0.26.1)(lodash@4.17.21)(query-string@6.14.1)(react-dom@16.14.0(react@16.14.0))(react-query@3.39.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)
+        version: 1.0.3(axios@0.27.2)(lodash@4.17.21)(query-string@6.14.1)(react-dom@16.14.0(react@16.14.0))(react-query@3.39.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)
       '@carbon/charts':
         specifier: ^0.58.2
         version: 0.58.2(d3@7.9.0)
@@ -41,11 +43,11 @@ importers:
         specifier: ^5.3.2
         version: 5.3.2(closest@0.0.1)(lodash@4.17.21)(pathfinding@0.4.18)(paths-js@0.4.11)(react@16.14.0)
       axios:
-        specifier: ^0.26.0
-        version: 0.26.1
+        specifier: ^0.27.2
+        version: 0.27.2(debug@4.3.4)
       axios-hooks:
         specifier: ^3.0.1
-        version: 3.1.5(axios@0.26.1)(react@16.14.0)
+        version: 3.1.5(axios@0.27.2)(react@16.14.0)
       carbon-components:
         specifier: 10.56.0
         version: 10.56.0
@@ -176,8 +178,8 @@ importers:
         specifier: ^0.4.0
         version: 0.4.2(immer@9.0.21)(react@16.14.0)
       validator:
-        specifier: ^10.7.1
-        version: 10.11.0
+        specifier: ^13.7.0
+        version: 13.15.0
       yup:
         specifier: ^0.32.11
         version: 0.32.11
@@ -1066,7 +1068,7 @@ packages:
     resolution: {integrity: sha512-OaNetZpizG4mhLsHOpfzRqIHZOtm70Y+V57EOKh3TgnqM0V/k2xF/+n+4bmyj2CsFrLC0QbnK5zyUpesfdv2IA==}
     peerDependencies:
       '@carbon/icons-react': ^10.38.0
-      axios: '>=0.26.0'
+      axios: ^0.27.2
       carbon-components: ^10.25.0
       carbon-components-react: ^7.25.0
       carbon-icons: ^7.0.7
@@ -1083,7 +1085,7 @@ packages:
   '@boomerang-io/utils@1.0.3':
     resolution: {integrity: sha512-XjFZ5/406WpwCoBxmU6YbXdUkJd/YPIwTVjtfL5Xtc6A+vHPf6YTQY+uHbWLVaEWw81G3TwBW2JRPWr+18yn5g==}
     peerDependencies:
-      axios: '>=0.24.0'
+      axios: ^0.27.2
       lodash: ^4.17.21
       query-string: ^6.14.1
       react: ^17.0.0 || ^16.14.0
@@ -2599,11 +2601,8 @@ packages:
   axios-hooks@3.1.5:
     resolution: {integrity: sha512-mU4WZ9c6YiOTxgTIKbswoHvb/b9fWXa2FxNFKI/hVcfD9Qemz1r9KLfRSVZf1GZg8nFry7oTM5gxNmPSn5PG0Q==}
     peerDependencies:
-      axios: '>=0.24.0'
+      axios: ^0.27.2
       react: ^16.8.0-0 || ^17.0.0 || ^18.0.0
-
-  axios@0.26.1:
-    resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
 
   axios@0.27.2:
     resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
@@ -8483,8 +8482,8 @@ packages:
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
 
-  validator@10.11.0:
-    resolution: {integrity: sha512-X/p3UZerAIsbBfN/IwahhYaBbY68EN/UQBWHtsbXGT5bfrH/p4NQzUCG1kF/rtKaNpnJ7jAu6NGTdSNtyNIXMw==}
+  validator@13.15.0:
+    resolution: {integrity: sha512-36B2ryl4+oL5QxZ3AzD0t5SsMNGvTtQHpjgFO5tbNxfXbMFkY822ktCDe1MnlqV3301QQI9SLHDNJokDI+Z9pA==}
     engines: {node: '>= 0.10'}
 
   value-equal@1.0.1:
@@ -9717,14 +9716,14 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@boomerang-io/carbon-addons-boomerang-react@2.0.5(@carbon/icons-react@10.49.0(react@16.14.0))(axios@0.26.1)(carbon-components-react@7.56.0(carbon-components@10.56.0)(carbon-icons@7.0.7)(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(carbon-components@10.56.0)(carbon-icons@7.0.7)(formik@2.4.6(react@16.14.0))(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)':
+  '@boomerang-io/carbon-addons-boomerang-react@2.0.5(@carbon/icons-react@10.49.0(react@16.14.0))(axios@0.27.2)(carbon-components-react@7.56.0(carbon-components@10.56.0)(carbon-icons@7.0.7)(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(carbon-components@10.56.0)(carbon-icons@7.0.7)(formik@2.4.6(react@16.14.0))(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)':
     dependencies:
       '@babel/runtime': 7.17.2
       '@carbon/icons-react': 10.49.0(react@16.14.0)
       '@carbon/themes': 10.52.0
       '@stomp/stompjs': 6.1.2
       '@tippyjs/react': 4.2.6(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
-      axios: 0.26.1
+      axios: 0.27.2(debug@4.3.4)
       carbon-components: 10.56.0
       carbon-components-react: 7.56.0(carbon-components@10.56.0)(carbon-icons@7.0.7)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       carbon-icons: 7.0.7
@@ -9758,9 +9757,9 @@ snapshots:
       normalize-scss: 7.0.1
       rimraf: 3.0.2
 
-  '@boomerang-io/utils@1.0.3(axios@0.26.1)(lodash@4.17.21)(query-string@6.14.1)(react-dom@16.14.0(react@16.14.0))(react-query@3.39.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)':
+  '@boomerang-io/utils@1.0.3(axios@0.27.2)(lodash@4.17.21)(query-string@6.14.1)(react-dom@16.14.0(react@16.14.0))(react-query@3.39.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-router-dom@5.3.0(react@16.14.0))(react@16.14.0)(yup@0.32.11)':
     dependencies:
-      axios: 0.26.1
+      axios: 0.27.2(debug@4.3.4)
       lodash: 4.17.21
       query-string: 6.14.1
       react: 16.14.0
@@ -11576,19 +11575,13 @@ snapshots:
 
   axe-core@4.10.3: {}
 
-  axios-hooks@3.1.5(axios@0.26.1)(react@16.14.0):
+  axios-hooks@3.1.5(axios@0.27.2)(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.18.9
-      axios: 0.26.1
+      axios: 0.27.2(debug@4.3.4)
       dequal: 2.0.3
       lru-cache: 6.0.0
       react: 16.14.0
-
-  axios@0.26.1:
-    dependencies:
-      follow-redirects: 1.15.9(debug@4.3.4)
-    transitivePeerDependencies:
-      - debug
 
   axios@0.27.2(debug@4.3.4):
     dependencies:
@@ -18650,7 +18643,7 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  validator@10.11.0: {}
+  validator@13.15.0: {}
 
   value-equal@1.0.1: {}
 
