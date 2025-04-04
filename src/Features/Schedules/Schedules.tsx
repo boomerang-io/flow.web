@@ -212,8 +212,8 @@ export default function Schedules() {
     type WorkflowScopeType = typeof WorkflowScope[keyof typeof WorkflowScope];
 
     const workflowScopeOptions: { label: string; value: WorkflowScopeType }[] = [
-      { label: "User", value: "user" },
-      { label: "Team", value: "team" },
+      { label: "User", value: WorkflowScope.User },
+      { label: "Team", value: WorkflowScope.Team },
     ];
 
     if (isSystemWorkflowsEnabled) {
