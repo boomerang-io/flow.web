@@ -209,12 +209,9 @@ export default function Schedules() {
       userWorkflowsData: userWorkflows.workflows,
     });
 
-    // const workflowScopeOptions = [
-    //   { label: "User", value: WorkflowScope.User },
-    //   { label: "Team", value: WorkflowScope.Team },
-    // ];
+    type WorkflowScopeType = typeof WorkflowScope[keyof typeof WorkflowScope];
 
-    const workflowScopeOptions: { label: string; value: string }[] = [
+    const workflowScopeOptions: { label: string; value: WorkflowScopeType }[] = [
       { label: "User", value: "user" },
       { label: "Team", value: "team" },
     ];

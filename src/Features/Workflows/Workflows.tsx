@@ -21,7 +21,7 @@ import WelcomeBanner from "Components/WelcomeBanner";
 import WorkflowCard from "Components/WorkflowCard";
 import WorkflowsHeader from "Components/WorkflowsHeader";
 import WorkflowQuotaModalContent from "./WorkflowQuotaModalContent";
-import { FlowTeam, FlowUser, ModalTriggerProps, ComposedModalChildProps, WorkflowSummary, PlatformRole } from "Types";
+import { FlowTeam, FlowUser, ModalTriggerProps, ComposedModalChildProps, WorkflowSummary } from "Types";
 import { WorkflowScope, elevatedUserRoles, UserType } from "Constants";
 import { AppPath, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
@@ -312,10 +312,6 @@ const TeamWorkflows: React.FC<TeamWorkflowsProps> = ({ searchQuery, team, teams,
   const workflowQuotasEnabled = useFeature(FeatureFlag.WorkflowQuotasEnabled);
 
   const systemWorkflowsEnabled = elevatedUserRoles.includes(user.type);
-  // const systemWorkflowsEnabled =
-  // elevatedUserRoles.includes(PlatformRole.Admin) ||
-  // elevatedUserRoles.includes(PlatformRole.User) ||
-  // elevatedUserRoles.includes(PlatformRole.Operator);
 
   const canEditWorkflow =
     (team?.userRoles ? team?.userRoles.indexOf(UserType.Operator) > -1 : true) || systemWorkflowsEnabled;
