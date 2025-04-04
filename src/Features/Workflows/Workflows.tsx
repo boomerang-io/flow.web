@@ -312,6 +312,7 @@ const TeamWorkflows: React.FC<TeamWorkflowsProps> = ({ searchQuery, team, teams,
   const workflowQuotasEnabled = useFeature(FeatureFlag.WorkflowQuotasEnabled);
 
   const systemWorkflowsEnabled = elevatedUserRoles.includes(user.type);
+
   const canEditWorkflow =
     (team?.userRoles ? team?.userRoles.indexOf(UserType.Operator) > -1 : true) || systemWorkflowsEnabled;
 

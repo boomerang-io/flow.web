@@ -201,7 +201,9 @@ function Selects(props: SelectsProps) {
     userWorkflowsData: userWorkflows.workflows,
   });
 
-  const workflowScopeOptions = [
+  type WorkflowScopeType = typeof WorkflowScope[keyof typeof WorkflowScope];
+
+  const workflowScopeOptions: { label: string; value: WorkflowScopeType }[] = [
     { label: "User", value: WorkflowScope.User },
     { label: "Team", value: WorkflowScope.Team },
   ];
