@@ -27,7 +27,7 @@ import { elevatedUserRoles, QueryStatus } from "Constants";
 import { serviceUrl, resolver } from "Config/servicesConfig";
 import { appLink, FeatureFlag } from "Config/appConfig";
 import { Catalog16, CopyFile16, StopOutline16, Warning16 } from "@carbon/icons-react";
-import { ExecutionStatus, WorkflowSummary } from "Types";
+import { ExecutionStatus, PlatformRole, WorkflowSummary } from "Types";
 import styles from "./executionHeader.module.scss";
 
 type Props = {
@@ -48,7 +48,7 @@ function ExecutionHeader({ history, workflow, workflowExecution, version }: Prop
   const queryClient = useQueryClient();
 
   const { platformRole } = user;
-  const systemWorkflowsEnabled = elevatedUserRoles.includes(platformRole);
+  const systemWorkflowsEnabled = elevatedUserRoles.includes(platformRole as PlatformRole);
   const { teamName, initiatedByUserName, trigger, creationDate, scope, status, id } = workflowExecution.data;
   const displayCancelButton = cancelSatusTypes.includes(status);
 
