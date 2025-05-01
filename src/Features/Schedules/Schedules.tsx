@@ -1,26 +1,26 @@
 import React from "react";
-import { useTeamContext } from "Hooks";
-import { useHistory, useLocation, Link } from "react-router-dom";
-import { useQuery } from "react-query";
 import { Layer, FilterableMultiSelect, Breadcrumb, BreadcrumbItem } from "@carbon/react";
 import {
   FeatureHeader as Header,
   FeatureHeaderSubtitle as HeaderSubtitle,
   FeatureHeaderTitle as HeaderTitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
+import { sortByProp } from "@boomerang-io/utils";
+import isArray from "lodash/isArray";
+import moment from "moment-timezone";
+import queryString from "query-string";
+import type { SlotInfo } from "react-big-calendar";
+import { useQuery } from "react-query";
+import { useHistory, useLocation, Link } from "react-router-dom";
 import Calendar from "Components/ScheduleCalendar";
 import ScheduleCreator from "Components/ScheduleCreator";
 import ScheduleEditor from "Components/ScheduleEditor";
 import SchedulePanelDetail from "Components/SchedulePanelDetail";
 import SchedulePanelList from "Components/SchedulePanelList";
-import isArray from "lodash/isArray";
-import moment from "moment-timezone";
-import queryString from "query-string";
-import { sortByProp } from "@boomerang-io/utils";
+import { useTeamContext } from "Hooks";
 import { scheduleStatusOptions } from "Constants";
 import { queryStringOptions, appLink } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
-import type { SlotInfo } from "react-big-calendar";
 import type {
   CalendarDateRange,
   CalendarEntry,
@@ -55,7 +55,10 @@ export default function Schedules() {
   const { statuses = defaultStatusArray, workflows } = queryString.parse(location.search, queryStringOptions);
 
   /** Retrieve Workflows */
-  const getWorkflowsUrl = serviceUrl.team.workflow.getWorkflows({ team: team?.name, query: `statuses=active,inactive` });
+  const getWorkflowsUrl = serviceUrl.team.workflow.getWorkflows({
+    team: team?.name,
+    query: `statuses=active,inactive`,
+  });
   const workflowsQuery = useQuery<PaginatedWorkflowResponse, string>({
     queryKey: getWorkflowsUrl,
     queryFn: resolver.query(getWorkflowsUrl),
@@ -66,7 +69,7 @@ export default function Schedules() {
       statuses,
       workflows,
     },
-    queryStringOptions
+    queryStringOptions,
   );
   const getSchedulesUrl = serviceUrl.team.schedule.getSchedules({ team: team?.name, query: schedulesUrlQuery });
 
@@ -91,7 +94,7 @@ export default function Schedules() {
       fromDate,
       toDate,
     },
-    queryStringOptions
+    queryStringOptions,
   );
   const getCalendarUrl = serviceUrl.team.schedule.getSchedulesCalendars({ team: team?.name, query: calendarUrlQuery });
 
@@ -177,7 +180,7 @@ export default function Schedules() {
           header={
             <>
               <HeaderTitle className={styles.headerTitle}>Schedules</HeaderTitle>
-              <HeaderSubtitle>Manange all of your Schedules</HeaderSubtitle>
+              <HeaderSubtitle>Your Workflow's calendar assistant - set it and forget it!</HeaderSubtitle>
             </>
           }
           actions={
@@ -195,7 +198,7 @@ export default function Schedules() {
                     return workflow.name;
                   }}
                   initialSelectedItems={getWorkflowFilter().filter((workflow: Workflow) =>
-                    Boolean(selectedWorkflowIds?.find((id) => id === workflow.id))
+                    Boolean(selectedWorkflowIds?.find((id) => id === workflow.id)),
                   )}
                   titleText="Filter by Workflow"
                 />
@@ -210,7 +213,7 @@ export default function Schedules() {
                   items={scheduleStatusOptions}
                   itemToString={(item: MultiSelectItem) => (item ? item.label : "")}
                   initialSelectedItems={scheduleStatusOptions.filter((option) =>
-                    Boolean(selectedStatuses?.find((status) => status === option.value))
+                    Boolean(selectedStatuses?.find((status) => status === option.value)),
                   )}
                   titleText="Filter by status"
                 />
@@ -300,7 +303,7 @@ function CalendarView(props: CalendarViewProps) {
   if (calendarQuery.data && props.schedules) {
     for (let calendarEntry of calendarQuery.data) {
       const matchingSchedule: ScheduleUnion | undefined = props.schedules.find(
-        (schedule: ScheduleUnion) => schedule.id === calendarEntry.scheduleId
+        (schedule: ScheduleUnion) => schedule.id === calendarEntry.scheduleId,
       );
       if (matchingSchedule) {
         for (const date of calendarEntry.dates) {

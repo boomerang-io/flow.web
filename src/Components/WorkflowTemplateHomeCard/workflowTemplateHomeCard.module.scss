@@ -2,7 +2,7 @@
 
 .container {
   display: flex;
-  background-color: var(--cds-ui-01);
+  background-color: var(--cds-layer-02);
   flex-direction: column;
   justify-content: space-between;
   min-width: 19.375rem;
@@ -10,36 +10,6 @@
   height: 10.31255rem;
   position: relative;
   @include border-radius();
-
-  a {
-    &:focus {
-      @include focus-outline($offset: 0rem);
-    }
-    &[disabled] {
-      pointer-events: none;
-    }
-  }
-
-  :global .cds--overflow-menu {
-    height: 2rem;
-  }
-
-  :global .cds--overflow-menu-options__btn {
-    color: var(--cds-text-03);
-    text-decoration: none !important;
-  }
-  :global .cds--overflow-menu-options--open {
-    @include border-radius();
-    overflow: hidden;
-    z-index: 998;
-  }
-
-  :global .cds--overflow-menu-options__option {
-    min-width: 11.125rem;
-    // &:hover {
-    //   background-color: $cool-gray-1;
-    // }
-  }
 }
 
 .details {
@@ -47,15 +17,13 @@
   box-sizing: border-box;
   justify-content: space-between;
   height: 6.5rem;
-  padding: 0.5rem;
-  margin-top: 1.5rem;
+  padding: 1rem;
 }
 
 .iconContainer {
   color: var(--cds-text-primary);
   display: flex;
-  justify-content: center;
-  width: 5rem;
+  width: 3rem;
 }
 
 .icon {

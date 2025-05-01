@@ -1,60 +1,87 @@
 import React, { useState } from "react";
 //@ts-ignore
-import { Button, InlineLoading, OverflowMenu, OverflowMenuItem } from "@carbon/react";
-import { Run, Bee, CircleFill, InformationFilled, Template, Add } from "@carbon/react/icons";
-import { ComposedModal, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
+import { InlineLoading, OverflowMenu, OverflowMenuItem } from "@carbon/react";
+import { Bee } from "@carbon/react/icons";
+import { ConfirmModal, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
 import workflowIcons from "Assets/workflowIcons";
+import axios from "axios";
+import fileDownload from "js-file-download";
 import { useMutation, useQueryClient } from "react-query";
-import { Link, useHistory } from "react-router-dom";
-import { appLink, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
-import { FlowTeam, ModalTriggerProps, WorkflowTemplate } from "Types";
-import CreateWorkflowContent from "./CreateWorkflowContent";
+import { Workflow } from "Types";
 import styles from "./workflowTemplateCard.module.scss";
 
 interface WorkflowTemplateCardProps {
-  template: WorkflowTemplate;
-  teams: Array<FlowTeam>;
+  workflow: Workflow;
+  getWorkflowsUrl: string;
 }
 
-const WorkflowTemplateCard: React.FC<WorkflowTemplateCardProps> = ({ template, teams }) => {
-  const history = useHistory();
+const WorkflowTemplateCard: React.FC<WorkflowTemplateCardProps> = ({ workflow, getWorkflowsUrl }) => {
+  const queryClient = useQueryClient();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { mutateAsync: deleteWorkflowTemplateMutator, isLoading: isDeleting } = useMutation(
+    resolver.deleteWorkflowTemplate,
+    {},
+  );
 
-  const {
-    mutateAsync: createTemplateWorkflowMutator,
-    isLoading: createTemplateWorkflowIsLoading,
-    error: createTemplateWorkflowError,
-  } = useMutation(resolver.postCreateWorkflow);
-
-  const handleCreateWorkflow = async (
-    team: string,
-    requestBody: { name: string; description: string; icon: string },
-  ) => {
+  const handleDeleteWorkflow = async () => {
+    const workflowId = workflow.id;
     try {
-      const data = { ...template, ...requestBody };
-      const { data: workflow } = await createTemplateWorkflowMutator({
-        team: team,
-        body: data,
-      });
-      history.push(appLink.editorCanvas({ team: team, workflowId: workflow.id }));
+      await deleteWorkflowTemplateMutator({ id: workflowId });
       notify(
         <ToastNotification
           kind="success"
-          title="Create Workflow"
-          subtitle="Successfully created workflow from template"
+          title={`Delete Workflow Template`}
+          subtitle={`Workflow Template successfully deleted`}
         />,
       );
-      return;
-    } catch (e) {
-      console.log(e);
-      return;
-      //no-op
+      queryClient.invalidateQueries(getWorkflowsUrl);
+    } catch {
+      notify(
+        <ToastNotification
+          kind="error"
+          title="Something's Wrong"
+          subtitle={`Request to delete Workflow Template failed`}
+        />,
+      );
     }
   };
-  const isLoading = createTemplateWorkflowIsLoading;
-  const { name, Icon = Bee } = workflowIcons.find((icon) => icon.name === template.icon) ?? {};
+
+  //TODO: duplicate Workflow Template
+  const handleExportWorkflow = (workflow: Workflow) => {
+    notify(<ToastNotification kind="info" title={`Export Workflow Template`} subtitle="Export starting soon" />);
+    axios
+      .get(serviceUrl.template.getExportWorkflowTemplate({ workflowId: workflow.id }))
+      .then(({ data }) => {
+        fileDownload(JSON.stringify(data, null, 4), `${workflow.name}.json`);
+      })
+      .catch((error) => {
+        notify(
+          <ToastNotification kind="error" title="Something's Wrong" subtitle={`Export Workflow Template failed`} />,
+        );
+      });
+  };
+
+  let menuOptions = [
+    {
+      itemText: "Export",
+      onClick: () => handleExportWorkflow(workflow),
+    },
+    {
+      hasDivider: true,
+      itemText: "Delete",
+      isDelete: true,
+      onClick: () => setIsDeleteModalOpen(true),
+    },
+  ];
+
+  const { name, Icon = Bee } = workflowIcons.find((icon) => icon.name === workflow.icon) ?? {};
 
   let loadingText = "";
+
+  if (isDeleting) {
+    loadingText = "Deleting...";
+  }
 
   return (
     <div className={styles.container}>
@@ -63,43 +90,51 @@ const WorkflowTemplateCard: React.FC<WorkflowTemplateCardProps> = ({ template, t
           <Icon className={styles.icon} alt={`${name}`} />
         </div>
         <div className={styles.descriptionContainer}>
-          <h1 title={template.name} className={styles.name} data-testid="workflow-card-title">
-            {template.name}
+          <h1 title={workflow.name} className={styles.name} data-testid="workflow-card-title">
+            {workflow.name}
           </h1>
-          <p title={template.description} className={styles.description}>
-            {template.description}
+          <p title={workflow.description} className={styles.description}>
+            {workflow.description}
           </p>
         </div>
       </section>
-      <section className={styles.launch}>
-        <ComposedModal
-          modalHeaderProps={{
-            title: "Create Workflow from Template",
-            subtitle: "Get started by leveraging this template",
-          }}
-          modalTrigger={({ openModal }: ModalTriggerProps) => (
-            <Button iconDescription={`Create from Template`} renderIcon={Template} size="md" onClick={openModal}>
-              Create from template
-            </Button>
-          )}
-        >
-          {({ closeModal }) => (
-            <CreateWorkflowContent
-              template={template}
-              createWorkflow={handleCreateWorkflow}
-              createError={createTemplateWorkflowError}
-              isLoading={isLoading}
-              teams={teams}
-            />
-          )}
-        </ComposedModal>
-      </section>
-      {isLoading ? (
+      {isDeleting ?? (
         <InlineLoading
           description={loadingText}
           style={{ position: "absolute", left: "0.5rem", top: "0", width: "fit-content" }}
         />
-      ) : null}
+      )}
+      <div style={{ position: "absolute", right: "0" }}>
+        <OverflowMenu flipped ariaLabel="Overflow card menu" iconDescription="Overflow menu icon" size="sm">
+          {menuOptions.map(({ onClick, itemText, ...rest }, index) => (
+            <OverflowMenuItem
+              onClick={onClick}
+              itemText={itemText}
+              key={`${itemText}-${index}`}
+              disabled={isDeleting}
+              {...rest}
+            />
+          ))}
+        </OverflowMenu>
+      </div>
+      {isDeleteModalOpen && (
+        <ConfirmModal
+          affirmativeAction={handleDeleteWorkflow}
+          affirmativeButtonProps={{ kind: "danger" }}
+          affirmativeText="Delete"
+          isOpen={isDeleteModalOpen}
+          negativeAction={() => {
+            setIsDeleteModalOpen(false);
+          }}
+          negativeText="Cancel"
+          onCloseModal={() => {
+            setIsDeleteModalOpen(false);
+          }}
+          title={`Delete Workflow Template`}
+        >
+          {`Are you sure you want to delete this Workflow Template? There's no going back from this decision.`}
+        </ConfirmModal>
+      )}
     </div>
   );
 };

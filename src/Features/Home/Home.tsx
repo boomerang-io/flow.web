@@ -13,7 +13,7 @@ import HomeBanner from "Components/HomeBanner";
 import LearnCard from "Components/LearnCard";
 import TeamCard from "Components/TeamCard";
 import TeamCardCreate from "Components/TeamCardCreate";
-import WorkflowTemplateCard from "Components/WorkflowTemplateCard";
+import WorkflowTemplateHomeCard from "Components/WorkflowTemplateHomeCard";
 import { useAppContext } from "Hooks";
 import { resolver, serviceUrl } from "Config/servicesConfig";
 import { MemberRole } from "Types";
@@ -93,7 +93,9 @@ export default function Home() {
         <Section title="Get Started With A Template" hasBorder>
           <nav className={styles.sectionLinks}>
             {workflowTemplates
-              ? workflowTemplates?.map((template) => <WorkflowTemplateCard template={template} teams={sortedTeams} />)
+              ? workflowTemplates?.map((template) => (
+                  <WorkflowTemplateHomeCard template={template} teams={sortedTeams} />
+                ))
               : null}
           </nav>
         </Section>

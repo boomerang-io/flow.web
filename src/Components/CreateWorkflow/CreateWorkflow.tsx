@@ -1,17 +1,17 @@
-import { ComposedModal, notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Add } from "@carbon/react/icons";
 import React from "react";
-import { useMutation, useQueryClient } from "react-query";
-import { useHistory } from "react-router-dom";
+import { Add } from "@carbon/react/icons";
+import { ComposedModal, notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import { formatErrorMessage } from "@boomerang-io/utils";
 import { useFeature } from "flagged";
-import CreateWorkflowContainer from "./CreateWorkflowContainer";
-import styles from "./createWorkflow.module.scss";
+import { useMutation, useQueryClient } from "react-query";
+import { useHistory } from "react-router-dom";
+import { WorkflowView } from "Constants";
 import { appLink } from "Config/appConfig";
 import { FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
-import { WorkflowView } from "Constants";
 import { FlowTeam, ModalTriggerProps, CreateWorkflowSummary, Workflow, WorkflowViewType } from "Types";
+import CreateWorkflowContainer from "./CreateWorkflowContainer";
+import styles from "./createWorkflow.module.scss";
 
 interface CreateWorkflowProps {
   team?: FlowTeam;
@@ -26,13 +26,19 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
   const teamQuotasEnabled = useFeature(FeatureFlag.TeamQuotasEnabled);
 
   const createWorkflowMutator = useMutation(resolver.postCreateWorkflow);
+  const createTemplateMutator = useMutation(resolver.postCreateTemplate);
 
   const handleCreateWorkflow = async (workflowSummary: CreateWorkflowSummary) => {
     try {
-      const { data: newWorkflow } = await createWorkflowMutator.mutateAsync({
-        team: team?.name,
-        body: workflowSummary,
-      });
+      const { data: newWorkflow } =
+        viewType === WorkflowView.Workflow
+          ? await createWorkflowMutator.mutateAsync({
+              team: team?.name,
+              body: workflowSummary,
+            })
+          : await createTemplateMutator.mutateAsync({
+              body: workflowSummary,
+            });
       const workflowId = newWorkflow.id;
       history.push(appLink.editorCanvas({ team: team?.name!, workflowId: workflowId }));
       notify(
@@ -51,13 +57,17 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
     }
   };
 
-  // TODO - fix up import query
   const handleImportWorkflow = async (workflow: Workflow, closeModal: () => void) => {
     try {
-      const { data: newWorkflow } = await createWorkflowMutator.mutateAsync({
-        team: team?.name,
-        body: workflow,
-      });
+      const { data: newWorkflow } =
+        viewType === WorkflowView.Workflow
+          ? await createWorkflowMutator.mutateAsync({
+              team: team?.name,
+              body: workflow,
+            })
+          : await createTemplateMutator.mutateAsync({
+              body: workflow,
+            });
       history.push(appLink.editorCanvas({ team: team?.name!, workflowId: newWorkflow.id }));
       notify(
         <ToastNotification kind="success" title={`Update ${viewType}`} subtitle={`${viewType} successfully updated`} />,
@@ -65,7 +75,7 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
       if (viewType === WorkflowView.Template) {
         queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
       } else {
-        queryClient.invalidateQueries(serviceUrl.team.workflow.getWorkflows({ team: team?.name }));
+        queryClient.invalidateQueries(serviceUrl.team.workflow.getWorkflows({ team: team?.name! }));
       }
       closeModal();
     } catch (err) {

@@ -88,7 +88,7 @@ export const serviceUrl = {
   postGitHubAppLink: () => `${BASE_URL}/integration/github/link`,
   postGitHubAppUnlink: () => `${BASE_URL}/integration/github/unlink`,
   schedule: {
-    getCronValidation: ({ expression }) => `${BASE_URL}/schedule/validate-cron?cron=${expression}`,
+    getCronValidation: ({ team, expression }) => `${BASE_URL}/team/${team}/schedule/validate-cron?cron=${expression}`,
   },
   task: {
     // deleteArchiveTaskTemplate: ({ id }) => `${BASE_URL}/task/${id}`,
@@ -101,6 +101,7 @@ export const serviceUrl = {
     postValidateYaml: () => `${BASE_URL}/task/validate`,
   },
   template: {
+    getWorkflowTemplate: ({ id }) => `${BASE_URL}/workflowtemplate/${id}`,
     getWorkflowTemplates: () => `${BASE_URL}/workflowtemplate/query`,
     postWorkflowTemplate: () => `${BASE_URL}/workflowtemplate`,
   },
@@ -198,6 +199,7 @@ export const resolver = {
     axios({ url: serviceUrl.team.deleteTeamMembers({ team }), data: body, method: HttpMethod.Delete }),
   deleteTeamParameter: ({ team, name }) => axios.delete(serviceUrl.team.deleteTeamParameter({ team, name })),
   deleteWorkflow: ({ team, id }) => axios.delete(serviceUrl.team.workflow.getWorkflow({ team, id })),
+  deleteWorkflowTemplate: ({ id }) => axios.delete(serviceUrl.template.getWorkflowTemplate({ id })),
   leaveTeam: ({ team }) => axios.delete(serviceUrl.team.leaveTeam({ team })),
   deleteSchedule: ({ team, id }) => axios.delete(serviceUrl.team.schedule.deleteSchedule({ team, id })),
   deleteTeam: ({ team }: TeamArg) => axios.delete(serviceUrl.resourceTeam({ team })),
@@ -234,8 +236,10 @@ export const resolver = {
       data: body,
       method: HttpMethod.Post,
     }),
-  postCreateTemplate: ({ body }) => axios.post(serviceUrl.workflowtemplate.postWorkflowTemplate(), body),
-  postCreateWorkflow: ({ team, body }) => axios.post(serviceUrl.team.workflow.postCreateWorkflow({ team }), body),
+  postCreateTemplate: ({ body }) =>
+    axios({ url: serviceUrl.template.postWorkflowTemplate(), data: body, method: HttpMethod.Post }),
+  postCreateWorkflow: ({ team, body }) =>
+    axios({ url: serviceUrl.team.workflow.postCreateWorkflow({ team }), data: body, method: HttpMethod.Post }),
   postDuplicateWorkflow: ({ team, workflowId }) =>
     axios.post(serviceUrl.team.workflow.postDuplicateWorkflow({ team, workflowId })),
   postTemplateWorkflow: ({ workflowId, body }) => axios.post(serviceUrl.postDuplicateWorkflow({ workflowId }), body),

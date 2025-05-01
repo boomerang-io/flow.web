@@ -1,3 +1,6 @@
+import React from "react";
+import { Tag, MultiSelect, InlineNotification, Button, Dropdown } from "@carbon/react";
+import { Launch, Popup, TrashCan, Add } from "@carbon/react/icons";
 import {
   ComposedModal,
   TextArea,
@@ -6,30 +9,27 @@ import {
   TooltipHover,
   CheckboxList,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { Tag, MultiSelect, InlineNotification, Button, Dropdown } from "@carbon/react";
-import { Launch, Popup, TrashCan, Add } from "@carbon/react/icons";
-import React from "react";
-import { Helmet } from "react-helmet";
-import { useQuery } from "react-query";
-import { Switch, Route, Redirect, useLocation, useParams } from "react-router-dom";
 import workflowIcons from "Assets/workflowIcons";
 import cx from "classnames";
 import { useFeature } from "flagged";
 import { Formik, FormikProps, FieldArray } from "formik";
 import capitalize from "lodash/capitalize";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+import { Switch, Route, Redirect, useLocation, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import TokenSection from "Components/TokenSection";
 import { useTeamContext } from "Hooks";
+import { WorkspaceConfigType } from "Constants";
+import { appLink, AppPath, FeatureFlag } from "Config/appConfig";
+import { resolver, serviceUrl } from "Config/servicesConfig";
+import { Workflow, ConfigureWorkflowFormValues, FlowTeam } from "Types";
 import BuildWebhookModalContent from "./BuildWebhookModalContent";
 import ConfigureEventTrigger from "./ConfigureEventTrigger";
 import ConfigureStorage from "./ConfigureStorage";
 import CustomLabel from "./CustomLabel";
 import NavPanel from "./SideNav";
 import styles from "./configure.module.scss";
-import { appLink, AppPath, FeatureFlag } from "Config/appConfig";
-import { resolver, serviceUrl } from "Config/servicesConfig";
-import { WorkspaceConfigType } from "Constants";
-import { Workflow, ConfigureWorkflowFormValues, FlowTeam } from "Types";
 
 const TRIGGER_YUP_SCHEMA = Yup.object().shape({
   enabled: Yup.bool(),
@@ -645,7 +645,7 @@ function Configure(props: ConfigureProps) {
           )}
         </Route>
         {/* <Route exact path={AppPath.EditorConfigureParams}> */}
-          {/* <Section title="GitHub" description="Auto inject GitHub Parameters." beta>
+        {/* <Section title="GitHub" description="Auto inject GitHub Parameters." beta>
             <div className={styles.toggleContainer}>
               <Toggle
                 id="bob"

@@ -1,7 +1,8 @@
 // Look for the data injected into the HTML file from the Express app
 // See server/app.js for implementation
-import { Envs } from "Constants";
 import { StringifyOptions } from "query-string";
+import { Envs } from "Constants";
+
 export const APP_ROOT =
   window._SERVER_DATA && window._SERVER_DATA.APP_ROOT ? window._SERVER_DATA.APP_ROOT : "/apps/flow";
 
@@ -131,7 +132,7 @@ interface TeamArg {
 }
 
 interface UserIdArg {
-  userId: string
+  userId: string;
 }
 
 type TeamRouteArgs = WorkflowIdArg & TeamArg;
@@ -160,7 +161,8 @@ export const appLink = {
   editorConfigureTriggers: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/triggers`,
   editorConfigureRun: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/run`,
   editorConfigureParams: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/parameters`,
-  editorConfigureWorkspaces: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/workspaces`,
+  editorConfigureWorkspaces: ({ team, workflowId }: TeamRouteArgs) =>
+    `/${team}/editor/${workflowId}/configure/workspaces`,
   editorConfigureTokens: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/tokens`,
   editorChangelog: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/changelog`,
   editorProperties: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/parameters`,
@@ -170,10 +172,8 @@ export const appLink = {
   profile: () => "/profile",
   insights: ({ team }: TeamArg) => `/${team}/insights`,
   integrations: ({ team }: TeamArg) => `/${team}/integrations`,
-  manageTasks: ({ team }: TeamArg) =>
-    `/${team}/task-manager`,
-  manageTasksEdit: ({ team, name, version }: ManageTaskTemplateArgs) =>
-    `/${team}/task-manager/${name}/${version}`,
+  manageTasks: ({ team }: TeamArg) => `/${team}/task-manager`,
+  manageTasksEdit: ({ team, name, version }: ManageTaskTemplateArgs) => `/${team}/task-manager/${name}/${version}`,
   manageTasksYaml: ({ team, name, version }: ManageTaskTemplateArgs) =>
     `/${team}/task-manager/${name}/${version}/editor`,
   manageTeam: ({ team }: TeamArg) => `/${team}/manage`,
@@ -201,7 +201,7 @@ export const appLink = {
   workflows: ({ team }: TeamArg) => `/${team}/workflows`,
   workflowActivity: ({ team, workflowId }: TeamRouteArgs) => `/${team}/activity?page=0&size=10&workflows=${workflowId}`,
   //external apps
-  docsWorkflowEditor: () => `${BASE_DOCUMENTATION_URL}/how-to-guide/workflow-editor`,
+  docsWorkflowEditor: () => `${BASE_DOCUMENTATION_URL}/fundamentals/triggers`,
 };
 
 /**

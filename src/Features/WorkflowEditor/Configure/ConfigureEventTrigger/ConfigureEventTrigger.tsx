@@ -1,8 +1,8 @@
 import React from "react";
-import { serviceUrl } from "Config/servicesConfig";
-import { ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import { Button, ModalBody, ModalFooter, CodeSnippet } from "@carbon/react";
+import { ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import copy from "copy-to-clipboard";
+import { serviceUrl } from "Config/servicesConfig";
 import styles from "./ConfigureEventTrigger.module.scss";
 
 const EXAMPLE_CLOUD_EVENT = `{
@@ -37,7 +37,7 @@ export default function ConfigureStorage({ closeModal, workflowId }: Props) {
         <p>
           Forward events from external systems with the following URL. Add a token to the URL using{" "}
           <CodeSnippet type="inline" hideCopyButton className={styles.codeSnippetInline}>
-            &access_token=TOKEN
+            &access_token=
           </CodeSnippet>
           . Actual tokens are only shown at token creation time.
         </p>

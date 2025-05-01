@@ -28,6 +28,7 @@ import axios from "axios";
 import cronstrue from "cronstrue";
 import moment from "moment-timezone";
 import * as Yup from "yup";
+import { useTeamContext } from "Hooks";
 import { cronToDateTime, daysOfWeekCronList } from "Utils/cronHelper";
 import { DATETIME_LOCAL_INPUT_FORMAT, defaultTimeZone, timezoneOptions, transformTimeZone } from "Utils/dateHelper";
 import { scheduleTypeLabelMap } from "Constants";
@@ -55,6 +56,7 @@ interface CreateEditFormProps {
 }
 
 export default function CreateEditForm(props: CreateEditFormProps) {
+  const { team } = useTeamContext();
   const [workflowProperties, setWorkflowProperties] = React.useState<Array<DataDrivenInput> | undefined>(
     props.workflow?.config?.map((property) => ({ ...property, name: `$parameter:${property.name}` })) ?? [],
   );
@@ -166,7 +168,9 @@ export default function CreateEditForm(props: CreateEditFormProps) {
             .test({
               name: "isValidCron",
               test: async (value: string | undefined, { createError, path }) => {
-                const response = await axios.get(serviceUrl.schedule.getCronValidation({ expression: value }));
+                const response = await axios.get(
+                  serviceUrl.schedule.getCronValidation({ team: team.name, expression: value }),
+                );
                 if (response.data.valid) {
                   return true;
                 } else {

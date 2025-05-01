@@ -21,20 +21,14 @@ const BuildWebhookModalContent: React.FC<BuildWebhookModalContentProps> = ({ wor
         <div className={styles.container}>
           <>
             <p>
-              Webhooks are used to receive data as it happens, as opposed to polling an API (calling an API
-              intermittently) to see if data is available. When you create a webhook, you specify a URL and subscribe to
-              events that occur. When an event that your webhook is subscribed to occurs a HTTP request with data about
-              the event to the URL that you specified.
+              Webhooks are used to receive data as it happens, as opposed to polling or intermittently calling an API.
+            </p>
+            <p>
+              In systems that accept webhook, you specify a URL and subscribe to events that occur. When an event
+              occurs, a HTTP request with data about the event will be sent to the URL that you specified.
             </p>
             <h2 className={styles.sectionHeader}>Configuring Webhooks</h2>
-            <p>
-              Configure an external service to push events that execute this workflow with the following URL. Add a
-              token to the URL using{" "}
-              <CodeSnippet type="inline" hideCopyButton className={styles.codeSnippetInline}>
-                &access_token=TOKEN
-              </CodeSnippet>
-              . Actual tokens are only shown at token creation time.
-            </p>
+            <p>Configure an external service to push events that execute this workflow with the following URL.</p>
             <CodeSnippet
               type="single"
               copyButtonDescription="Copy URL"
@@ -44,17 +38,25 @@ const BuildWebhookModalContent: React.FC<BuildWebhookModalContentProps> = ({ wor
             >
               POST{"  "}
               {`${resourceUrl}/webhook?workflow=${workflowId}
-                &access_token=TOKEN`}
+                &access_token=`}
             </CodeSnippet>
           </>
-
           <h2 className={styles.sectionHeader}>Authentication</h2>
+          <p className={styles.sectionDetail}>There are two main ways to add authentication:</p>
+          <ul>
+            <li>Authorization header</li>
+            <li>
+              Adding{" "}
+              <CodeSnippet type="inline" hideCopyButton className={styles.codeSnippetInline}>
+                &access_token=
+              </CodeSnippet>{" "}
+              to the URL. The actual token is only shown at creation time.
+            </li>
+          </ul>
+          <h2 className={styles.sectionHeader}>Payload</h2>
           <p className={styles.sectionDetail}>
-            There are two main ways to add authentication: Authorization header or by adding{" "}
-            <CodeSnippet type="inline" hideCopyButton className={styles.codeSnippetInline}>
-              &access_token=TOKEN
-            </CodeSnippet>{" "}
-            to the URL. The actual token is only shown at creation time.
+            The payload submitted to the Webhook will be available as a 'data' parameter which, if JSON, you can use the
+            JSONPath dot notation to access specific elements.
           </p>
         </div>
       </ModalBody>

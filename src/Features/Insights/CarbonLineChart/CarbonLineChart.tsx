@@ -17,7 +17,7 @@ function CarbonLineChart(props: CarbonLineChartProps) {
         height: "400px",
         axes: {
           left: {
-            title: "Executions",
+            title: "Runs",
           },
           bottom: {
             title: "Date",

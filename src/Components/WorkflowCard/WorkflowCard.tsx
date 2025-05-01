@@ -35,10 +35,18 @@ interface WorkflowCardProps {
   quotas: FlowTeamQuotas | null;
   workflow: Workflow;
   viewType: WorkflowViewType;
+  enableTemplate: boolean;
   getWorkflowsUrl: string;
 }
 
-const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow, viewType, getWorkflowsUrl }) => {
+const WorkflowCard: React.FC<WorkflowCardProps> = ({
+  teamName,
+  quotas,
+  workflow,
+  viewType,
+  getWorkflowsUrl,
+  enableTemplate,
+}) => {
   const queryClient = useQueryClient();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateWorkflowModalOpen, setIsUpdateWorkflowModalOpen] = useState(false);
@@ -60,6 +68,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
     resolver.postDuplicateWorkflow,
   );
 
+  const createTemplateMutator = useMutation(resolver.postCreateTemplate);
+
   const isDuplicating = duplicateWorkflowIsLoading;
 
   /**
@@ -80,11 +90,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
       notify(
         <ToastNotification kind="success" title={`Delete ${viewType}`} subtitle={`${viewType} successfully deleted`} />,
       );
-      if (viewType === WorkflowView.Template) {
-        queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
-      } else {
-        queryClient.invalidateQueries(getWorkflowsUrl);
-      }
+      queryClient.invalidateQueries(getWorkflowsUrl);
     } catch {
       notify(
         <ToastNotification
@@ -223,6 +229,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
     },
   ];
 
+  //Remove View Activity if not enabled
   if (!activityEnabled) {
     menuOptions = menuOptions.filter((el) => el.itemText !== "View Activity");
   }
@@ -270,68 +277,71 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
           </div>
         </section>
       </Link>
-      <section className={styles.launch}>
-        {Array.isArray(formattedProperties) && formattedProperties.length !== 0 ? (
-          <ComposedModal
-            modalHeaderProps={{
-              title: `Workflow Parameters`,
-              subtitle: `Provide parameter values for your Workflow`,
-            }}
-            modalTrigger={({ openModal }: ModalTriggerProps) => (
-              <Button
-                disabled={isDeleting || isDisabled}
-                iconDescription={`Run ${viewType}`}
-                renderIcon={Run}
-                size="md"
-                onClick={openModal}
-              >
-                Run it
-              </Button>
-            )}
-          >
-            {({ closeModal }) => (
-              <WorkflowInputModalContent
-                closeModal={closeModal}
-                executeError={executeError}
-                executeWorkflow={handleExecuteWorkflow}
-                isExecuting={isExecuting}
-                /* @ts-ignore-next-line */
-                inputs={formattedProperties}
-                errorMessage={errorMessage}
-              />
-            )}
-          </ComposedModal>
-        ) : (
-          <ComposedModal
-            composedModalProps={{ containerClassName: `${styles.executeWorkflow}` }}
-            modalHeaderProps={{
-              title: `Execute ${viewType}`,
-              subtitle: `"Run and View" will navigate you to the ${viewType.toLowerCase()} exeuction view.`,
-            }}
-            modalTrigger={({ openModal }: ModalTriggerProps) => (
-              <Button
-                disabled={isDeleting || isDisabled}
-                iconDescription={`Run ${viewType}`}
-                renderIcon={Run}
-                size="md"
-                onClick={openModal}
-              >
-                Run it
-              </Button>
-            )}
-          >
-            {({ closeModal }) => (
-              <WorkflowRunModalContent
-                closeModal={closeModal}
-                executeError={executeError}
-                executeWorkflow={handleExecuteWorkflow}
-                isExecuting={isExecuting}
-                errorMessage={errorMessage}
-              />
-            )}
-          </ComposedModal>
-        )}
-      </section>
+
+      {viewType === WorkflowView.Workflow && (
+        <section className={styles.launch}>
+          {Array.isArray(formattedProperties) && formattedProperties.length !== 0 ? (
+            <ComposedModal
+              modalHeaderProps={{
+                title: `Workflow Parameters`,
+                subtitle: `Provide parameter values for your Workflow`,
+              }}
+              modalTrigger={({ openModal }: ModalTriggerProps) => (
+                <Button
+                  disabled={isDeleting || isDisabled}
+                  iconDescription={`Run ${viewType}`}
+                  renderIcon={Run}
+                  size="md"
+                  onClick={openModal}
+                >
+                  Run it
+                </Button>
+              )}
+            >
+              {({ closeModal }) => (
+                <WorkflowInputModalContent
+                  closeModal={closeModal}
+                  executeError={executeError}
+                  executeWorkflow={handleExecuteWorkflow}
+                  isExecuting={isExecuting}
+                  /* @ts-ignore-next-line */
+                  inputs={formattedProperties}
+                  errorMessage={errorMessage}
+                />
+              )}
+            </ComposedModal>
+          ) : (
+            <ComposedModal
+              composedModalProps={{ containerClassName: `${styles.executeWorkflow}` }}
+              modalHeaderProps={{
+                title: `Execute ${viewType}`,
+                subtitle: `"Run and View" will navigate you to the ${viewType.toLowerCase()} exeuction view.`,
+              }}
+              modalTrigger={({ openModal }: ModalTriggerProps) => (
+                <Button
+                  disabled={isDeleting || isDisabled}
+                  iconDescription={`Run ${viewType}`}
+                  renderIcon={Run}
+                  size="md"
+                  onClick={openModal}
+                >
+                  Run it
+                </Button>
+              )}
+            >
+              {({ closeModal }) => (
+                <WorkflowRunModalContent
+                  closeModal={closeModal}
+                  executeError={executeError}
+                  executeWorkflow={handleExecuteWorkflow}
+                  isExecuting={isExecuting}
+                  errorMessage={errorMessage}
+                />
+              )}
+            </ComposedModal>
+          )}
+        </section>
+      )}
       {workflow.upgradesAvailable && (
         <div className={styles.templatesWarningIcon}>
           <TooltipHover

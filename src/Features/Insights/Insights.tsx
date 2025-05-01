@@ -1,10 +1,4 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import cx from "classnames";
-import moment from "moment";
-import queryString from "query-string";
-import { useHistory, useLocation, Link } from "react-router-dom";
-import { serviceUrl, resolver } from "Config/servicesConfig";
 import {
   DatePicker,
   DatePickerInput,
@@ -18,19 +12,19 @@ import {
   FeatureHeaderTitle as HeaderTitle,
   FeatureHeaderSubtitle as HeaderSubtitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import { useTeamContext } from "Hooks";
-import { useQuery } from "react-query";
 import { sortByProp } from "@boomerang-io/utils";
+import cx from "classnames";
+import moment from "moment";
+import queryString from "query-string";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+import { useHistory, useLocation, Link } from "react-router-dom";
 import ErrorDragon from "Components/ErrorDragon";
-import ChartsTile from "./ChartsTile";
-import InsightsTile from "./InsightsTile";
-import CarbonDonutChart from "./CarbonDonutChart";
-import CarbonLineChart from "./CarbonLineChart";
-import CarbonScatterChart from "./CarbonScatterChart";
-import { executionOptions, statusOptions } from "Constants/filterOptions";
-import { parseChartsData } from "./utils/formatData";
-import { queryStringOptions, appLink } from "Config/appConfig";
+import { useTeamContext } from "Hooks";
 import { timeSecondsToTimeUnit } from "Utils/timeSecondsToTimeUnit";
+import { executionOptions, statusOptions } from "Constants/filterOptions";
+import { queryStringOptions, appLink } from "Config/appConfig";
+import { serviceUrl, resolver } from "Config/servicesConfig";
 import type {
   RunStatus,
   PaginatedWorkflowResponse,
@@ -39,10 +33,16 @@ import type {
   Workflow,
   FlowTeam,
 } from "Types";
+import CarbonDonutChart from "./CarbonDonutChart";
+import CarbonLineChart from "./CarbonLineChart";
+import CarbonScatterChart from "./CarbonScatterChart";
+import ChartsTile from "./ChartsTile";
 import styles from "./Insights.module.scss";
+import InsightsTile from "./InsightsTile";
+import { parseChartsData } from "./utils/formatData";
 
 export interface InsightsRuns {
-  creationDate: string; 
+  creationDate: string;
   duration: number;
   status: RunStatus;
   workflowRef: string;
@@ -82,10 +82,10 @@ export default function Insights() {
       fromDate,
       toDate,
     },
-    queryStringOptions
+    queryStringOptions,
   );
 
-  const insightsUrl = serviceUrl.team.getInsights({ team: team?.name,query: insightsSearchParams });
+  const insightsUrl = serviceUrl.team.getInsights({ team: team?.name, query: insightsSearchParams });
   const insightsQuery = useQuery<WorkflowInsightsRes>({
     queryKey: insightsUrl,
     queryFn: resolver.query(insightsUrl),
@@ -174,7 +174,7 @@ function InsightsContainer({ team, children }: InsightsContainerProps) {
         header={
           <>
             <HeaderTitle>Insights</HeaderTitle>
-            <HeaderSubtitle>Gain valuable insight by digging deeper into the Workflow executions</HeaderSubtitle>
+            <HeaderSubtitle>Gain valuable insight by digging deeper into the Workflow runs</HeaderSubtitle>
           </>
         }
       />
@@ -254,7 +254,7 @@ function Selects(props: SelectsProps) {
           return workflow.name;
         }}
         initialSelectedItems={getWorkflowOptions().filter((workflow: Workflow) =>
-          Boolean(selectedWorkflowIds ? selectedWorkflowIds.find((id) => id === workflow.id) : false)
+          Boolean(selectedWorkflowIds ? selectedWorkflowIds.find((id) => id === workflow.id) : false),
         )}
         titleText="Filter by Workflow"
       />
@@ -267,7 +267,7 @@ function Selects(props: SelectsProps) {
         items={statusOptions}
         itemToString={(item: MultiSelectItem) => (item ? item.label : "")}
         initialSelectedItems={statusOptions.filter((option) =>
-          Boolean(selectedStatuses?.find((status: string) => status === option.value))
+          Boolean(selectedStatuses?.find((status: string) => status === option.value)),
         )}
         titleText="Filter by status"
       />
@@ -300,20 +300,15 @@ function Graphs(props: GraphsProps) {
   const { data, statuses } = props;
   const { donutData, durationData, lineChartData, scatterPlotData, executionsCountList } = React.useMemo(
     () => parseChartsData(data.runs, statuses),
-    [data.runs, statuses]
+    [data.runs, statuses],
   );
 
-  const totalExecutions = data.totalRuns;
+  const totalRuns = data.totalRuns;
   const medianExecutionTime = Math.round(data.medianDuration / 1000);
   return (
     <>
       <div className={styles.statsWidgets} data-testid="completed-insights">
-        <InsightsTile
-          title="Executions"
-          type="runs"
-          totalCount={totalExecutions}
-          infoList={executionsCountList.slice(0, 5)}
-        />
+        <InsightsTile title="Runs" type="runs" totalCount={totalRuns} infoList={executionsCountList.slice(0, 5)} />
         <InsightsTile
           title="Duration (median)"
           type=""
@@ -322,7 +317,7 @@ function Graphs(props: GraphsProps) {
           valueWidth="7rem"
         />
         <div className={styles.donut}>
-          {totalExecutions === 0 ? (
+          {totalRuns === 0 ? (
             <p className={`${styles.statsLabel} --no-data`}>No Data</p>
           ) : (
             <CarbonDonutChart data={donutData} title="Status" />
@@ -331,17 +326,17 @@ function Graphs(props: GraphsProps) {
       </div>
       <div className={styles.graphsWidgets}>
         <ChartsTile>
-          {totalExecutions === 0 ? (
+          {totalRuns === 0 ? (
             <p className={`${styles.graphsLabel} --no-data`}>No Data</p>
           ) : (
-            <CarbonLineChart data={lineChartData} title="Executions" />
+            <CarbonLineChart data={lineChartData} title="Runs" />
           )}
         </ChartsTile>
         <ChartsTile>
-          {totalExecutions === 0 ? (
+          {totalRuns === 0 ? (
             <p className={`${styles.graphsLabel} --no-data`}>No Data</p>
           ) : (
-            <CarbonScatterChart data={scatterPlotData} title="Execution Time" />
+            <CarbonScatterChart data={scatterPlotData} title="Run Time" />
           )}
         </ChartsTile>
       </div>

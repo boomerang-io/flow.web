@@ -1,14 +1,14 @@
-import { useHistory, useLocation } from "react-router-dom";
-import { useQuery } from "Hooks";
 import { Loading } from "@carbon/react";
-import CreateWorkflow from "Components/CreateWorkflow";
+import queryString from "query-string";
+import { useHistory, useLocation } from "react-router-dom";
+import CreateWorkflowTemplate from "Components/CreateWorkflowTemplate";
 import EmptyState from "Components/EmptyState";
 import ErrorDragon from "Components/ErrorDragon";
-import WorkflowCard from "Components/WorkflowCard";
+import WorkflowTemplateCard from "Components/WorkflowTemplateCard";
 import WorkflowsHeader from "Components/WorkflowsHeader";
-import queryString from "query-string";
-import { serviceUrl } from "Config/servicesConfig";
+import { useQuery } from "Hooks";
 import { WorkflowView } from "Constants";
+import { serviceUrl } from "Config/servicesConfig";
 import { Workflow } from "Types";
 import styles from "./TemplateWorkflows.module.scss";
 
@@ -34,7 +34,7 @@ export default function TemplateWorkflows() {
   const handleUpdateFilter = (query: { [key: string]: any }) => {
     const queryStr = `?${queryString.stringify(
       { ...queryString.parse(location.search, { arrayFormat: "comma" }), ...query },
-      { arrayFormat: "comma", skipEmptyString: true }
+      { arrayFormat: "comma", skipEmptyString: true },
     )}`;
 
     history.push({ search: queryStr });
@@ -47,7 +47,7 @@ export default function TemplateWorkflows() {
     <>
       <div className={styles.container}>
         <WorkflowsHeader
-          title="Template Workflows"
+          title="Workflow Templates"
           subtitle="Define reuseable Workflows available to all teams as Templates."
           handleUpdateFilter={handleUpdateFilter}
           searchQuery={searchQuery}
@@ -59,7 +59,7 @@ export default function TemplateWorkflows() {
             <RenderTemplates
               isLoading={isLoadingTemplatesWorkflow}
               error={errorTemplatesWorkflow}
-              workflows={templatesWorkflowData}
+              workflows={templatesWorkflowData?.content ? templatesWorkflowData.content : []}
               filteredWorkflows={filteredWorkflows}
               searchQuery={searchQuery}
             />
@@ -93,9 +93,15 @@ const RenderTemplates = ({ isLoading, error, workflows, filteredWorkflows, searc
   return (
     <div className={styles.workflows}>
       {filteredWorkflows.map((workflow) => (
-        <WorkflowCard key={workflow.id} workflow={workflow} quotas={null} viewType={WorkflowView.Template} />
+        <WorkflowTemplateCard
+          key={workflow.id}
+          workflow={workflow}
+          quotas={null}
+          viewType={WorkflowView.Template}
+          getWorkflowsUrl={serviceUrl.template.getWorkflowTemplates()}
+        />
       ))}
-      {<CreateWorkflow hasReachedWorkflowLimit={false} workflows={workflows} viewType={WorkflowView.Template} />}
+      {<CreateWorkflowTemplate workflows={workflows} />}
     </div>
   );
 };
