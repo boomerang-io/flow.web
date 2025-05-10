@@ -442,7 +442,11 @@ export interface Token {
   principal: string;
   description: string;
   valid: boolean;
-  permissions: Array<String>;
+  permissions: Array<{
+    scope: TokenScopeType;
+    principal: string;
+    actions: Array<string>;
+  }>;
 }
 
 export interface TokenRequest {

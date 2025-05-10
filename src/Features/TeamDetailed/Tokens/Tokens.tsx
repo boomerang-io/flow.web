@@ -1,21 +1,34 @@
 import React, { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { Helmet } from "react-helmet";
-import { notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
-import { serviceUrl, resolver } from "Config/servicesConfig";
-import queryString from "query-string";
-import moment from "moment";
-import cx from "classnames";
-import { Box } from "reflexbox";
-import { DataTable, DataTableSkeleton, Pagination, InlineNotification } from "@carbon/react";
-import { ErrorMessage } from "@boomerang-io/carbon-addons-boomerang-react";
-import EmptyState from "Components/EmptyState";
-import DeleteToken from "Components/DeleteToken";
-import CreateToken from "Components/CreateToken";
-import { arrayPagination, sortByProp } from "Utils/arrayHelper";
+import {
+  DataTable,
+  DataTableSkeleton,
+  Pagination,
+  InlineNotification,
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow,
+  StructuredListWrapper,
+  StructuredListHead,
+  StructuredListBody,
+  StructuredListRow,
+  StructuredListCell,
+} from "@carbon/react";
 import { Help } from "@carbon/react/icons";
-import type { FlowTeam, Token } from "Types";
+import { notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { ErrorMessage } from "@boomerang-io/carbon-addons-boomerang-react";
+import cx from "classnames";
+import moment from "moment";
+import queryString from "query-string";
+import { Helmet } from "react-helmet";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { Box } from "reflexbox";
+import CreateToken from "Components/CreateToken";
+import DeleteToken from "Components/DeleteToken";
+import EmptyState from "Components/EmptyState";
+import { arrayPagination, sortByProp } from "Utils/arrayHelper";
 import { TokenType } from "Constants";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import type { FlowTeam, Token } from "Types";
 import styles from "./tokens.module.scss";
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -37,18 +50,13 @@ const HEADERS = [
     sortable: true,
   },
   {
-    header: "Date Created",
+    header: "Creation Date",
     key: "creationDate",
     sortable: true,
   },
   {
-    header: "Expires (UTC)",
+    header: "Expiration Date",
     key: "expirationDate",
-    sortable: true,
-  },
-  {
-    header: "Permissions",
-    key: "permissions",
     sortable: true,
   },
   {
@@ -166,7 +174,9 @@ function Tokens({ team, canEdit }: { team: FlowTeam; canEdit: boolean }) {
           </section>
         ) : null}
         <div className={styles.buttonContainer}>
-          {team && <CreateToken type={TokenType.Team} principal={team.name} getTokensUrl={getTokensUrl} disabled={!canEdit}/>}
+          {team && (
+            <CreateToken type={TokenType.Team} principal={team.name} getTokensUrl={getTokensUrl} disabled={!canEdit} />
+          )}
         </div>
         {tokensData?.content?.length > 0 ? (
           <>
@@ -178,15 +188,18 @@ function Tokens({ team, canEdit }: { team: FlowTeam; canEdit: boolean }) {
                 rows,
                 headers,
                 getHeaderProps,
+                getRowProps,
               }: {
                 rows: any;
                 headers: Array<{ header: string; key: string; sortable: boolean }>;
                 getHeaderProps: any;
+                getRowProps: any;
               }) => (
                 <TableContainer>
                   <Table isSortable>
                     <TableHead>
                       <TableRow className={styles.tableHeadRow}>
+                        <TableExpandHeader />
                         {headers.map((header: { header: string; key: string; sortable: boolean }) => (
                           <TableHeader
                             id={header.key}
@@ -204,7 +217,7 @@ function Tokens({ team, canEdit }: { team: FlowTeam; canEdit: boolean }) {
                                 {header.header}
                                 <TooltipHover
                                   direction="top"
-                                  tooltipText="Permissions in the format SCOPE / PRINCIPAL / ACTION. Read more about permissions in the documentation."
+                                  tooltipText="Read more about permissions in the documentation to understand the assigned scope and actions"
                                 >
                                   <Help className={styles.headerHoverIcon} />
                                 </TooltipHover>
@@ -218,13 +231,26 @@ function Tokens({ team, canEdit }: { team: FlowTeam; canEdit: boolean }) {
                     </TableHead>
                     <TableBody className={styles.tableBody}>
                       {rows.map((row: any) => (
-                        <TableRow key={row.id}>
-                          {row.cells.map((cell: any, cellIndex: number) => (
-                            <TableCell key={cell.id} style={{ padding: "0" }}>
-                              <div className={styles.tableCell}>{renderCell(row.id, cellIndex, cell.value)}</div>
-                            </TableCell>
-                          ))}
-                        </TableRow>
+                        <>
+                          <TableExpandRow key={row.id} {...getRowProps({ row })}>
+                            {row.cells.map((cell: any, cellIndex: number) => (
+                              <TableCell key={cell.id} style={{ padding: "0" }}>
+                                <div className={styles.tableCell}>{renderCell(row.id, cellIndex, cell.value)}</div>
+                              </TableCell>
+                            ))}
+                          </TableExpandRow>
+                          <TableExpandedRow colSpan={headers.length + 1}>
+                            {tokensData.content.find((t) => t.id === row.id).permissions.length > 0 ? (
+                              <TokenPermissions
+                                permissions={tokensData.content
+                                  .find((t) => t.id === row.id)
+                                  .permissions.map((p, i) => ({ id: `${row.id}-${i}`, ...p }))}
+                              />
+                            ) : (
+                              "Permissions detail unavailable"
+                            )}
+                          </TableExpandedRow>
+                        </>
                       ))}
                     </TableBody>
                   </Table>
@@ -248,5 +274,38 @@ function Tokens({ team, canEdit }: { team: FlowTeam; canEdit: boolean }) {
     </section>
   );
 }
+
+interface TokenPermissionsProps {
+  permissions: [{ scope: string; principal: string; actions: string[] }];
+}
+
+const TokenPermissions: React.FC<TokenPermissionsProps> = ({ permissions }) => {
+  return (
+    <StructuredListWrapper className={styles.structuredListWrapper} ariaLabel="Token list" isCondensed={true}>
+      <StructuredListHead>
+        <StructuredListRow head>
+          <StructuredListCell head>Scope</StructuredListCell>
+          <StructuredListCell head>Resource</StructuredListCell>
+          <StructuredListCell head>Allowed Actions</StructuredListCell>
+        </StructuredListRow>
+      </StructuredListHead>
+      <StructuredListBody>
+        {permissions.map(({ scope, principal, actions }) => (
+          <StructuredListRow>
+            <StructuredListCell>{scope}</StructuredListCell>
+            <StructuredListCell>{principal}</StructuredListCell>
+            <StructuredListCell>
+              <ul>
+                {actions.map((action) => (
+                  <li>{action}</li>
+                ))}
+              </ul>
+            </StructuredListCell>
+          </StructuredListRow>
+        ))}
+      </StructuredListBody>
+    </StructuredListWrapper>
+  );
+};
 
 export default Tokens;

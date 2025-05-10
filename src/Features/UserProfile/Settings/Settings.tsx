@@ -1,15 +1,21 @@
 import React, { useState } from "react";
-import { Helmet } from "react-helmet";
-import { ConfirmModal, ComposedModal, notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
-import { useMutation } from "react-query";
-import { Edit, CopyFile, Close } from "@carbon/react/icons";
 import { Tag, Button, InlineNotification } from "@carbon/react";
+import { Edit, CopyFile, Close } from "@carbon/react/icons";
+import {
+  ConfirmModal,
+  ComposedModal,
+  notify,
+  ToastNotification,
+  TooltipHover,
+} from "@boomerang-io/carbon-addons-boomerang-react";
 import CopyToClipboard from "react-copy-to-clipboard";
-import type { FlowUser } from "Types";
-import { resolver } from "Config/servicesConfig";
+import { Helmet } from "react-helmet";
+import { useMutation } from "react-query";
 import TokenSection from "Components/TokenSection";
-import styles from "./Settings.module.scss";
 import { TokenType } from "Constants";
+import { resolver } from "Config/servicesConfig";
+import type { FlowUser } from "Types";
+import styles from "./Settings.module.scss";
 import UpdateBasicDetails from "./UpdateBasicDetails";
 
 interface UserSettingsProps {
@@ -60,7 +66,8 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
           Manage your profile, tokens, special features, or close your account.
         </p>
       )}
-      <SettingSection title="Basic details"
+      <SettingSection
+        title="Basic details"
         editModal={
           <ComposedModal
             composedModalProps={{
@@ -72,18 +79,15 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
               //     "Try to keep it concise to avoid truncation in the sidebar. You must make sure the name is valid before it can be updated.",
             }}
             modalTrigger={({ openModal }) => (
-              <button
-                className={styles.teamEditIcon}
-                onClick={openModal}
-                data-testid="open-change-name-modal"
-              >
+              <button className={styles.teamEditIcon} onClick={openModal} data-testid="open-change-name-modal">
                 <Edit />
               </button>
             )}
           >
             {({ closeModal }) => <UpdateBasicDetails closeModal={closeModal} user={user} />}
           </ComposedModal>
-        }>
+        }
+      >
         <dl className={styles.detailedListContainer}>
           <div className={styles.detailedListGrid}>
             <div className={styles.detailedListGridItem}>
@@ -107,6 +111,7 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
             Personal access tokens allow other apps to access the APIs as if they were you. All of your access will be
             shared. Be careful how you distribute these tokens!
           </p>
+          <p className={styles.detailedListParagraph}>Expand the token row to view the assigned permissions.</p>
           <TokenSection type={TokenType.User} principal={user.id} />
         </dl>
       </SettingSection>
@@ -148,8 +153,8 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
       <SettingSection title="Delete Account">
         <div className={styles.detailedListContainer}>
           <p className={styles.detailedListParagraph}>
-            Done with your work here? Deleting your account means you will no longer be able to access any items you have
-            created. You will also no longer receive any notifications from the platform.
+            Done with your work here? Deleting your account means you will no longer be able to access any items you
+            have created. You will also no longer receive any notifications from the platform.
           </p>
           <p className={styles.detailedListParagraph}>
             This action cannot be undone. Be sure you want to permanently delete your access.
@@ -174,9 +179,9 @@ export default function Settings({ user, userManagementEnabled }: UserSettingsPr
               </Button>
             )}
           >
-            Permanently remove your account and all of its contents. Deleting your account cannot be
-            undone. Are you sure you want to do this?
-            { teamCount > 0 && (
+            Permanently remove your account and all of its contents. Deleting your account cannot be undone. Are you
+            sure you want to do this?
+            {teamCount > 0 && (
               <InlineNotification
                 className={styles.inlineDelete}
                 lowContrast

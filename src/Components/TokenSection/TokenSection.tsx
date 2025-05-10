@@ -1,27 +1,72 @@
 import React from "react";
-import { notify, ToastNotification, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { resolver, serviceUrl } from "Config/servicesConfig";
-import queryString from "query-string";
-import { Help } from "@carbon/react/icons";
 import {
-  SkeletonText,
+  DataTable,
+  DataTableSkeleton,
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow,
   StructuredListWrapper,
   StructuredListHead,
+  StructuredListBody,
   StructuredListRow,
   StructuredListCell,
-  StructuredListBody,
 } from "@carbon/react";
+import { Key } from "@carbon/react/icons";
+import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
+import cx from "classnames";
+import moment from "moment";
+import queryString from "query-string";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import CreateToken from "Components/CreateToken";
 import DeleteToken from "Components/DeleteToken";
-import moment from "moment";
-import { TokenType } from "Constants";
+import EmptyState from "Components/EmptyState";
+import { resolver, serviceUrl } from "Config/servicesConfig";
 import type { Token, TokenScopeType } from "Types";
 import styles from "./TokenSection.module.scss";
 
+const HEADERS = [
+  {
+    header: "Name",
+    key: "name",
+    sortable: true,
+  },
+  {
+    header: "Status",
+    key: "valid",
+    sortable: true,
+  },
+  {
+    header: "Description",
+    key: "description",
+    sortable: true,
+  },
+  {
+    header: "Creation Date",
+    key: "creationDate",
+    sortable: true,
+  },
+  {
+    header: "Expiration Date",
+    key: "expirationDate",
+    sortable: true,
+  },
+  {
+    header: "",
+    key: "delete",
+    sortable: false,
+  },
+];
+
 interface TokenProps {
   type: TokenScopeType;
-  principal: string;
+  principal?: string;
 }
 
 const TokenSection: React.FC<TokenProps> = ({ type, principal }) => {
@@ -35,6 +80,19 @@ const TokenSection: React.FC<TokenProps> = ({ type, principal }) => {
   });
 
   const deleteTokenMutator = useMutation(resolver.deleteToken);
+
+  if (getTokensQuery.isLoading) {
+    return (
+      <DataTableSkeleton
+        data-testid="token-loading-skeleton"
+        className={cx(`cds--skeleton`, `cds--data-table`, styles.tableSkeleton)}
+        rowCount={3}
+        columnCount={HEADERS.length}
+        headers={HEADERS.map((header) => header.header)}
+      />
+    );
+  }
+
   const deleteToken = async (tokenId: string) => {
     try {
       await deleteTokenMutator.mutateAsync({ tokenId });
@@ -45,82 +103,119 @@ const TokenSection: React.FC<TokenProps> = ({ type, principal }) => {
     }
   };
 
+  const renderCell = (tokenItemId: string, cellIndex: number, value: string) => {
+    const tokenDetails = getTokensQuery.data.content.find((token: Token) => token.id === tokenItemId);
+    const column = HEADERS[cellIndex];
+    switch (column.key) {
+      case "permissions":
+        return <p className={styles.tableTextarea}>{value ? tokenDetails.permissions.join(", ") : "---"}</p>;
+      case "valid":
+        return <p className={styles.tableTextarea}>{value ? "Active" : "Inactive"}</p>;
+      case "creationDate":
+      case "expirationDate":
+        return (
+          <p className={styles.tableTextarea}>
+            {value ? moment(value).utc().startOf("day").format("MMMM DD, YYYY") : "---"}
+          </p>
+        );
+      case "delete":
+        return tokenDetails && tokenDetails.id ? (
+          <DeleteToken tokenItem={tokenDetails} deleteToken={deleteToken} />
+        ) : (
+          ""
+        );
+      default:
+        return <p className={styles.tableTextarea}>{value || "---"}</p>;
+    }
+  };
+
+  //TODO - create empty state for tokens
+  if (getTokensQuery.data.content.length === 0) {
+    return <CreateToken getTokensUrl={getTokensUrl} principal={principal} type={type} />;
+  }
+
   return (
-    <>
-      <dl className={styles.detailedListContainer}>
-        <StructuredListWrapper className={styles.structuredListWrapper} ariaLabel="Structured list" isCondensed={true}>
-          <StructuredListHead>
-            <StructuredListRow head>
-              <StructuredListCell head>Name</StructuredListCell>
-              <StructuredListCell head>Status</StructuredListCell>
-              <StructuredListCell head>Creation Date</StructuredListCell>
-              <StructuredListCell head>Expiration Date</StructuredListCell>
-              <StructuredListCell head className={styles.structuredListHeader}>
-                Permissions
-                <TooltipHover
-                  direction="top"
-                  tooltipText="Permissions in the format SCOPE / PRINCIPAL / ACTION. Read more about permissions in the documentation."
-                >
-                  <Help className={styles.structuredListHeaderHoverIcon} />
-                </TooltipHover>
-              </StructuredListCell>
-              <StructuredListCell head />
-            </StructuredListRow>
-          </StructuredListHead>
-          <StructuredListBody>
-            {getTokensQuery.isLoading ? (
-              <StructuredListRow>
-                <StructuredListCell>
-                  <SkeletonText data-testid="token-loading-skeleton" />
-                </StructuredListCell>
-                <StructuredListCell>
-                  <SkeletonText data-testid="token-loading-skeleton" />
-                </StructuredListCell>
-                <StructuredListCell>
-                  <SkeletonText data-testid="token-loading-skeleton" />
-                </StructuredListCell>
-                <StructuredListCell>
-                  <SkeletonText data-testid="token-loading-skeleton" />
-                </StructuredListCell>
-                <StructuredListCell />
-              </StructuredListRow>
-            ) : (
-              getTokensQuery.data.content?.map((token: Token) => (
-                <TokenRow tokenData={token} deleteToken={deleteToken} />
-              ))
-            )}
-          </StructuredListBody>
-        </StructuredListWrapper>
-      </dl>
+    <div className={styles.dataTable}>
+      <DataTable
+        rows={getTokensQuery.data.content}
+        headers={HEADERS}
+        pageSize={getTokensQuery.data.content.length}
+        render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+          <TableContainer title="" description="" {...getTableContainerProps()}>
+            <Table {...getTableProps()}>
+              <TableHead>
+                <TableRow>
+                  <TableExpandHeader />
+                  {headers.map((header) => (
+                    <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row: any) => (
+                  <>
+                    <TableExpandRow key={row.id} {...getRowProps({ row })}>
+                      {row.cells.map((cell: any, cellIndex: number) => (
+                        <TableCell key={cell.id} style={{ padding: "0" }}>
+                          <div className={styles.tableCell}>{renderCell(row.id, cellIndex, cell.value)}</div>
+                        </TableCell>
+                      ))}
+                    </TableExpandRow>
+                    <TableExpandedRow colSpan={headers.length + 1}>
+                      {getTokensQuery.data.content.find((t) => t.id === row.id).permissions.length > 0 ? (
+                        <TokenPermissions
+                          permissions={getTokensQuery.data.content
+                            .find((t) => t.id === row.id)
+                            .permissions.map((p, i) => ({ id: `${row.id}-${i}`, ...p }))}
+                        />
+                      ) : (
+                        "Permissions detail unavailable"
+                      )}
+                    </TableExpandedRow>
+                  </>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      />
       <CreateToken getTokensUrl={getTokensUrl} principal={principal} type={type} />
-    </>
+    </div>
   );
 };
 
-interface TokenRowProps {
-  tokenData: Token;
-  deleteToken: (tokenId: string) => void;
+interface TokenPermissionsProps {
+  permissions: [{ scope: string; principal: string; actions: string[] }];
 }
 
-const TokenRow: React.FC<TokenRowProps> = ({ tokenData, deleteToken }) => {
+const TokenPermissions: React.FC<TokenPermissionsProps> = ({ permissions }) => {
   return (
-    <StructuredListRow>
-      <StructuredListCell>{tokenData.name}</StructuredListCell>
-      <StructuredListCell>{tokenData.valid ? "Active" : "Inactive"}</StructuredListCell>
-      <StructuredListCell>
-        {tokenData.creationDate ? moment(tokenData.creationDate).utc().startOf("day").format("MMMM DD, YYYY") : "---"}
-      </StructuredListCell>
-      <StructuredListCell>
-        {tokenData.expirationDate
-          ? moment(tokenData.expirationDate).utc().startOf("day").format("MMMM DD, YYYY")
-          : "---"}
-      </StructuredListCell>
-      <StructuredListCell>{tokenData.permissions ? tokenData.permissions.join(", ") : "---"}</StructuredListCell>
-      <div>
-        <DeleteToken tokenItem={tokenData} deleteToken={deleteToken} />
-      </div>
-      <StructuredListCell />
-    </StructuredListRow>
+    <StructuredListWrapper className={styles.structuredListWrapper} ariaLabel="Token list" isCondensed={true}>
+      <StructuredListHead>
+        <StructuredListRow head>
+          <StructuredListCell head>Scope</StructuredListCell>
+          <StructuredListCell head>Resource</StructuredListCell>
+          <StructuredListCell head>Allowed Actions</StructuredListCell>
+        </StructuredListRow>
+      </StructuredListHead>
+      <StructuredListBody>
+        {permissions.map(({ scope, principal, actions }) => (
+          <StructuredListRow>
+            <StructuredListCell>{scope}</StructuredListCell>
+            <StructuredListCell>{principal}</StructuredListCell>
+            <StructuredListCell>
+              <ul>
+                {actions.map((action) => (
+                  <li>{action}</li>
+                ))}
+              </ul>
+            </StructuredListCell>
+          </StructuredListRow>
+        ))}
+      </StructuredListBody>
+    </StructuredListWrapper>
   );
 };
 

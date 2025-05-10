@@ -1,8 +1,6 @@
 import React from "react";
-import moment from "moment";
-import * as Yup from "yup";
-import { useAppContext } from "Hooks";
 import { Button, DatePicker, DatePickerInput, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
+import { Information } from "@carbon/react/icons";
 import {
   ModalFlowForm,
   TextArea,
@@ -14,8 +12,10 @@ import {
   ComboBoxMultiSelect,
 } from "@boomerang-io/carbon-addons-boomerang-react";
 import { Formik } from "formik";
-import { Information } from "@carbon/react/icons";
+import moment from "moment";
 import { useMutation, useQueryClient } from "react-query";
+import * as Yup from "yup";
+import { useAppContext } from "Hooks";
 import { TokenType } from "Constants";
 import { resolver } from "Config/servicesConfig";
 import { TokenScopeType } from "Types";
@@ -53,24 +53,24 @@ function CreateServiceTokenForm({
   const teamsComboxBoxList = teams?.map((team: any) => ({
     label: team.displayName,
     value: team.name,
-    disabled: team.satus === "active" ? true : false,
+    disabled: team.status === "active" ? true : false,
   }));
 
   const permissionsList = [
     {
-      id: `**/${principal}/Read`,
+      id: `**/read`,
       labelText: "Read",
     },
     {
-      id: `**/${principal}/Write`,
+      id: `**/write`,
       labelText: "Write",
     },
     {
-      id: `**/${principal}/Action`,
+      id: `**/action`,
       labelText: "Action",
     },
     {
-      id: `**/${principal}/Delete`,
+      id: `**/delete`,
       labelText: "Delete",
     },
   ];
@@ -84,9 +84,7 @@ function CreateServiceTokenForm({
       principal: values.principal,
     };
 
-    if (type === TokenType.User) {
-      request = { ...request, teams: values.teams.map((t) => t.value) };
-    } else {
+    if (type !== TokenType.User) {
       request = { ...request, permissions: values.permissions };
     }
 
@@ -123,7 +121,7 @@ function CreateServiceTokenForm({
         expirationDate: "",
         description: "",
         principal: principal,
-        permissions: [`**/${principal}/Read`],
+        permissions: [`**/read`],
         teams: [],
       }}
       validateOnMount
@@ -161,30 +159,7 @@ function CreateServiceTokenForm({
                 placeholder="my-unique-task-name"
                 value={values.name}
               />
-              {type === TokenType.User ? (
-                <>
-                  {" "}
-                  <RadioGroup
-                    id="access-type"
-                    name="accesstype"
-                    defaultSelected={accessType}
-                    tooltipContent="Selecting 'All Teams' will allow this token to access all current and future teams this user has access. Selecting 'Select Teams' will allow you to specify at least one team this token can access. Access is based on the role in the current or future team."
-                    labelText="Team Permissions"
-                    onChange={(value) => setAccessType(value)}
-                    options={ACCESS_TYPE_OPTIONS}
-                    orientation="vertical"
-                  />
-                  <ComboBoxMultiSelect
-                    onChange={({ selectedItems }) => setFieldValue("teams", selectedItems)}
-                    id="access-teams"
-                    items={teamsComboxBoxList}
-                    placeholder="Choose teams"
-                    titleText="Select Teams"
-                    selectedItems={values.teams}
-                    disabled={accessType === "all"}
-                  />
-                </>
-              ) : (
+              {type !== TokenType.User ? (
                 <CheckboxList
                   id="permissions"
                   helperText="Select at least one permission."
@@ -195,7 +170,7 @@ function CreateServiceTokenForm({
                     handleCheckboxListChange(setFieldValue, values.permissions, checked, label)
                   }
                 />
-              )}
+              ) : null}
               <DatePicker
                 id="token-date-picker"
                 dateFormat="Y/m/d"
@@ -243,7 +218,7 @@ function CreateServiceTokenForm({
                   className={styles.errorNotification}
                   kind="error"
                   title="Error"
-                  subtitle="Failed to create team token"
+                  subtitle="Failed to create this token"
                   style={{ marginTop: "1rem" }}
                 />
               ) : null}

@@ -70,7 +70,7 @@ POST `http://<workflow-service>/internal/debug/token`
 {
   "type": "global",
   "name": "global-test-token",
-  "permissions": ["**/**/**"]
+  "permissions": ["**/**"]
 }
 ```
 

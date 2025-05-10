@@ -130,3 +130,15 @@
 .headerHoverIcon {
   margin-left: 0.25rem;
 }
+
+.dataTable {
+    :global .cds--data-table thead {
+        background: var(--cds-ui-background) !important;
+    }
+    :global .cds--data-table th {
+        background: var(--cds-ui-background) !important;
+    }
+    :global .cds--data-table-container {
+        padding-bottom: 1rem;
+    }
+}

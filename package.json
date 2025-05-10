@@ -39,7 +39,7 @@
     "@carbon/charts": "^1.13.6",
     "@carbon/charts-react": "^1.13.6",
     "@carbon/pictograms-react": "^11.50.0",
-    "@carbon/react": "1.53.0",
+    "@carbon/react": "1.59.0",
     "@dagrejs/dagre": "^1.0.4",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "axios": "^0.27.2",
