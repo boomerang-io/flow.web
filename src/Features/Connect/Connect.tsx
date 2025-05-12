@@ -6,13 +6,16 @@ import styles from "./connect.module.scss";
 
 function Connect() {
   const location = useLocation();
-  const parsed = queryString.parse(location.search);
-  console.log(parsed);
+  const searchParams = new URLSearchParams(location.search);
+  console.log(searchParams);
 
-  //TODO - add in the ability to retrieve a path param of :providor
+  const state = searchParams.get("state");
+  const installationId = searchParams.get("installation_id");
+  const team = atob(decodeURIComponent(state));
+  console.log(team);
   return (
     <div className={styles.container}>
-      <GitHub installId={parsed.installation_id} />
+      <GitHub installId={installationId} team={team} />
     </div>
   );
 }

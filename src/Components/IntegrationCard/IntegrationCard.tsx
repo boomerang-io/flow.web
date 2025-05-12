@@ -1,14 +1,14 @@
-import { ComposedModal, ToastNotification, notify, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import React, { useState } from "react";
 import { InlineLoading } from "@carbon/react";
 import { CircleFill, CircleStroke, Popup } from "@carbon/react/icons";
-import React, { useState } from "react";
+import { ComposedModal, ToastNotification, notify, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { formatErrorMessage } from "@boomerang-io/utils";
 import { useMutation, useQueryClient } from "react-query";
 import { Link } from "react-router-dom";
-import { formatErrorMessage } from "@boomerang-io/utils";
-import ModalContent from "./ModalContent";
-import styles from "./integrationCard.module.scss";
 import { resolver } from "Config/servicesConfig";
 import { ModalTriggerProps } from "Types";
+import ModalContent from "./ModalContent";
+import styles from "./integrationCard.module.scss";
 
 interface IntegrationCardProps {
   teamName: string;
@@ -67,7 +67,11 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({ teamName, data, url }
       //   />
       // );
       // queryClient.invalidateQueries(url);
-      window.open(data.link, "_blank");
+      var link = data.link;
+      if (data.name === "GitHub") {
+        link = `${link}?state=${encodeURIComponent(btoa(teamName))}`;
+      }
+      window.open(link, "_blank");
       closeModal();
     } catch (err) {
       seterrorMessage(

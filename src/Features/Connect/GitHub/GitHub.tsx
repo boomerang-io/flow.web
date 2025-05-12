@@ -1,15 +1,15 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import { Button, Dropdown, TextInput, DropdownSkeleton } from "@carbon/react";
+import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Link } from "@carbon/pictograms-react";
+import { Formik } from "formik";
+import { Helmet } from "react-helmet";
 import { useMutation, useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
-import { Link } from "@carbon/pictograms-react";
-import { resolver, serviceUrl } from "Config/servicesConfig";
-import { appLink } from "Config/appConfig";
-import { useAppContext } from "Hooks";
-import { Formik } from "formik";
 import * as Yup from "yup";
+import { useAppContext } from "Hooks";
+import { appLink } from "Config/appConfig";
+import { resolver, serviceUrl } from "Config/servicesConfig";
 import styles from "./github.module.scss";
 
 interface GitHubProps {
