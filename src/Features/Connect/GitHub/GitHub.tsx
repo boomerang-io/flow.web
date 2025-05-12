@@ -32,9 +32,11 @@ export default function Github({ installId, team }: GitHubProps) {
             subtitle={`${team} successfully linked to GitHub`}
           />,
         );
-        history.push({
-          pathname: appLink.integrations({ team: team }),
-        });
+        setTimeout(() => {
+          history.push({
+            pathname: appLink.integrations({ team: team }),
+          });
+        }, 1000); // 1000ms = 1 seconds
       } catch (error) {
         notify(
           <ToastNotification kind="error" title="Something's Wrong" subtitle="Request to link GitHub App failed." />,
