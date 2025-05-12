@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Layer } from "@carbon/react";
 import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import { formatErrorMessage } from "@boomerang-io/utils";
+import { Api, Parameter } from "@carbon/icons-react";
 import { Gear, PlanningAnalytics, PlayerFlow, Workflows } from "@carbon/pictograms-react";
 import cx from "classnames";
 import kebabcase from "lodash/kebabCase";
@@ -134,7 +135,7 @@ export default function Home() {
               tags={["Next steps"]}
             />
             <LearnCard
-              icon={<Gear style={{ height: "1.5rem", width: "1.5rem" }} />}
+              icon={<Parameter style={{ height: "1.5rem", width: "1.5rem" }} />}
               key="manage"
               title="Parameter power"
               description="Learn the power of parameters and how to use them to make your workflows dynamic."
@@ -142,7 +143,7 @@ export default function Home() {
               tags={["Advanced"]}
             />
             <LearnCard
-              icon={<Gear style={{ height: "1.5rem", width: "1.5rem" }} />}
+              icon={<Api style={{ height: "1.5rem", width: "1.5rem" }} />}
               key="manage"
               title="External triggers & the API"
               description="Use external triggers & events to start workflows."

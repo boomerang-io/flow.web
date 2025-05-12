@@ -12,10 +12,23 @@ interface CardProps {
   icon: React.ReactNode;
 }
 
+/**
+ * The Card component link to the Boomerang Docs
+ *
+ * Uses <a> for absolute urls to avoid basename being prefixed to the link
+ *
+ * @param title
+ * @param description
+ * @param tags
+ * @param link
+ * @param icon
+ *
+ * @returns {JSX.Element}
+ */
 function LearnCard({ title, description, tags, link, icon }: CardProps) {
   return (
     <div className={styles.container}>
-      <Link to={link} target="_blank">
+      <a href={link} target="_blank">
         <div className={styles.content}>
           <div className={styles.image}>{icon}</div>
           <h1 title={title} className={styles.name} data-testid="card-title">
@@ -32,7 +45,7 @@ function LearnCard({ title, description, tags, link, icon }: CardProps) {
           {/* Change to external link icon */}
           <Launch size={24} className={styles.ctaIcon} />
         </div>
-      </Link>
+      </a>
     </div>
   );
 }
