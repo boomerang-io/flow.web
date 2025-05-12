@@ -104,9 +104,9 @@ export default function Home() {
             <LearnCard
               icon={<Workflows style={{ height: "1.5rem", width: "1.5rem" }} />}
               key="first-workflow"
-              title="Create your first workflow"
+              title="Create your first Team & Workflow"
               description="Dive into the world of automation and create your first Workflow with our drag-and-drop designer."
-              link="https://useboomerang.io/docs"
+              link="https://useboomerang.io/docs/introduction/getting-started"
               tags={["Getting started"]}
             />
             <LearnCard
@@ -114,7 +114,7 @@ export default function Home() {
               key="activity"
               title="Explore Workflow activity"
               description="Gain control with execution activity and empower you to monitor, analyze, and optimize with precision and authority."
-              link="https://useboomerang.io/docs"
+              link="https://useboomerang.io/docs/fundamentals/insights"
               tags={["Getting started"]}
             />
             <LearnCard
@@ -122,16 +122,32 @@ export default function Home() {
               key="actions"
               title="Your Action to-do list"
               description="Focus on the approvals and manual actions that do need the visibility or analysis of a human."
-              link="https://useboomerang.io/docs"
+              link="https://useboomerang.io/docs/fundamentals/actions"
               tags={["Next steps"]}
             />
             <LearnCard
               icon={<Gear style={{ height: "1.5rem", width: "1.5rem" }} />}
               key="manage"
-              title="Manage your team"
+              title="Manage your Team"
               description="Everything you need to manage your team effectively. Its members, workflows, approver groups, quotas, tokens, and more."
-              link="https://useboomerang.io/docs"
+              link="https://useboomerang.io/docs/fundamentals/manage"
               tags={["Next steps"]}
+            />
+            <LearnCard
+              icon={<Gear style={{ height: "1.5rem", width: "1.5rem" }} />}
+              key="manage"
+              title="Parameter power"
+              description="Learn the power of parameters and how to use them to make your workflows dynamic."
+              link="https://useboomerang.io/docs/fundamentals/parameters"
+              tags={["Advanced"]}
+            />
+            <LearnCard
+              icon={<Gear style={{ height: "1.5rem", width: "1.5rem" }} />}
+              key="manage"
+              title="External triggers & the API"
+              description="Use external triggers & events to start workflows."
+              link="https://useboomerang.io/docs/architecture/eventing"
+              tags={["Advanced"]}
             />
           </nav>
         </Section>

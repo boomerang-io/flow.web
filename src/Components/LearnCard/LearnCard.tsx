@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { Tag } from "@carbon/react";
 import { Launch } from "@carbon/react/icons";
+import { Link } from "react-router-dom";
 import styles from "./learnCard.module.scss";
 
 interface CardProps {
@@ -15,7 +15,7 @@ interface CardProps {
 function LearnCard({ title, description, tags, link, icon }: CardProps) {
   return (
     <div className={styles.container}>
-      <Link to={link}>
+      <Link to={link} target="_blank">
         <div className={styles.content}>
           <div className={styles.image}>{icon}</div>
           <h1 title={title} className={styles.name} data-testid="card-title">

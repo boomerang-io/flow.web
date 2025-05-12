@@ -18,7 +18,6 @@ import {
   StructuredListRow,
   StructuredListCell,
 } from "@carbon/react";
-import { Key } from "@carbon/react/icons";
 import { notify, ToastNotification } from "@boomerang-io/carbon-addons-boomerang-react";
 import cx from "classnames";
 import moment from "moment";
@@ -26,7 +25,6 @@ import queryString from "query-string";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import CreateToken from "Components/CreateToken";
 import DeleteToken from "Components/DeleteToken";
-import EmptyState from "Components/EmptyState";
 import { resolver, serviceUrl } from "Config/servicesConfig";
 import type { Token, TokenScopeType } from "Types";
 import styles from "./TokenSection.module.scss";
