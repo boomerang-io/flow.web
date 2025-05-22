@@ -1,8 +1,9 @@
 import { Button, ModalBody } from "@carbon/react";
+import { ArrowRight } from "@carbon/react/icons";
 import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useTeamContext } from "Hooks";
 import dateHelper from "Utils/dateHelper";
 import { ExecutionStatusCopy, NodeType, executionStatusIcon } from "Constants";
@@ -25,6 +26,7 @@ type Props = {
 
 function RunTaskItem({ taskRun, workflowRun }: Props) {
   const { team } = useTeamContext();
+  const history = useHistory();
   const Icon = executionStatusIcon[taskRun.status];
   const statusClassName = styles[taskRun.status];
 
@@ -127,12 +129,18 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
           </ComposedModal>
         )}
         {taskRun.type === NodeType.RunWorkflow && taskRun.id && taskRun.workflowRef && (
-          <Link
-            to={appLink.execution({ team: team.name, runId: taskRun.id, workflow: workflowRun.workflowRef })}
-            className={styles.viewActivityLink}
+          <Button
+            kind="ghost"
+            size="sm"
+            onClick={() =>
+              history.push(
+                appLink.execution({ team: team.name, runId: taskRun.id, workflow: workflowRun.workflowName }),
+              )
+            }
+            renderIcon={ArrowRight}
           >
             View Activity
-          </Link>
+          </Button>
         )}
         {taskRun.type === NodeType.Approval && taskRun.phase === RunPhase.Completed && (
           <ComposedModal
