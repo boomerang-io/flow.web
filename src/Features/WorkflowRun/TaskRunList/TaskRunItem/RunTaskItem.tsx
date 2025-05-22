@@ -134,7 +134,11 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
             size="sm"
             onClick={() =>
               history.push(
-                appLink.execution({ team: team.name, runId: taskRun.id, workflow: workflowRun.workflowName }),
+                appLink.execution({
+                  team: team.name,
+                  runId: taskRun.results.find((result) => result.name === "workflowRunRef")?.value ?? "",
+                  workflow: workflowRun.workflowName,
+                }),
               )
             }
             renderIcon={ArrowRight}

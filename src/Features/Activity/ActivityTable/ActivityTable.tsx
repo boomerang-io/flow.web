@@ -147,8 +147,6 @@ function ActivityTable(props: ActivityTableProps) {
     }
   }
 
-  console.log("content", content);
-
   return (
     <section>
       <div className={styles.tableContainer}>
