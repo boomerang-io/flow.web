@@ -127,59 +127,56 @@ const TokenSection: React.FC<TokenProps> = ({ type, principal }) => {
     }
   };
 
-  //TODO - create empty state for tokens
-  if (getTokensQuery.data.content.length === 0) {
-    return <CreateToken getTokensUrl={getTokensUrl} principal={principal} type={type} />;
-  }
-
   return (
     <div className={styles.dataTable}>
-      <DataTable
-        rows={getTokensQuery.data.content}
-        headers={HEADERS}
-        pageSize={getTokensQuery.data.content.length}
-        render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer title="" description="" {...getTableContainerProps()}>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader />
-                  {headers.map((header) => (
-                    <TableHeader key={header.key} {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row: any) => (
-                  <>
-                    <TableExpandRow key={row.id} {...getRowProps({ row })}>
-                      {row.cells.map((cell: any, cellIndex: number) => (
-                        <TableCell key={cell.id} style={{ padding: "0" }}>
-                          <div className={styles.tableCell}>{renderCell(row.id, cellIndex, cell.value)}</div>
-                        </TableCell>
-                      ))}
-                    </TableExpandRow>
-                    <TableExpandedRow colSpan={headers.length + 1}>
-                      {getTokensQuery.data.content.find((t) => t.id === row.id).permissions.length > 0 ? (
-                        <TokenPermissions
-                          permissions={getTokensQuery.data.content
-                            .find((t) => t.id === row.id)
-                            .permissions.map((p, i) => ({ id: `${row.id}-${i}`, ...p }))}
-                        />
-                      ) : (
-                        "Permissions detail unavailable"
-                      )}
-                    </TableExpandedRow>
-                  </>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      />
       <CreateToken getTokensUrl={getTokensUrl} principal={principal} type={type} />
+      {getTokensQuery.data.content.length > 0 && (
+        <DataTable
+          rows={getTokensQuery.data.content}
+          headers={HEADERS}
+          pageSize={getTokensQuery.data.content.length}
+          render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+            <TableContainer title="" description="" {...getTableContainerProps()}>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    <TableExpandHeader />
+                    {headers.map((header) => (
+                      <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row: any) => (
+                    <>
+                      <TableExpandRow key={row.id} {...getRowProps({ row })}>
+                        {row.cells.map((cell: any, cellIndex: number) => (
+                          <TableCell key={cell.id} style={{ padding: "0" }}>
+                            <div className={styles.tableCell}>{renderCell(row.id, cellIndex, cell.value)}</div>
+                          </TableCell>
+                        ))}
+                      </TableExpandRow>
+                      <TableExpandedRow colSpan={headers.length + 1}>
+                        {getTokensQuery.data.content.find((t) => t.id === row.id).permissions.length > 0 ? (
+                          <TokenPermissions
+                            permissions={getTokensQuery.data.content
+                              .find((t) => t.id === row.id)
+                              .permissions.map((p, i) => ({ id: `${row.id}-${i}`, ...p }))}
+                          />
+                        ) : (
+                          "Permissions detail unavailable"
+                        )}
+                      </TableExpandedRow>
+                    </>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        />
+      )}
     </div>
   );
 };
