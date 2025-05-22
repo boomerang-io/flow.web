@@ -57,9 +57,15 @@ interface CreateEditFormProps {
 
 export default function CreateEditForm(props: CreateEditFormProps) {
   const { team } = useTeamContext();
-  const [workflowProperties, setWorkflowProperties] = React.useState<Array<DataDrivenInput> | undefined>(
-    props.workflow?.config?.map((property) => ({ ...property, name: `$parameter:${property.name}` })) ?? [],
+  const [workflowParams, setWorkflowParams] = React.useState<Array<DataDrivenInput> | undefined>(
+    props.workflow?.params?.map((param) => ({
+      ...param,
+      key: `$parameter:${param.name}`,
+      defaultValue: param.default,
+    })) ?? [],
   );
+
+  console.log("workflowProperties", workflowParams);
   let initFormValues: Partial<ScheduleManagerFormInputs> = {
     id: props.schedule?.id,
     name: props.schedule?.name ?? "",
@@ -73,7 +79,20 @@ export default function CreateEditForm(props: CreateEditFormProps) {
   };
 
   /**
-   * Namespace parameter values if they exist
+   * Default values if they exist. Has to be before the values from the saved schedule
+   */
+  if (workflowParams) {
+    workflowParams.forEach((param) => {
+      const key = param.name;
+      if (key) {
+        //@ts-ignore
+        initFormValues[`$parameter:${key}`] = param.default;
+      }
+    });
+  }
+
+  /**
+   * Namespace parameter values if they exist from saved schedule
    */
   if (Array.isArray(props.schedule?.params) && props.schedule?.params?.length > 0) {
     for (const param of props.schedule.params) {
@@ -134,12 +153,14 @@ export default function CreateEditForm(props: CreateEditFormProps) {
     }
   }
 
+  console.log("initFormValues", initFormValues);
+
   return (
     <DynamicFormik
       enableReinitialize
       validateOnMount
       initialValues={initFormValues}
-      inputs={workflowProperties ?? []}
+      inputs={workflowParams ?? []}
       onSubmit={async (args: ScheduleManagerFormInputs) => {
         try {
           await props.handleSubmit(args);
@@ -203,13 +224,17 @@ export default function CreateEditForm(props: CreateEditFormProps) {
                 initialSelectedItem={formikProps.values.workflow}
                 items={props?.workflowOptions ?? []}
                 itemToString={(workflow: Workflow) => {
-                  return workflow?.name ?? "";
+                  return workflow?.displayName ?? "";
                 }}
                 onChange={({ selectedItem }: { selectedItem: Workflow }) => {
                   formikProps.setFieldValue("workflow", selectedItem);
-                  if (selectedItem?.id) {
-                    setWorkflowProperties(
-                      selectedItem.config?.map((property) => ({ ...property, key: `$parameter:${property.key}` })),
+                  if (selectedItem?.name) {
+                    setWorkflowParams(
+                      selectedItem.params?.map((param) => ({
+                        ...param,
+                        key: `$parameter:${param.name}`,
+                        defaultValue: param.default,
+                      })),
                     );
                   }
                 }}

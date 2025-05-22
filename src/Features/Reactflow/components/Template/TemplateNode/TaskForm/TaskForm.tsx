@@ -2,6 +2,7 @@ import React from "react";
 import { Button, ModalBody, ModalFooter, Tag } from "@carbon/react";
 import { DynamicFormik, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import * as Yup from "yup";
+import { normaliseInputs } from "Utils/paramsHelper";
 import type { DataDrivenInput, Task, WorkflowNodeData } from "Types";
 import {
   AutoSuggestInput,
@@ -48,12 +49,13 @@ function WorkflowTaskForm(props: WorkflowTaskFormProps) {
 
   const taskResults = task.spec.results;
   const handleOnSave = (values: Record<string, string>) => {
+    props.node.name = values.taskName;
     props.onSave(values);
     props.closeModal();
   };
 
   // Add the name input
-  const inputs: Array<any> = [
+  let inputs: Array<any> = [
     {
       key: "taskName",
       name: "taskName",
@@ -73,6 +75,9 @@ function WorkflowTaskForm(props: WorkflowTaskFormProps) {
       customComponent: ResultsDisplay,
     },
   ];
+
+  // Normalise inputs to match Carbon's requirements
+  inputs = normaliseInputs(inputs);
 
   const initialValues: Record<string, any> = {
     taskName: node.name,

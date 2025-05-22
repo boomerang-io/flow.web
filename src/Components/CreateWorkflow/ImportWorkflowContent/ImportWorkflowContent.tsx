@@ -1,6 +1,4 @@
 import React from "react";
-import { Formik, FormikProps } from "formik";
-import * as Yup from "yup";
 import {
   Button,
   FileUploaderDropContainer,
@@ -9,10 +7,12 @@ import {
   ModalFooter,
   InlineNotification,
 } from "@carbon/react";
-import { Loading, TextInput, TextArea } from "@boomerang-io/carbon-addons-boomerang-react";
-import { requiredWorkflowProps } from "./constants";
 import { ErrorFilled } from "@carbon/react/icons";
+import { Loading, TextInput, TextArea } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Formik, FormikProps } from "formik";
+import * as Yup from "yup";
 import { FlowTeam, Workflow } from "Types";
+import { requiredWorkflowProps } from "./constants";
 import styles from "./importWorkflowContent.module.scss";
 
 const FILE_UPLOAD_MESSAGE = "Choose a file or drag one here";
@@ -47,6 +47,7 @@ interface ImportWorkflowContentProps {
 interface FormProps {
   team?: FlowTeam;
   name: string;
+  displayName: string;
   description: string;
   file: Workflow | undefined;
 }
@@ -98,9 +99,10 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
       {
         ...fileData,
         name: values.name,
+        displayName: values.displayName,
         description: values.description,
       },
-      closeModal
+      closeModal,
     );
   };
 
@@ -108,6 +110,7 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
     <Formik
       initialValues={{
         name: "",
+        displayName: "",
         description: "",
         file: undefined,
       }}
@@ -116,18 +119,26 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
       validationSchema={Yup.object().shape({
         name: Yup.string()
           .required(`Please enter a name for your ${type}`)
-          .max(64, "Name must not be greater than 64 characters")
+          .max(100, "Enter a name that is at most 100 characters in length")
+          .test("regex", `Name must only contain letters, numbers, and dashes`, (value) => {
+            const regex = /^[a-zA-Z0-9\-]+$/;
+            if (value) {
+              return regex.test(value);
+            }
+            return true;
+          })
           .notOneOf(
             existingWorkflowNames,
-            `There’s already a ${type} with that name in this team, consider giving this one a different name.`
+            `There’s already a ${type} with that name in this team. Names must be unique.`,
           ),
+        displayName: Yup.string().optional(),
         description: Yup.string().max(250, "Description must not be greater than 250 characters"),
         file: Yup.mixed()
           .test(
             "fileSize",
             "File is larger than 1MiB",
             // If it's bigger than 1MiB will display the error (1048576 bytes = 1 mebibyte)
-            (file) => (file?.size ? file.size < 1048576 : true)
+            (file) => (file?.size ? file.size < 1048576 : true),
           )
           .test("validFile", "File is invalid", async (file) => {
             let isValid = true;
@@ -169,7 +180,7 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
                 multiple={false}
                 onAddFiles={async (
                   event: React.SyntheticEvent,
-                  { addedFiles }: { addedFiles: { name: string; size: number }[] }
+                  { addedFiles }: { addedFiles: { name: string; size: number }[] },
                 ) => {
                   let contents = await readFile(addedFiles[0], setFieldError);
                   let fileInfo = {
@@ -179,6 +190,7 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
                   };
                   setFieldValue("file", fileInfo);
                   setFieldValue("name", contents?.name ?? "");
+                  setFieldValue("displayName", contents?.displayName ?? "");
                   setFieldValue("description", contents?.description ?? "");
                 }}
               />
@@ -202,12 +214,24 @@ const ImportWorkflowContent: React.FC<ImportWorkflowContentProps> = ({
                     <TextInput
                       id="name"
                       labelText="Name"
-                      helperText="Enter a unique name for your workflow"
+                      placeholder="e.g. my-workflow"
+                      helperText="This is your unique identifier name within the Team. Can only contain letters, numbers, and dashes."
                       value={values.name}
                       onBlur={handleBlur}
                       onChange={handleChange}
                       invalid={Boolean(errors.name && touched.name)}
                       invalidText={errors.name}
+                    />
+                    <TextInput
+                      id="displayName"
+                      label="Display Name (optional)"
+                      helperText="This is the name that will be displayed in the UI. If left empty, will be set to the unique name."
+                      placeholder="My Fantastical Workflow"
+                      value={values.displayName}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      invalid={Boolean(errors.displayName && touched.displayName)}
+                      invalidText={errors.displayName}
                     />
                     <TextArea
                       id="description"

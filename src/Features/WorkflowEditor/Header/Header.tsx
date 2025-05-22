@@ -11,7 +11,7 @@ import {
 } from "@boomerang-io/carbon-addons-boomerang-react";
 import { AxiosResponse } from "axios";
 import { UseMutationResult } from "react-query";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { WorkflowView } from "Constants";
 import { appLink } from "Config/appConfig";
 import { ModalTriggerProps, WorkflowCanvas, WorkflowViewType, ChangeLog } from "Types";
@@ -28,7 +28,7 @@ interface DesignerHeaderProps {
   revisionMutator: UseMutationResult<
     AxiosResponse<any, any>,
     unknown,
-    { team: any; workflowId: any; body: any },
+    { team: any; workflow: any; body: any },
     unknown
   >;
   revisionState: WorkflowCanvas;
@@ -45,11 +45,8 @@ const DesignerHeader: React.FC<DesignerHeaderProps> = ({
   revisionState,
   viewType,
 }) => {
-  const routeMatch: { params: { team: string; workflowId: string } } = useRouteMatch();
-  const {
-    params: { team, workflowId },
-  } = routeMatch;
-  const { name } = revisionState;
+  const params = useParams<{ team: string; workflow: string }>();
+  const { displayName } = revisionState;
   const { version: currentRevision } = revisionState;
   const isPreviousVersion = currentRevision < revisionCount;
   const performActionButtonText = currentRevision < revisionCount ? "Set version to latest" : "Create new version";
@@ -59,31 +56,47 @@ const DesignerHeader: React.FC<DesignerHeaderProps> = ({
     createRevision(`Set ${currentRevision} to the latest version`);
   };
 
+  const NavigationComponent = () => {
+    return (
+      <Breadcrumb noTrailingSlash>
+        <BreadcrumbItem>
+          <Link to={appLink.home()}>Home</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem isCurrentPage>
+          <p>{team ? team.displayName : "---"}</p>
+        </BreadcrumbItem>
+      </Breadcrumb>
+    );
+  };
+
   return (
     <Header
       className={styles.container}
       nav={
         <Breadcrumb noTrailingSlash>
           <BreadcrumbItem>
+            <Link to={appLink.home()}>Home</Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             {viewType === WorkflowView.Workflow ? (
-              <Link to={appLink.workflows({ team })}>Workflows</Link>
+              <Link to={appLink.workflows({ team: params.team })}>Workflows</Link>
             ) : (
               <Link to={appLink.templateWorkflows()}>Template Workflows</Link>
             )}
           </BreadcrumbItem>
           <BreadcrumbItem isCurrentPage>
-            <p>{name}</p>
+            <p>{displayName}</p>
           </BreadcrumbItem>
         </Breadcrumb>
       }
       header={<HeaderTitle>Editor</HeaderTitle>}
       footer={
         <Tabs ariaLabel="Editor pages">
-          <Tab label="Canvas" to={appLink.editorCanvas({ team, workflowId })} />
-          <Tab label="Parameters" to={appLink.editorProperties({ team, workflowId })} />
-          <Tab label="Configure" to={appLink.editorConfigure({ team, workflowId })} />
-          <Tab label="Schedules" to={appLink.editorSchedule({ team, workflowId })} />
-          <Tab label="Change Log" to={appLink.editorChangelog({ team, workflowId })} />
+          <Tab label="Canvas" to={appLink.editorCanvas({ team: params.team, workflow: params.workflow })} />
+          <Tab label="Parameters" to={appLink.editorProperties({ team: params.team, workflow: params.workflow })} />
+          <Tab label="Configure" to={appLink.editorConfigure({ team: params.team, workflow: params.workflow })} />
+          <Tab label="Schedules" to={appLink.editorSchedule({ team: params.team, workflow: params.workflow })} />
+          <Tab label="Change Log" to={appLink.editorChangelog({ team: params.team, workflow: params.workflow })} />
         </Tabs>
       }
       actions={

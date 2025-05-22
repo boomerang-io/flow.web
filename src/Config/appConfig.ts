@@ -76,19 +76,19 @@ export const AppPath: Record<AppPathKey, string> = {
   ActionsApprovals: "/:team/actions/approvals",
   ActionsManual: "/:team/actions/manual",
   Callback: "/callback",
-  Editor: "/:team/editor/:workflowId",
-  EditorCanvas: `/:team/editor/:workflowId/canvas`,
-  EditorConfigure: `/:team/editor/:workflowId/configure`,
-  EditorConfigureGeneral: `/:team/editor/:workflowId/configure/general`,
-  EditorConfigureTriggers: `/:team/editor/:workflowId/configure/triggers`,
-  EditorConfigureRun: `/:team/editor/:workflowId/configure/run`,
-  EditorConfigureParams: `/:team/editor/:workflowId/configure/parameters`,
-  EditorConfigureWorkspaces: `/:team/editor/:workflowId/configure/workspaces`,
-  EditorConfigureTokens: `/:team/editor/:workflowId/configure/tokens`,
-  EditorChangelog: `/:team/editor/:workflowId/changelog`,
-  EditorProperties: `/:team/editor/:workflowId/parameters`,
-  EditorSchedule: `/:team/editor/:workflowId/schedule`,
-  Run: "/:team/activity/:workflowId/run/:runId",
+  Editor: "/:team/editor/:workflow",
+  EditorCanvas: `/:team/editor/:workflow/canvas`,
+  EditorConfigure: `/:team/editor/:workflow/configure`,
+  EditorConfigureGeneral: `/:team/editor/:workflow/configure/general`,
+  EditorConfigureTriggers: `/:team/editor/:workflow/configure/triggers`,
+  EditorConfigureRun: `/:team/editor/:workflow/configure/run`,
+  EditorConfigureParams: `/:team/editor/:workflow/configure/parameters`,
+  EditorConfigureWorkspaces: `/:team/editor/:workflow/configure/workspaces`,
+  EditorConfigureTokens: `/:team/editor/:workflow/configure/tokens`,
+  EditorChangelog: `/:team/editor/:workflow/changelog`,
+  EditorProperties: `/:team/editor/:workflow/parameters`,
+  EditorSchedule: `/:team/editor/:workflow/schedule`,
+  Run: "/:team/activity/:workflow/run/:runId",
   Home: "/home",
   Profile: "/profile",
   Insights: "/:team/insights",
@@ -124,9 +124,10 @@ export const AppPath: Record<AppPathKey, string> = {
   UserList: "/admin/users",
 };
 
-interface WorkflowIdArg {
-  workflowId: string;
+interface WorkflowArg {
+  workflow: string;
 }
+
 interface TeamArg {
   team: string;
 }
@@ -135,7 +136,7 @@ interface UserIdArg {
   userId: string;
 }
 
-type TeamRouteArgs = WorkflowIdArg & TeamArg;
+type TeamRouteArgs = WorkflowArg & TeamArg;
 interface ManageTaskTemplateArgs {
   team: string;
   name: string;
@@ -147,7 +148,7 @@ interface AdminTaskTemplateArgs {
 }
 interface ExecutionArgs {
   runId: string;
-  workflowId: string;
+  workflow: string;
 }
 
 export const appLink = {
@@ -155,19 +156,18 @@ export const appLink = {
   actions: ({ team }: TeamArg) => `/${team}/actions`,
   actionsApprovals: ({ team }: TeamArg) => `/${team}/actions/approvals`,
   actionsManual: ({ team }: TeamArg) => `/${team}/actions/manual`,
-  editorCanvas: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/canvas`,
-  editorConfigure: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure`,
-  editorConfigureGeneral: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/general`,
-  editorConfigureTriggers: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/triggers`,
-  editorConfigureRun: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/run`,
-  editorConfigureParams: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/parameters`,
-  editorConfigureWorkspaces: ({ team, workflowId }: TeamRouteArgs) =>
-    `/${team}/editor/${workflowId}/configure/workspaces`,
-  editorConfigureTokens: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/configure/tokens`,
-  editorChangelog: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/changelog`,
-  editorProperties: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/parameters`,
-  editorSchedule: ({ team, workflowId }: TeamRouteArgs) => `/${team}/editor/${workflowId}/schedule`,
-  execution: ({ team, workflowId, runId }: TeamArg & ExecutionArgs) => `/${team}/activity/${workflowId}/run/${runId}`,
+  editorCanvas: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/canvas`,
+  editorConfigure: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/configure`,
+  editorConfigureGeneral: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/configure/general`,
+  editorConfigureTriggers: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/configure/triggers`,
+  editorConfigureRun: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/configure/run`,
+  editorConfigureParams: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/configure/parameters`,
+  editorConfigureWorkspaces: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/configure/workspaces`,
+  editorConfigureTokens: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/configure/tokens`,
+  editorChangelog: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/changelog`,
+  editorProperties: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/parameters`,
+  editorSchedule: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/schedule`,
+  execution: ({ team, workflow, runId }: TeamArg & ExecutionArgs) => `/${team}/activity/${workflow}/run/${runId}`,
   home: () => "/home",
   profile: () => "/profile",
   insights: ({ team }: TeamArg) => `/${team}/insights`,
@@ -199,7 +199,7 @@ export const appLink = {
   userSettings: ({ userId }: UserIdArg) => `/admin/users/${userId}/settings`,
   userList: () => "/admin/users",
   workflows: ({ team }: TeamArg) => `/${team}/workflows`,
-  workflowActivity: ({ team, workflowId }: TeamRouteArgs) => `/${team}/activity?page=0&size=10&workflows=${workflowId}`,
+  workflowActivity: ({ team, workflow }: TeamRouteArgs) => `/${team}/activity?page=0&size=10&workflows=${workflow}`,
   //external apps
   docsWorkflowEditor: () => `${BASE_DOCUMENTATION_URL}/fundamentals/triggers`,
 };

@@ -128,7 +128,7 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
         )}
         {taskRun.type === NodeType.RunWorkflow && taskRun.id && taskRun.workflowRef && (
           <Link
-            to={appLink.execution({ team: team.name, runId: taskRun.id, workflowId: workflowRun.workflowRef })}
+            to={appLink.execution({ team: team.name, runId: taskRun.id, workflow: workflowRun.workflowRef })}
             className={styles.viewActivityLink}
           >
             View Activity

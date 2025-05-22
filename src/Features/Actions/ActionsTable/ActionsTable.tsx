@@ -1,26 +1,25 @@
 import React from "react";
-import { useAppContext, useTeamContext } from "Hooks";
-import { Link } from "react-router-dom";
 import { Button, DataTableSkeleton, DataTable, Pagination } from "@carbon/react";
+import { CheckmarkOutline, CloseOutline, Help, Warning } from "@carbon/react/icons";
 import { TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
 import cx from "classnames";
 import queryString from "query-string";
-import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
+import { Link } from "react-router-dom";
 import EmptyState from "Components/EmptyState";
+import { useAppContext, useTeamContext } from "Hooks";
+import dateHelper from "Utils/dateHelper";
+import { appLink } from "Config/appConfig";
+import { Action, ApprovalStatus } from "Types";
+import styles from "./ActionsTable.module.scss";
 import ApproveRejectActions from "./ApproveRejectActions";
 import ManualTask from "./ManualTask";
-import { Action, ApprovalStatus } from "Types";
-import { appLink } from "Config/appConfig";
-import dateHelper from "Utils/dateHelper";
-import { CheckmarkOutline, CloseOutline, Help, Warning } from "@carbon/react/icons";
-import styles from "./ActionsTable.module.scss";
 
 interface ActionsTableProps {
   actionsQueryToRefetch: string;
   history: any;
   isLoading: boolean;
   location: any;
-  match: any;
   tableData: {
     number: number;
     size: number;
@@ -204,7 +203,13 @@ function ActionsTable(props: ActionsTableProps) {
         return <time className={styles.tableTextarea}>{value ? dateHelper.humanizedSimpleTimeAgo(value) : "---"}</time>;
       case HeadersKey.ActivityLink:
         return (
-          <Link to={appLink.execution({ team: team.name, runId: currentAction?.workflowRunRef, workflowId: currentAction?.workflowRef })}>
+          <Link
+            to={appLink.execution({
+              team: team.name,
+              runId: currentAction?.workflowRunRef,
+              workflow: currentAction?.workflowRef,
+            })}
+          >
             View Activity
           </Link>
         );

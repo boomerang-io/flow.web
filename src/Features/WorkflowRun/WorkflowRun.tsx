@@ -19,7 +19,7 @@ import styles from "./WorkflowRun.module.scss";
 
 export default function WorkflowRunFeature() {
   const { team } = useTeamContext();
-  const { workflowId, runId }: { team: string; workflowId: string; runId: string } = useParams();
+  const params = useParams<{ team: string; workflow: string; runId: string }>();
   const getTasksUrl = serviceUrl.task.queryTasks({
     query: queryString.stringify({ statuses: "active" }),
   });
@@ -27,7 +27,7 @@ export default function WorkflowRunFeature() {
     query: queryString.stringify({ statuses: "active" }),
     team: team.name,
   });
-  const getExecutionUrl = serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id: runId });
+  const getExecutionUrl = serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id: params.runId });
 
   /**
    * Queries
@@ -67,7 +67,7 @@ export default function WorkflowRunFeature() {
         team={team.name}
         workflowRun={executionQuery.data}
         tasksData={[...tasksQuery.data.content, ...prefixTeamTask(teamTasksQuery.data.content, team)]}
-        workflowId={workflowId}
+        workflowRef={params.workflow}
       />
     );
   }
@@ -78,15 +78,15 @@ export default function WorkflowRunFeature() {
 type RevisionProps = {
   team: string;
   tasksData: Task[];
-  workflowId: string;
+  workflowRef: string;
   workflowRun: WorkflowRun;
 };
 
-function RevisionContainer({ team, workflowRun, tasksData, workflowId }: RevisionProps) {
+function RevisionContainer({ team, workflowRun, tasksData, workflowRef }: RevisionProps) {
   const version = workflowRun.workflowVersion;
   const getWorkflowUrl = serviceUrl.team.workflow.getWorkflowComposeRun({
     team: team,
-    id: workflowId,
+    workflow: workflowRef,
     version,
   });
 

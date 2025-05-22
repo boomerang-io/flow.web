@@ -7,6 +7,10 @@
   :global .cds--file__selected-file {
     background: var(--cds-ui-background);
   }
+
+  :global .cds--file-browse-btn {
+    max-inline-size: none;
+  }
 }
 
 .confirmInfoForm {
@@ -14,7 +18,7 @@
   flex-direction: column;
   :global .cds--form-item,
   :global .cds--list-box__wrapper {
-    max-width: 20rem;
+    // max-width: 20rem;
     margin-top: 1rem;
   }
 }

@@ -47,7 +47,7 @@ export default function ScheduleView(props: ScheduleProps) {
   const schedulesUrlQuery = queryString.stringify(
     {
       statuses: scheduleStatusOptions.map((statusObj) => statusObj.value),
-      workflows: props.workflow.id,
+      workflows: props.workflow.name,
     },
     queryStringOptions,
   );

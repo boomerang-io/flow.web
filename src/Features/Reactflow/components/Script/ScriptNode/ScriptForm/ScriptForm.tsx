@@ -2,6 +2,7 @@ import React from "react";
 import { Button, ModalBody, ModalFooter } from "@carbon/react";
 import { DynamicFormik, ModalForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import * as Yup from "yup";
+import { normaliseInputs } from "Utils/paramsHelper";
 import { Task, WorkflowNodeData } from "Types";
 import {
   AutoSuggestInput,
@@ -44,7 +45,7 @@ function ScriptForm(props: ScriptFormProps) {
   const taskVersionConfig = task.spec.params ?? [];
 
   // Add the name and future inputs
-  const inputs: Array<any> = [
+  let inputs: Array<any> = [
     {
       name: "taskName",
       id: "taskName",
@@ -62,6 +63,8 @@ function ScriptForm(props: ScriptFormProps) {
       customComponent: ResultsInput,
     },
   ];
+  // Normalise inputs to match Carbon's requirements
+  inputs = normaliseInputs(inputs);
 
   const initialValues: Record<string, any> = {
     taskName: node.name,

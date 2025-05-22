@@ -40,6 +40,7 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
   const handleSubmit = (values: any) => {
     const requestBody = {
       name: values.name,
+      displayName: values.displayName,
       description: values.description,
       icon: values.icon,
     };
@@ -52,6 +53,7 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
       initialErrors={{ name: "Name is required" }}
       initialValues={{
         name: "",
+        displayName: "",
         description: "",
         icon: workflowIcons[2].name,
       }}
@@ -59,8 +61,19 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
       validationSchema={Yup.object().shape({
         name: Yup.string()
           .required("Name is required")
-          .max(64, "Name must not be greater than 64 characters")
-          .notOneOf(existingWorkflowNames, "This name already exists"),
+          .max(100, "Enter a name that is at most 100 characters in length")
+          .test("regex", `Name must only contain letters, numbers, and dashes`, (value) => {
+            const regex = /^[a-zA-Z0-9\-]+$/;
+            if (value) {
+              return regex.test(value);
+            }
+            return true;
+          })
+          .notOneOf(
+            existingWorkflowNames,
+            `There’s already a ${viewType} with that name in this team. Names must be unique.`,
+          ),
+        displayName: Yup.string().optional(),
         description: Yup.string().max(250, "Description must not be greater than 250 characters"),
       })}
     >
@@ -74,13 +87,24 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
               <TextInput
                 id="name"
                 labelText="Name"
-                placeholder="e.g. My Amazing Workflow"
-                helperText="Enter a unique name for your workflow"
+                placeholder="e.g. my-workflow"
+                helperText="This is your unique identifier name within the Team. Can only contain letters, numbers, and dashes."
                 value={values.name}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 invalid={Boolean(errors.name && touched.name)}
                 invalidText={errors.name}
+              />
+              <TextInput
+                id="displayName"
+                label="Display Name (optional)"
+                helperText="This is the name that will be displayed in the UI. If left empty, will be set to the unique name."
+                placeholder="e.g. My Fantastical Workflow"
+                value={values.displayName}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                invalid={Boolean(errors.displayName && touched.displayName)}
+                invalidText={errors.displayName}
               />
               <TextArea
                 id="description"

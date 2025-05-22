@@ -75,6 +75,9 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
         <div className={styles.headerNav}>
           <Breadcrumb noTrailingSlash>
             <BreadcrumbItem>
+              <Link to={appLink.home()}>Home</Link>
+            </BreadcrumbItem>
+            <BreadcrumbItem>
               <Link to={state ? state.fromUrl : appLink.activity({ team: team.name })}>
                 {state ? capitalize(state.fromText) : "Activity"}
               </Link>
@@ -215,10 +218,10 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
 }
 
 function WorkflowAdvancedDetail({ workflow }: { workflow: WorkflowCanvas }) {
-  const { workflowId, runId }: { workflowId: string; runId: string } = useParams();
+  const { team, workflow: workflowRef, runId } = useParams<{ team: string; workflow: string; runId: string }>();
   const [copyTokenText, setCopyTokenText] = React.useState("Copy");
 
-  const labelTexts = [`boomerang.io/workflow-id=${workflowId}`, `boomerang.io/workflow-activity-id=${runId}`];
+  const labelTexts = [`boomerang.io/workflow-ref=${workflowRef}`, `boomerang.io/workflowrun-ref=${runId}`];
 
   if (Array.isArray(workflow.labels) && workflow.labels.length > 0) {
     workflow.labels.forEach((label) => {

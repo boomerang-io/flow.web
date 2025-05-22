@@ -189,7 +189,7 @@ const WorkflowContent: React.FC<WorkflowContentProps> = ({ team, searchQuery, wo
       <div className={styles.workflows}>
         {filteredWorkflowList.map((workflow) => (
           <WorkflowCard
-            key={workflow.id}
+            key={workflow.name}
             quotas={team.quotas}
             teamName={team.name}
             viewType={WorkflowView.Workflow}

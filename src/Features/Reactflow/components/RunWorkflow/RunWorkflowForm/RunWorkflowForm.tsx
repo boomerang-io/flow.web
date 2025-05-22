@@ -4,6 +4,7 @@ import { ComboBox, DynamicFormik, ModalForm } from "@boomerang-io/carbon-addons-
 import { FormikProps } from "formik";
 import * as Yup from "yup";
 import { useEditorContext } from "Hooks";
+import { normaliseInputs } from "Utils/paramsHelper";
 import { DataDrivenInput, Task, WorkflowNodeData } from "Types";
 import {
   AutoSuggestInput,
@@ -30,12 +31,12 @@ interface RunWorkflowFormProps {
 function RunWorkflowForm(props: RunWorkflowFormProps) {
   const { workflowsQueryData } = useEditorContext();
   const { availableParameters, node, otherTaskNames } = props;
-  const paramWorkflowId = node?.params.find((param) => param.name === "workflowId")?.value;
-  const [selectedWorkflowId, setSelectedWorkflowId] = useState(paramWorkflowId ?? "");
+  const paramWorkflowId = node?.params.find((param) => param.name === "workflowRef")?.value;
+  const [selectedWorkflowRef, setSelectedWorkflowRef] = useState(paramWorkflowId ?? "");
 
   const workflows = workflowsQueryData.content;
-  const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.name, value: workflow.id })) ?? [];
-  const selectedWorkflowConfg = workflows.find((workflow) => workflow.id === selectedWorkflowId)?.params ?? [];
+  const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.displayName, value: workflow.name })) ?? [];
+  const selectedWorkflowConfg = workflows.find((workflow) => workflow.name === selectedWorkflowRef)?.params ?? [];
 
   const activeInputs: Record<string, string> = {};
   if (selectedWorkflowConfg) {
@@ -43,7 +44,7 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
       const name = item.name;
       if (name) {
         //@ts-ignore
-        activeInputs[name] = item.defaultValue;
+        activeInputs[name] = item.default;
       }
     });
   }
@@ -63,8 +64,8 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
     const { errors, touched, setFieldValue, values } = formikProps;
     const error = errors[input.id];
     const touch = touched[input.id];
-    const initialSelectedItem = values.workflowId
-      ? workflowsMapped.find((workflow) => workflow.value === values.workflowId)
+    const initialSelectedItem = values.workflowRef
+      ? workflowsMapped.find((workflow) => workflow.value === values.workflowRef)
       : "";
     return (
       <ComboBox
@@ -72,8 +73,8 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
         id="workflow-select"
         onChange={({ selectedItem }) => {
           const value = selectedItem?.value ?? "";
-          setFieldValue("workflowId", value);
-          setSelectedWorkflowId(value);
+          setFieldValue("workflowRef", value);
+          setSelectedWorkflowRef(value);
         }}
         items={workflowsMapped}
         initialSelectedItem={initialSelectedItem}
@@ -86,7 +87,7 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
   };
 
   // Add the name and future inputs
-  const inputs: Array<any> = [
+  let inputs: Array<any> = [
     {
       name: "taskName",
       id: "taskName",
@@ -97,19 +98,22 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
       customComponent: TaskNameTextInput,
     },
     {
-      name: "workflowId",
-      id: "workflowId",
+      name: "workflowRef",
+      id: "workflowRef",
       type: "custom",
       required: true,
-      helperText: "When in the future you want the Workflow to execute",
+      helperText: "The Workflow you wish to run",
       customComponent: WorkflowSelectionInput,
     },
     ...selectedWorkflowConfg,
   ];
 
+  // Normalise inputs to match Carbon's requirements
+  inputs = normaliseInputs(inputs);
+
   const initialValues: Record<string, any> = {
     taskName: node.name,
-    workflowId: selectedWorkflowId,
+    workflowRef: selectedWorkflowRef,
     ...activeInputs,
     ...node.params.reduce(
       (accum, curr) => {
@@ -129,7 +133,7 @@ function RunWorkflowForm(props: RunWorkflowFormProps) {
         taskName: Yup.string()
           .required("Enter a task name")
           .notOneOf(otherTaskNames, "Enter a unique value for task name"),
-        workflowId: Yup.string().required("Select a workflow"),
+        workflowRef: Yup.string().required("Select a workflow"),
       })}
       initialValues={initialValues}
       inputs={inputs}

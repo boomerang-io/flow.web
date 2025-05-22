@@ -86,7 +86,7 @@ export default function CreateSchedule(props: CreateScheduleProps) {
       timezone: timezone.value,
       labels: scheduleLabels,
       params: resetParameters,
-      workflowRef: workflow.id,
+      workflowRef: workflow.name,
     };
 
     if (schedule.type === "runOnce") {

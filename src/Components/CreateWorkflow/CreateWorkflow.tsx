@@ -39,8 +39,7 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
           : await createTemplateMutator.mutateAsync({
               body: workflowSummary,
             });
-      const workflowId = newWorkflow.id;
-      history.push(appLink.editorCanvas({ team: team?.name!, workflowId: workflowId }));
+      history.push(appLink.editorCanvas({ team: team?.name!, workflow: newWorkflow.name }));
       notify(
         <ToastNotification kind="success" title={`Create ${viewType}`} subtitle={`${viewType} successfully created`} />,
       );
@@ -68,9 +67,13 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
           : await createTemplateMutator.mutateAsync({
               body: workflow,
             });
-      history.push(appLink.editorCanvas({ team: team?.name!, workflowId: newWorkflow.id }));
+      history.push(appLink.editorCanvas({ team: team?.name!, workflow: newWorkflow.name }));
       notify(
-        <ToastNotification kind="success" title={`Update ${viewType}`} subtitle={`${viewType} successfully updated`} />,
+        <ToastNotification
+          kind="success"
+          title={`Import ${viewType}`}
+          subtitle={`${viewType} successfully imported`}
+        />,
       );
       if (viewType === WorkflowView.Template) {
         queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());

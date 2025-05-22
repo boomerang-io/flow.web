@@ -88,7 +88,7 @@ function ScheduleEditor(props: ScheduleEditorProps) {
       labels: scheduleLabels,
       timezone: timezone.value,
       params: resetParameters,
-      workflowRef: workflow.id || props.workflow?.id,
+      workflowRef: workflow.name || props.workflow?.name,
     };
 
     if (schedule.type === "runOnce") {
