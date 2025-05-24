@@ -80,13 +80,13 @@ export default function Schedules() {
 
   const { fromDate = defaultFromDate, toDate = defaultToDate } = queryString.parse(location.search, queryStringOptions);
 
-  const hasScheduleData = Boolean(schedulesQuery.data?.content);
   let userScheduleIds = [];
   if (schedulesQuery.data?.content) {
     for (const schedule of schedulesQuery.data?.content) {
       userScheduleIds.push(schedule.id);
     }
   }
+  const hasScheduleData = Boolean(userScheduleIds.length > 0);
 
   const calendarUrlQuery = queryString.stringify(
     {
