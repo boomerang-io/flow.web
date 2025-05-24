@@ -27,12 +27,13 @@ type Props = {
   workflow: WorkflowCanvas;
   workflowRun: WorkflowRun;
   version: number;
+  executionViewRedirect: (args: { workflowRunRef: string }) => void;
 };
 
 const cancelStatusTypes = [RunStatus.NotStarted, RunStatus.Waiting, RunStatus.Ready, RunStatus.Running];
 const retryStatusTypes = [RunStatus.Cancelled, RunStatus.Failed, RunStatus.TimedOut, RunStatus.Invalid];
 
-export default function RunHeader({ workflow, workflowRun, version }: Props) {
+export default function RunHeader({ workflow, workflowRun, version, executionViewRedirect }: Props) {
   const { team } = useTeamContext();
   const history = useHistory<{ fromUrl: string; fromText: string }>();
   const state = history.location.state;
@@ -54,6 +55,7 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
     try {
       await retryWorkflowRunMutation({ id, team: team.name });
       notify(<ToastNotification kind="success" title="Retry run" subtitle="Retry successful" />);
+      executionViewRedirect({ workflowRunRef: id });
     } catch {
       notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to retry this run`} />);
     }

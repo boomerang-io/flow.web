@@ -184,7 +184,12 @@ function Main(props: MainProps) {
       <Helmet>
         <title>{workflow ? `${workflow.name} - Activity` : `Activity`}</title>
       </Helmet>
-      <RunHeader workflow={workflow} workflowRun={workflowRun} version={version} />
+      <RunHeader
+        workflow={workflow}
+        workflowRun={workflowRun}
+        version={version}
+        executionViewRedirect={executionViewRedirect}
+      />
       <section aria-label="Executions" className={styles.executionResultContainer}>
         <RunTaskLog workflowRun={workflowRun} executionViewRedirect={executionViewRedirect} />
         <div className={styles.executionDesignerContainer}>
