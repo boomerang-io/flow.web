@@ -15,7 +15,7 @@ import { useFeature } from "flagged";
 import { Formik, FormikProps, FieldArray } from "formik";
 import capitalize from "lodash/capitalize";
 import { Helmet } from "react-helmet";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { Switch, Route, Redirect, useLocation, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import TokenSection from "Components/TokenSection";

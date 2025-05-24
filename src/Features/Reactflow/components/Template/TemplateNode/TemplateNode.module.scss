@@ -151,6 +151,7 @@
   opacity: 0.5;
 }
 
+.timedout,
 .failed {
   border: 0.1875rem solid var(--flow-failure) !important;
 }
