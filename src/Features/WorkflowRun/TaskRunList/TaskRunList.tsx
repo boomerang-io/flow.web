@@ -13,9 +13,10 @@ import styles from "./TaskRunList.module.scss";
 
 type Props = {
   workflowRun: WorkflowRun;
+  executionViewRedirect: ({ workflowRef, workflowRunRef }: { workflowRef: string; workflowRunRef: string }) => void;
 };
 
-function TaskRunLog({ workflowRun }: Props) {
+function TaskRunLog({ workflowRun, executionViewRedirect }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [tasksSort, setTasksSort] = useState<"desc" | "asc">("desc");
 
@@ -93,7 +94,12 @@ function TaskRunLog({ workflowRun }: Props) {
       </section>
       <ul className={styles.tasklog}>
         {tasks.map((taskRun) => (
-          <TaskRunItem key={taskRun.id} taskRun={taskRun} workflowRun={workflowRun} />
+          <TaskRunItem
+            key={taskRun.id}
+            taskRun={taskRun}
+            workflowRun={workflowRun}
+            executionViewRedirect={executionViewRedirect}
+          />
         ))}
       </ul>
     </aside>

@@ -3,11 +3,8 @@ import { ArrowRight } from "@carbon/react/icons";
 import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
-import { Link, useHistory } from "react-router-dom";
-import { useTeamContext } from "Hooks";
 import dateHelper from "Utils/dateHelper";
 import { ExecutionStatusCopy, NodeType, executionStatusIcon } from "Constants";
-import { appLink } from "Config/appConfig";
 import { RunPhase, RunStatus, TaskRun, WorkflowRun } from "Types";
 import ManualTaskModal from "./ManualTaskModal";
 import PropertiesTable from "./PropertiesTable";
@@ -22,11 +19,10 @@ const logStatusTypes = [RunStatus.Succeeded, RunStatus.Failed, RunStatus.Running
 type Props = {
   taskRun: TaskRun;
   workflowRun: WorkflowRun;
+  executionViewRedirect: ({ workflowRef, workflowRunRef }: { workflowRef: string; workflowRunRef: string }) => void;
 };
 
-function RunTaskItem({ taskRun, workflowRun }: Props) {
-  const { team } = useTeamContext();
-  const history = useHistory();
+function RunTaskItem({ taskRun, workflowRun, executionViewRedirect }: Props) {
   const Icon = executionStatusIcon[taskRun.status];
   const statusClassName = styles[taskRun.status];
 
@@ -133,13 +129,10 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
             kind="ghost"
             size="sm"
             onClick={() =>
-              history.push(
-                appLink.execution({
-                  team: team.name,
-                  runId: taskRun.results.find((result) => result.name === "workflowRunRef")?.value ?? "",
-                  workflow: taskRun.params.find((param) => param.name === "workflowRef")?.value ?? "",
-                }),
-              )
+              executionViewRedirect({
+                workflowRef: taskRun.params.find((param) => param.name === "workflowRef")?.value ?? "",
+                workflowRunRef: taskRun.results.find((result) => result.name === "workflowRunRef")?.value ?? "",
+              })
             }
             renderIcon={ArrowRight}
           >
