@@ -81,7 +81,7 @@ export default function WorkflowRunFeature() {
         team={team.name}
         workflowRun={executionQuery.data}
         tasksData={[...tasksQuery.data.content, ...prefixTeamTask(teamTasksQuery.data.content, team)]}
-        workflowRef={params.workflow}
+        workflowRef={executionQuery.data.workflowName}
         executionViewRedirect={executionViewRedirect}
       />
     );
