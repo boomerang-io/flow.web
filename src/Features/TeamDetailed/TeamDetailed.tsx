@@ -9,9 +9,9 @@ import {
 import { useFeature } from "flagged";
 import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
-import { Switch, Route, useRouteMatch } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import { Box } from "reflexbox";
-import { useAppContext } from "Hooks";
+import { useAppContext, useTeamContext } from "Hooks";
 import { AppPath, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
 import ApproverGroups from "./ApproverGroups";
@@ -45,11 +45,10 @@ const FeatureLayout: React.FC = ({ children }) => {
 
 function TeamDetailedContainer() {
   const teamManagementEnabled = useFeature(FeatureFlag.TeamManagementEnabled);
-  const match: { params: { team: string } } = useRouteMatch();
-  const team = match?.params?.team;
+  const { team } = useTeamContext();
   const { user } = useAppContext();
 
-  const teamDetailsUrl = serviceUrl.resourceTeam({ team: team });
+  const teamDetailsUrl = serviceUrl.resourceTeam({ team: team.name });
 
   const teamDetailsQuery = useQuery({
     queryKey: teamDetailsUrl,

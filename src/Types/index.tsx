@@ -112,6 +112,7 @@ export interface ApproverGroup {
 export interface DataDrivenInput {
   id: string;
   default: string | Array<string> | Array<{ key: string; value: string }> | Object;
+  defaultValue: string | Array<string> | Array<{ key: string; value: string }> | Object;
   description?: string;
   helperText?: string;
   language?: string;
@@ -147,6 +148,7 @@ export interface FormikSetFieldValue {
 
 export interface CreateWorkflowSummary {
   name: string;
+  displayName: string;
   description: string;
   icon: string;
 }
@@ -166,6 +168,7 @@ export interface WorkflowWorkspace {
 export interface Workflow {
   id: string;
   name: string;
+  displayName: string;
   creationDate: string;
   status: WorkflowStatus;
   timeout: number;
@@ -670,6 +673,7 @@ export interface ConfigureWorkflowFormValues {
   icon: string;
   labels: Array<{ key: string; value: string }>;
   name: string;
+  displayName: string;
   storage: {
     workflowrun: {
       enabled: boolean;

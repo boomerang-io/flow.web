@@ -24,11 +24,10 @@ interface DesignerContainerProps {
 function DesignerContainer(props: DesignerContainerProps) {
   const { notes, reactFlowInstance, setReactFlowInstance, tasks, updateNotes, workflow } = props;
 
-  const params = useParams<{ team: string; workflowId: string }>();
+  const params = useParams<{ team: string; workflow: string }>();
 
   const location = useLocation();
-  const isOnDesignerPath =
-    appLink.editorCanvas({ team: params.team, workflowId: params.workflowId }) === location.pathname;
+  const isOnDesignerPath = appLink.editorCanvas({ team: params.team, workflow: params.workflow }) === location.pathname;
 
   return (
     <div className={cx(styles.container, { [styles.hidden]: !isOnDesignerPath })}>

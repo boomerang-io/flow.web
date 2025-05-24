@@ -31,8 +31,8 @@ type NameArg = {
   name: string;
 };
 
-type WorkflowIdArg = {
-  workflowId: string;
+type WorkflowArg = {
+  workflow: string;
 };
 
 type TeamArg = {
@@ -131,26 +131,29 @@ export const serviceUrl = {
       postValidateYaml: () => `${BASE_URL}/team/${team}/task/validate`,
     },
     workflow: {
-      getWorkflow: ({ team, id, version }: TeamArg & IdArg & Partial<VersionArg>) =>
-        `${BASE_URL}/team/${team}/workflow/${id}${version ? `?version=${version}` : ""}`,
+      getWorkflow: ({ team, workflow, version }: TeamArg & WorkflowArg & Partial<VersionArg>) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}${version ? `?version=${version}` : ""}`,
       getWorkflows: ({ team, query }: TeamArg & Partial<QueryArg>) =>
         `${BASE_URL}/team/${team}/workflow/query${query ? "?" + query : ""}`,
-      getWorkflowCompose: ({ team, id, version }: TeamArg & IdArg & Partial<VersionArg>) =>
-        `${BASE_URL}/team/${team}/workflow/${id}/compose${version ? `?version=${version}` : ""}`,
-      getWorkflowComposeRun: ({ team, id, version }: TeamArg & IdArg & Partial<VersionArg>) =>
-        `${BASE_URL}/team/${team}/workflow/${id}/compose${version ? `?version=${version}&kind=workflowRun` : ""}`,
-      getWorkflowChangelog: ({ team, id }: TeamArg & IdArg) => `${BASE_URL}/team/${team}/workflow/${id}/changelog`,
+      getWorkflowCompose: ({ team, workflow, version }: TeamArg & WorkflowArg & Partial<VersionArg>) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/compose${version ? `?version=${version}` : ""}`,
+      getWorkflowComposeRun: ({ team, workflow, version }: TeamArg & WorkflowArg & Partial<VersionArg>) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/compose${version ? `?version=${version}&kind=workflowRun` : ""}`,
+      getWorkflowChangelog: ({ team, workflow }: TeamArg & WorkflowArg) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/changelog`,
       postCreateWorkflow: ({ team }: TeamArg) => `${BASE_URL}/team/${team}/workflow`,
-      postDuplicateWorkflow: ({ team, workflowId }: TeamArg & WorkflowIdArg) =>
-        `${BASE_URL}/team/${team}/workflow/${workflowId}/duplicate`,
-      postSubmitWorkflow: ({ team, workflowId }: TeamArg & WorkflowIdArg) =>
-        `${BASE_URL}/team/${team}/workflow/${workflowId}/submit`,
-      getAvailableParameters: ({ team, workflowId }: TeamArg & WorkflowIdArg) =>
-        `${BASE_URL}/team/${team}/workflow/${workflowId}/available-parameters`,
-      putApplyWorkflow: ({ team, workflowId }: TeamArg & WorkflowIdArg) =>
-        `${BASE_URL}/team/${team}/workflow/${workflowId}/compose`,
-      getExportWorkflow: ({ team, workflowId }: TeamArg & WorkflowIdArg) =>
-        `${BASE_URL}/team/${team}/workflow/${workflowId}/export`,
+      postDuplicateWorkflow: ({ team, workflow }: TeamArg & WorkflowArg) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/duplicate`,
+      postSubmitWorkflow: ({ team, workflow }: TeamArg & WorkflowArg) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/submit`,
+      getAvailableParameters: ({ team, workflow }: TeamArg & WorkflowArg) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/available-parameters`,
+      putApplyWorkflowCompose: ({ team, workflow }: TeamArg & WorkflowArg) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/compose`,
+      putApplyWorkflow: ({ team }: TeamArg) => `${BASE_URL}/team/${team}/workflow`,
+      getExportWorkflow: ({ team, workflow }: TeamArg & WorkflowArg) =>
+        `${BASE_URL}/team/${team}/workflow/${workflow}/export`,
+      postValidateName: ({ team }: TeamArg) => `${BASE_URL}/team/${team}/workflow/validate-name`,
     },
     workflowrun: {
       deleteCancelWorkflow: ({ team, id }: TeamArg & IdArg) => `${BASE_URL}/team/${team}/workflowrun/${id}/cancel`,
@@ -198,7 +201,8 @@ export const resolver = {
   deleteTeamMembers: ({ team, body }) =>
     axios({ url: serviceUrl.team.deleteTeamMembers({ team }), data: body, method: HttpMethod.Delete }),
   deleteTeamParameter: ({ team, name }) => axios.delete(serviceUrl.team.deleteTeamParameter({ team, name })),
-  deleteWorkflow: ({ team, id }) => axios.delete(serviceUrl.team.workflow.getWorkflow({ team, id })),
+  deleteWorkflow: ({ team, workflow }: TeamArg & WorkflowArg) =>
+    axios.delete(serviceUrl.team.workflow.getWorkflow({ team, workflow })),
   deleteWorkflowTemplate: ({ id }) => axios.delete(serviceUrl.template.getWorkflowTemplate({ id })),
   leaveTeam: ({ team }) => axios.delete(serviceUrl.team.leaveTeam({ team })),
   deleteSchedule: ({ team, id }) => axios.delete(serviceUrl.team.schedule.deleteSchedule({ team, id })),
@@ -215,6 +219,7 @@ export const resolver = {
   putSchedule: ({ team, body }) => axios.put(serviceUrl.team.schedule.putSchedule({ team }), body),
   postTeam: ({ body }) => axios.post(serviceUrl.postTeam(), body),
   postTeamValidateName: ({ body }) => axios.post(serviceUrl.postTeamValidateName(), body),
+  postWorkflowValidateName: ({ team, body }) => axios.post(serviceUrl.team.workflow.postValidateName({ team }), body),
   postValidateYaml: ({ body }) =>
     axios({
       method: HttpMethod.Post,
@@ -240,8 +245,8 @@ export const resolver = {
     axios({ url: serviceUrl.template.postWorkflowTemplate(), data: body, method: HttpMethod.Post }),
   postCreateWorkflow: ({ team, body }) =>
     axios({ url: serviceUrl.team.workflow.postCreateWorkflow({ team }), data: body, method: HttpMethod.Post }),
-  postDuplicateWorkflow: ({ team, workflowId }) =>
-    axios.post(serviceUrl.team.workflow.postDuplicateWorkflow({ team, workflowId })),
+  postDuplicateWorkflow: ({ team, workflow }: TeamArg & WorkflowArg) =>
+    axios.post(serviceUrl.team.workflow.postDuplicateWorkflow({ team, workflow })),
   postTemplateWorkflow: ({ workflowId, body }) => axios.post(serviceUrl.postDuplicateWorkflow({ workflowId }), body),
   postToken: ({ body }) => axios({ url: serviceUrl.postToken(), data: body, method: HttpMethod.Post }),
   putApplyTaskTemplate: ({ name, replace, body }) =>
@@ -263,10 +268,12 @@ export const resolver = {
       headers: { "content-type": "application/x-yaml" },
     }),
   postCreateTeam: ({ body }) => axios({ url: serviceUrl.getManageTeamsCreate(), body, method: HttpMethod.Post }),
-  putApplyWorkflow: ({ team, workflowId, body }) =>
-    axios.put<Workflow, Workflow>(serviceUrl.team.workflow.putApplyWorkflow({ team, workflowId }), body),
-  postSubmitWorkflow: ({ team, workflowId, body }) =>
-    axios.post(serviceUrl.team.workflow.postSubmitWorkflow({ team, workflowId }), body),
+  putApplyWorkflow: ({ team, body }) =>
+    axios.put<Workflow, Workflow>(serviceUrl.team.workflow.putApplyWorkflow({ team }), body),
+  putApplyWorkflowCompose: ({ team, workflow, body }) =>
+    axios.put<Workflow, Workflow>(serviceUrl.team.workflow.putApplyWorkflowCompose({ team, workflow }), body),
+  postSubmitWorkflow: ({ team, workflow, body }) =>
+    axios.post(serviceUrl.team.workflow.postSubmitWorkflow({ team, workflow }), body),
   postGlobalParameter: ({ body }) =>
     axios({ url: serviceUrl.getGlobalParameters(), data: body, method: HttpMethod.Post }),
   postSchedule: ({ team, body }) => axios.post(serviceUrl.team.schedule.postSchedule({ team }), body),

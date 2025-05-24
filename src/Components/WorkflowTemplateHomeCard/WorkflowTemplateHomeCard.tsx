@@ -36,7 +36,7 @@ const WorkflowTemplateCard: React.FC<WorkflowTemplateCardProps> = ({ template, t
         team: team,
         body: data,
       });
-      history.push(appLink.editorCanvas({ team: team, workflowId: workflow.id }));
+      history.push(appLink.editorCanvas({ team: team, workflow: workflow.name }));
       notify(
         <ToastNotification
           kind="success"

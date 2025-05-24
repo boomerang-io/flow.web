@@ -1,8 +1,4 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
-import queryString from "query-string";
-import { useQuery } from "react-query";
 import {
   Search,
   StructuredListWrapper,
@@ -11,10 +7,14 @@ import {
   StructuredListRow,
   StructuredListCell,
 } from "@carbon/react";
-import EmptyState from "Components/EmptyState";
+import sortBy from "lodash/sortBy";
 import { matchSorter as ms } from "match-sorter";
 import moment from "moment";
-import sortBy from "lodash/sortBy";
+import queryString from "query-string";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+import { Link } from "react-router-dom";
+import EmptyState from "Components/EmptyState";
 import { appLink } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
 import { FlowTeam, PaginatedWorkflowResponse } from "Types";
@@ -56,7 +56,8 @@ function Workflows({ team }: { team: FlowTeam }) {
         <StructuredListWrapper>
           <StructuredListHead>
             <StructuredListRow head>
-              <StructuredListCell head>Name</StructuredListCell>
+              <StructuredListCell head>Display Name</StructuredListCell>
+              <StructuredListCell head>Unique Identifier Name</StructuredListCell>
               <StructuredListCell head>Date Created</StructuredListCell>
               <StructuredListCell head>Description</StructuredListCell>
               <StructuredListCell head>Version</StructuredListCell>
@@ -67,7 +68,12 @@ function Workflows({ team }: { team: FlowTeam }) {
           <StructuredListBody>
             {sortBy(filteredWorkflowsList, "name").map((workflow) => {
               return (
-                <StructuredListRow key={workflow.id}>
+                <StructuredListRow key={workflow.name}>
+                  <StructuredListCell>
+                    <div className={styles.workflowNameContainer}>
+                      <p>{workflow.displayName}</p>
+                    </div>
+                  </StructuredListCell>
                   <StructuredListCell>
                     <div className={styles.workflowNameContainer}>
                       <p>{workflow.name}</p>
@@ -82,7 +88,7 @@ function Workflows({ team }: { team: FlowTeam }) {
                     <Link
                       className={styles.viewWorkflowLink}
                       to={{
-                        pathname: appLink.editorCanvas({ workflowId: workflow.id }),
+                        pathname: appLink.editorCanvas({ team: team.name, workflow: workflow.name }),
                         state: { fromTeam: team.name },
                       }}
                     >
@@ -94,7 +100,7 @@ function Workflows({ team }: { team: FlowTeam }) {
                       className={styles.viewWorkflowLink}
                       to={{
                         pathname: appLink.activity({ team: team.name }),
-                        search: queryString.stringify({ page: 0, size: 10, workflowIds: workflow.id }),
+                        search: queryString.stringify({ page: 0, size: 10, workflows: workflow.name }),
                         state: { fromTeam: team.name },
                       }}
                     >

@@ -49,13 +49,13 @@ export default function EditorContainer() {
   // Init revision number state is held here so we can easily refect the data on change via react-query
 
   const [revisionNumber, setRevisionNumber] = useState<string | number>("");
-  const { workflowId }: { workflowId: string } = useParams();
+  const params = useParams<{ workflow: string }>();
 
   const getWorkflowsUrl = serviceUrl.team.workflow.getWorkflows({ team: team.name });
-  const getChangelogUrl = serviceUrl.team.workflow.getWorkflowChangelog({ team: team.name, id: workflowId });
+  const getChangelogUrl = serviceUrl.team.workflow.getWorkflowChangelog({ team: team.name, workflow: params.workflow });
   const getWorkflowUrl = serviceUrl.team.workflow.getWorkflowCompose({
     team: team.name,
-    id: workflowId,
+    workflow: params.workflow,
     version: revisionNumber,
   });
 
@@ -67,7 +67,10 @@ export default function EditorContainer() {
     team: team.name,
   });
 
-  const getAvailableParametersUrl = serviceUrl.team.workflow.getAvailableParameters({ team: team.name, workflowId });
+  const getAvailableParametersUrl = serviceUrl.team.workflow.getAvailableParameters({
+    team: team.name,
+    workflow: params.workflow,
+  });
 
   /**
    * Queries
@@ -87,7 +90,7 @@ export default function EditorContainer() {
   /**
    * Mutations
    */
-  const revisionMutator = useMutation(resolver.putApplyWorkflow);
+  const revisionMutator = useMutation(resolver.putApplyWorkflowCompose);
 
   if (
     workflowQuery.isLoading ||
@@ -132,7 +135,7 @@ export default function EditorContainer() {
         workflowsQueryData={workflowsQuery.data}
         setRevisionNumber={setRevisionNumber}
         taskList={taskList}
-        workflowId={workflowId}
+        workflowRef={params.workflow}
         key={revisionNumber}
         team={team}
       />
@@ -149,7 +152,7 @@ interface EditorStateContainerProps {
   revisionMutator: UseMutationResult<
     AxiosResponse<Workflow, any>,
     unknown,
-    { team: any; workflowId: any; body: any },
+    { team: any; workflow: any; body: any },
     unknown
   >;
   revisionNumber: string | number;
@@ -158,7 +161,7 @@ interface EditorStateContainerProps {
   workflowQueryUrl: string;
   workflowQueryData: WorkflowCanvas;
   workflowsQueryData: PaginatedWorkflowResponse;
-  workflowId: string;
+  workflowRef: string;
   team: FlowTeam;
 }
 
@@ -176,13 +179,11 @@ const EditorStateContainer: React.FC<EditorStateContainerProps> = ({
   workflowQueryUrl,
   workflowQueryData,
   workflowsQueryData,
-  workflowId,
+  workflowRef,
   team,
 }) => {
   const location = useLocation();
-  //const match: { params: { workflowId: string } } = useRouteMatch();
   const { quotas } = useAppContext();
-  //const isModalOpen = useIsModalOpen();
   const queryClient = useQueryClient();
 
   const [revisionState, revisionDispatch] = useImmerReducer(
@@ -208,7 +209,7 @@ const EditorStateContainer: React.FC<EditorStateContainerProps> = ({
       };
 
       try {
-        const { data } = await revisionMutator.mutateAsync({ team: team.name, workflowId, body: revision });
+        const { data } = await revisionMutator.mutateAsync({ team: team.name, workflow: workflowRef, body: revision });
         notify(
           <ToastNotification kind="success" title="Create Version" subtitle="Successfully created workflow version" />,
         );
@@ -327,7 +328,7 @@ const EditorStateContainer: React.FC<EditorStateContainerProps> = ({
           when={Boolean(revisionState.hasUnsavedUpdates)}
           message={(location) =>
             //Return true to navigate if going to the same route we are currently on
-            location.pathname.includes(workflowId)
+            location.pathname.includes(workflowRef)
               ? true
               : "Are you sure? You have unsaved changes to your workflow that will be lost."
           }

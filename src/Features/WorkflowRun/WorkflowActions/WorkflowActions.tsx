@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "@carbon/react";
+import { Edit } from "@carbon/react/icons";
 import { useHistory, useParams } from "react-router-dom";
 import { appLink } from "Config/appConfig";
-import { Edit } from "@carbon/react/icons";
 import type { Workflow } from "Types";
 import styles from "./WorkflowActions.module.scss";
 
@@ -12,7 +12,6 @@ type Props = {
 
 function WorkflowActions({ workflow }: Props) {
   const { team } = useParams<{ team: string }>();
-  const { id } = workflow;
   const history = useHistory();
 
   return (
@@ -21,7 +20,7 @@ function WorkflowActions({ workflow }: Props) {
       <Button
         kind="ghost"
         size="md"
-        onClick={() => history.push(appLink.editorCanvas({ team, workflowId: id }))}
+        onClick={() => history.push(appLink.editorCanvas({ team, workflow: workflow.name }))}
         renderIcon={Edit}
       >
         Edit Workflow

@@ -150,7 +150,8 @@
   border: 0.1875rem solid var(--cds-ui-01) !important;
   opacity: 0.5;
 }
-
+.cancelled
+.timedout,
 .failed {
   border: 0.1875rem solid var(--flow-failure) !important;
 }

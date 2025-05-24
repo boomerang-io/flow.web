@@ -5,6 +5,7 @@ import type { FormikProps } from "formik";
 import * as Yup from "yup";
 import { useEditorContext } from "Hooks";
 import { timezoneOptions, defaultTimeZone, transformTimeZone } from "Utils/dateHelper";
+import { normaliseInputs } from "Utils/paramsHelper";
 import { DataDrivenInput, Task, WorkflowNodeData } from "Types";
 import {
   AutoSuggestInput,
@@ -91,12 +92,12 @@ const TimeZoneInput = ({
 function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
   const { workflowsQueryData } = useEditorContext();
   const { availableParameters, node, task, otherTaskNames } = props;
-  const paramWorkflowId = node?.params.find((param) => param.name === "workflowId")?.value;
-  const [selectedWorkflowId, setSelectedWorkflowId] = useState(paramWorkflowId ?? "");
+  const paramWorkflowRef = node?.params.find((param) => param.name === "workflowRef")?.value;
+  const [selectedWorkflowRef, setSelectedWorkflowRef] = useState(paramWorkflowRef ?? "");
 
   const workflows = workflowsQueryData.content;
-  const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.name, value: workflow.id })) ?? [];
-  const selectedWorkflowConfg = workflows.find((workflow) => workflow.id === selectedWorkflowId)?.params ?? [];
+  const workflowsMapped = workflows?.map((workflow) => ({ label: workflow.displayName, value: workflow.name })) ?? [];
+  const selectedWorkflowParams = workflows.find((workflow) => workflow.name === selectedWorkflowRef)?.params ?? [];
 
   const handleOnSave = (values: { taskName: string; timezone: { value: string } }) => {
     props.node.name = values.taskName;
@@ -105,12 +106,12 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
     props.closeModal();
   };
   const activeInputs: Record<string, string> = {};
-  if (selectedWorkflowConfg) {
-    selectedWorkflowConfg.forEach((item) => {
+  if (selectedWorkflowParams) {
+    selectedWorkflowParams.forEach((item) => {
       const key = item.name;
       if (key) {
         //@ts-ignore
-        activeInputs[key] = item.defaultValue;
+        activeInputs[key] = item.default;
       }
     });
   }
@@ -124,8 +125,8 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
     const { errors, touched, setFieldValue, values } = formikProps;
     const error = errors[input.id];
     const touch = touched[input.id];
-    const initialSelectedItem = values.workflowId
-      ? workflowsMapped.find((workflow) => workflow.value === values.workflowId)
+    const initialSelectedItem = values.workflowRef
+      ? workflowsMapped.find((workflow) => workflow.value === values.workflowRef)
       : "";
 
     return (
@@ -134,8 +135,8 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
         id="workflow-select"
         onChange={({ selectedItem }) => {
           const value = selectedItem?.value ?? "";
-          setFieldValue("workflowId", value);
-          setSelectedWorkflowId(value);
+          setFieldValue("workflowRef", value);
+          setSelectedWorkflowRef(value);
         }}
         items={workflowsMapped}
         initialSelectedItem={initialSelectedItem}
@@ -148,7 +149,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
   };
 
   // Add the name and future inputs
-  const inputs: Array<any> = [
+  let inputs: Array<any> = [
     {
       name: "taskName",
       id: "taskName",
@@ -201,15 +202,18 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
       customComponent: TimeZoneInput,
     },
     {
-      name: "workflowId",
-      id: "workflowId",
+      name: "workflowRef",
+      id: "workflowRef",
       type: "custom",
       required: true,
       helperText: "When in the future you want the Workflow to execute",
       customComponent: WorkflowSelectionInput,
     },
-    ...selectedWorkflowConfg,
+    ...selectedWorkflowParams,
   ];
+
+  // Normalise inputs to match Carbon's requirements
+  inputs = normaliseInputs(inputs);
 
   const initTime = node?.params.find((param) => param.name === "time")?.value ?? "";
   const initTimeZone = transformTimeZone(
@@ -218,7 +222,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
 
   const initialValues: Record<string, any> = {
     taskName: node.name,
-    workflowId: selectedWorkflowId,
+    workflowRef: selectedWorkflowRef,
     time: initTime,
     timezone: initTimeZone,
     ...activeInputs,
@@ -254,7 +258,7 @@ function RunScheduledWorkflowForm(props: RunScheduledWorkflowFormProps) {
           }
           return true;
         }),
-        workflowId: Yup.string().required("Select a workflow"),
+        workflowRef: Yup.string().required("Select a workflow"),
       })}
       initialValues={initialValues}
       inputs={inputs}

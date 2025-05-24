@@ -1,8 +1,8 @@
 //@ts-nocheck
 import React, { Component } from "react";
-import { UseMutationResult } from "react-query";
 import { Button, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
 import { Loading, ModalForm, TextArea } from "@boomerang-io/carbon-addons-boomerang-react";
+import { UseMutationResult } from "react-query";
 import { QueryStatus } from "Constants";
 
 interface VersionCommentFormProps {

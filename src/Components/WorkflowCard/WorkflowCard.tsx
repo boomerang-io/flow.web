@@ -35,18 +35,10 @@ interface WorkflowCardProps {
   quotas: FlowTeamQuotas | null;
   workflow: Workflow;
   viewType: WorkflowViewType;
-  enableTemplate: boolean;
   getWorkflowsUrl: string;
 }
 
-const WorkflowCard: React.FC<WorkflowCardProps> = ({
-  teamName,
-  quotas,
-  workflow,
-  viewType,
-  getWorkflowsUrl,
-  enableTemplate,
-}) => {
+const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow, viewType, getWorkflowsUrl }) => {
   const queryClient = useQueryClient();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateWorkflowModalOpen, setIsUpdateWorkflowModalOpen] = useState(false);
@@ -68,8 +60,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
     resolver.postDuplicateWorkflow,
   );
 
-  const createTemplateMutator = useMutation(resolver.postCreateTemplate);
-
   const isDuplicating = duplicateWorkflowIsLoading;
 
   /**
@@ -84,9 +74,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   };
 
   const handleDeleteWorkflow = async () => {
-    const workflowId = workflow.id;
     try {
-      await deleteWorkflowMutator({ team: teamName, id: workflowId });
+      await deleteWorkflowMutator({ team: teamName, workflow: workflow.name });
       notify(
         <ToastNotification kind="success" title={`Delete ${viewType}`} subtitle={`${viewType} successfully deleted`} />,
       );
@@ -104,7 +93,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
   const handleDuplicateWorkflow = async (workflow: Workflow) => {
     try {
-      await duplicateWorkflowMutator({ team: teamName, workflowId: workflow.id });
+      await duplicateWorkflowMutator({ team: teamName, workflow: workflow.name });
       notify(
         <ToastNotification
           kind="success"
@@ -133,7 +122,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   const handleExportWorkflow = (workflow: Workflow) => {
     notify(<ToastNotification kind="info" title={`Export ${viewType}`} subtitle="Export starting soon" />);
     axios
-      .get(serviceUrl.team.workflow.getExportWorkflow({ team: teamName, workflowId: workflow.id }))
+      .get(serviceUrl.team.workflow.getExportWorkflow({ team: teamName, workflow: workflow.name }))
       .then(({ data }) => {
         fileDownload(JSON.stringify(data, null, 4), `${workflow.name}.json`);
       })
@@ -152,7 +141,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
    * This function is used to handle the execution of a workflow. It only needs to work for WorkflowView.Workflow as Templates cant be executed
    */
   const handleExecuteWorkflow = async (closeModal: () => void, redirect: boolean = false, properties: {} = {}) => {
-    const { id: workflowId } = workflow;
     let newProperties = properties;
     if (Object.values(properties).includes("")) {
       newProperties = cloneDeep(properties);
@@ -164,7 +152,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       // @ts-ignore:next-line
       const { data: execution } = await executeWorkflowMutator({
         team: teamName,
-        workflowId: workflowId,
+        workflow: workflow.name,
         body: body,
       });
       notify(
@@ -176,7 +164,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       );
       if (redirect) {
         history.push({
-          pathname: appLink.execution({ team: teamName, runId: execution.id, workflowId }),
+          pathname: appLink.execution({ team: teamName, runId: execution.id }),
           state: { fromUrl: appLink.workflows({ team: teamName }), fromText: `${viewType}s` },
         });
       } else {
@@ -203,11 +191,11 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   let menuOptions = [
     {
       itemText: "Edit",
-      onClick: () => history.push(appLink.editorCanvas({ team: teamName, workflowId: workflow.id })),
+      onClick: () => history.push(appLink.editorCanvas({ team: teamName, workflow: workflow.name })),
     },
     {
       itemText: "View Activity",
-      onClick: () => history.push(appLink.workflowActivity({ team: teamName, workflowId: workflow.id })),
+      onClick: () => history.push(appLink.workflowActivity({ team: teamName, workflow: workflow.name })),
     },
     {
       itemText: "Update",
@@ -262,14 +250,14 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
   return (
     <div className={styles.container}>
-      <Link to={!isDeleting ? appLink.editorCanvas({ team: teamName, workflowId: workflow.id }) : ""}>
+      <Link to={!isDeleting ? appLink.editorCanvas({ team: teamName, workflow: workflow.name }) : ""}>
         <section className={styles.details}>
           <div className={styles.iconContainer}>
-            <Icon className={styles.icon} alt={`${name}`} />
+            <Icon className={styles.icon} alt={`${workflow.icon}`} />
           </div>
           <div className={styles.descriptionContainer}>
             <h1 title={workflow.name} className={styles.name} data-testid="workflow-card-title">
-              {workflow.name}
+              {workflow.displayName}
             </h1>
             <p title={workflow.description} className={styles.description}>
               {workflow.description}
@@ -407,7 +395,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       {isUpdateWorkflowModalOpen && (
         <UpdateWorkflow
           onCloseModal={() => setIsUpdateWorkflowModalOpen(false)}
-          workflowId={workflow.id}
+          workflowRef={workflow.name}
+          getWorkflowsUrl={getWorkflowsUrl}
           teamName={teamName}
           type={viewType}
         />

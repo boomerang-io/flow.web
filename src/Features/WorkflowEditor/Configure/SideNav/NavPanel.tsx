@@ -9,52 +9,52 @@ import styles from "./navPanel.module.scss";
 
 interface NavPanelProps {
   team: string;
-  workflowId: string;
+  workflowRef: string;
 }
 
-const NavPanel: React.FC<NavPanelProps> = ({ team, workflowId }) => {
+const NavPanel: React.FC<NavPanelProps> = ({ team, workflowRef }) => {
   // List of Nav Items
   const navigationItems = [
     {
       name: "General",
       path: `${appLink.editorConfigureGeneral({
         team: team,
-        workflowId: workflowId,
+        workflow: workflowRef,
       })}`,
     },
     {
       name: "Triggers",
       path: `${appLink.editorConfigureTriggers({
         team: team,
-        workflowId: workflowId,
+        workflow: workflowRef,
       })}`,
     },
     // {
     //   name: "Parameters",
     //   path: `${appLink.editorConfigureParams({
     //     team: team,
-    //     workflowId: workflowId,
+    //     workflow: workflowRef,
     //   })}`,
     // },
     {
       name: "Run Options",
       path: `${appLink.editorConfigureRun({
         team: team,
-        workflowId: workflowId,
+        workflow: workflowRef,
       })}`,
     },
     {
       name: "Workspaces",
       path: `${appLink.editorConfigureWorkspaces({
         team: team,
-        workflowId: workflowId,
+        workflow: workflowRef,
       })}`,
     },
     {
       name: "Tokens",
       path: `${appLink.editorConfigureTokens({
         team: team,
-        workflowId: workflowId,
+        workflow: workflowRef,
       })}`,
     },
   ];

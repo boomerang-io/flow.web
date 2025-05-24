@@ -1,12 +1,10 @@
 import { Button, ModalBody } from "@carbon/react";
+import { ArrowRight } from "@carbon/react/icons";
 import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
-import { Link } from "react-router-dom";
-import { useTeamContext } from "Hooks";
 import dateHelper from "Utils/dateHelper";
 import { ExecutionStatusCopy, NodeType, executionStatusIcon } from "Constants";
-import { appLink } from "Config/appConfig";
 import { RunPhase, RunStatus, TaskRun, WorkflowRun } from "Types";
 import ManualTaskModal from "./ManualTaskModal";
 import PropertiesTable from "./PropertiesTable";
@@ -21,10 +19,10 @@ const logStatusTypes = [RunStatus.Succeeded, RunStatus.Failed, RunStatus.Running
 type Props = {
   taskRun: TaskRun;
   workflowRun: WorkflowRun;
+  executionViewRedirect: ({ workflowRunRef }: { workflowRunRef: string }) => void;
 };
 
-function RunTaskItem({ taskRun, workflowRun }: Props) {
-  const { team } = useTeamContext();
+function RunTaskItem({ taskRun, workflowRun, executionViewRedirect }: Props) {
   const Icon = executionStatusIcon[taskRun.status];
   const statusClassName = styles[taskRun.status];
 
@@ -127,12 +125,19 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
           </ComposedModal>
         )}
         {taskRun.type === NodeType.RunWorkflow && taskRun.id && taskRun.workflowRef && (
-          <Link
-            to={appLink.execution({ team: team.name, runId: taskRun.id, workflowId: workflowRun.workflowRef })}
-            className={styles.viewActivityLink}
+          <Button
+            kind="ghost"
+            size="sm"
+            onClick={() =>
+              executionViewRedirect({
+                workflowRef: taskRun.params.find((param) => param.name === "workflowRef")?.value ?? "",
+                workflowRunRef: taskRun.results.find((result) => result.name === "workflowRunRef")?.value ?? "",
+              })
+            }
+            renderIcon={ArrowRight}
           >
             View Activity
-          </Link>
+          </Button>
         )}
         {taskRun.type === NodeType.Approval && taskRun.phase === RunPhase.Completed && (
           <ComposedModal

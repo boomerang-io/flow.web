@@ -192,7 +192,7 @@ function Selects(props: SelectsProps) {
   const location = useLocation();
 
   const { statuses, workflows, fromDate, toDate } = queryString.parse(location.search, queryStringOptions);
-  const selectedWorkflowIds = typeof workflows === "string" ? [workflows] : workflows;
+  const selectedWorkflowRefs = typeof workflows === "string" ? [workflows] : workflows;
   const selectedStatuses = typeof statuses === "string" ? [statuses] : statuses;
   const selectedFromDate = Array.isArray(fromDate)
     ? Number.parseInt(fromDate[0])
@@ -206,10 +206,10 @@ function Selects(props: SelectsProps) {
     : defaultToDate;
 
   function handleSelectWorkflows({ selectedItems }: MultiSelectItems<Workflow>) {
-    const workflowIds = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.id) : undefined;
+    const workflowRefs = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.name) : undefined;
     props.updateHistorySearch({
       ...queryString.parse(location.search, queryStringOptions),
-      workflows: workflowIds,
+      workflows: workflowRefs,
       page: 0,
     });
     return;
@@ -251,10 +251,10 @@ function Selects(props: SelectsProps) {
         onChange={handleSelectWorkflows}
         items={getWorkflowOptions()}
         itemToString={(workflow: Workflow) => {
-          return workflow.name;
+          return workflow.displayName;
         }}
         initialSelectedItems={getWorkflowOptions().filter((workflow: Workflow) =>
-          Boolean(selectedWorkflowIds ? selectedWorkflowIds.find((id) => id === workflow.id) : false),
+          Boolean(selectedWorkflowRefs ? selectedWorkflowRefs.find((ref) => ref === workflow.name) : false),
         )}
         titleText="Filter by Workflow"
       />

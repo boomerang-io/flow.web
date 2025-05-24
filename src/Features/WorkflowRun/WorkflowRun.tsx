@@ -2,7 +2,8 @@ import React from "react";
 import { ErrorMessage, Loading } from "@boomerang-io/carbon-addons-boomerang-react";
 import queryString from "query-string";
 import { Helmet } from "react-helmet";
-import { useParams } from "react-router-dom";
+import { useQueryClient } from "react-query";
+import { useHistory, useParams } from "react-router-dom";
 import type { ReactFlowInstance } from "reactflow";
 import { Box } from "reflexbox";
 import ReactFlow from "Features/Reactflow";
@@ -10,6 +11,7 @@ import { useQuery } from "Hooks";
 import { useTeamContext, RunContextProvider } from "State/context";
 import { groupTasksByName } from "Utils";
 import { WorkflowEngineMode } from "Constants";
+import { appLink } from "Config/appConfig";
 import { serviceUrl } from "Config/servicesConfig";
 import { FlowTeam, PaginatedTaskResponse, RunStatus, Task, WorkflowCanvas, WorkflowRun } from "Types";
 import RunHeader from "./RunHeader";
@@ -19,7 +21,9 @@ import styles from "./WorkflowRun.module.scss";
 
 export default function WorkflowRunFeature() {
   const { team } = useTeamContext();
-  const { workflowId, runId }: { team: string; workflowId: string; runId: string } = useParams();
+  const queryClient = useQueryClient();
+  const history = useHistory();
+  const params = useParams<{ team: string; workflow: string; runId: string }>();
   const getTasksUrl = serviceUrl.task.queryTasks({
     query: queryString.stringify({ statuses: "active" }),
   });
@@ -27,7 +31,17 @@ export default function WorkflowRunFeature() {
     query: queryString.stringify({ statuses: "active" }),
     team: team.name,
   });
-  const getExecutionUrl = serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id: runId });
+  const getExecutionUrl = serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id: params.runId });
+
+  function executionViewRedirect({ workflowRunRef }: { workflowRunRef: string }) {
+    queryClient.invalidateQueries(getExecutionUrl);
+    history.push(
+      appLink.execution({
+        team: team.name,
+        runId: workflowRunRef,
+      }),
+    );
+  }
 
   /**
    * Queries
@@ -67,7 +81,8 @@ export default function WorkflowRunFeature() {
         team={team.name}
         workflowRun={executionQuery.data}
         tasksData={[...tasksQuery.data.content, ...prefixTeamTask(teamTasksQuery.data.content, team)]}
-        workflowId={workflowId}
+        workflowRef={executionQuery.data.workflowName}
+        executionViewRedirect={executionViewRedirect}
       />
     );
   }
@@ -78,15 +93,16 @@ export default function WorkflowRunFeature() {
 type RevisionProps = {
   team: string;
   tasksData: Task[];
-  workflowId: string;
+  workflowRef: string;
   workflowRun: WorkflowRun;
+  executionViewRedirect: ({ workflowRunRef }: { workflowRunRef: string }) => void;
 };
 
-function RevisionContainer({ team, workflowRun, tasksData, workflowId }: RevisionProps) {
+function RevisionContainer({ team, workflowRun, tasksData, workflowRef, executionViewRedirect }: RevisionProps) {
   const version = workflowRun.workflowVersion;
   const getWorkflowUrl = serviceUrl.team.workflow.getWorkflowComposeRun({
     team: team,
-    id: workflowId,
+    workflow: workflowRef,
     version,
   });
 
@@ -123,7 +139,13 @@ function RevisionContainer({ team, workflowRun, tasksData, workflowId }: Revisio
           workflowRun: workflowRun,
         }}
       >
-        <Main tasks={groupedTasks} workflow={workflowQuery.data} workflowRun={workflowRun} version={version} />
+        <Main
+          tasks={groupedTasks}
+          workflow={workflowQuery.data}
+          workflowRun={workflowRun}
+          version={version}
+          executionViewRedirect={executionViewRedirect}
+        />
       </RunContextProvider>
     );
   }
@@ -136,10 +158,11 @@ type MainProps = {
   workflow: WorkflowCanvas;
   workflowRun: WorkflowRun;
   version: number;
+  executionViewRedirect: ({ workflowRunRef }: { workflowRunRef: string }) => void;
 };
 
 function Main(props: MainProps) {
-  const { workflow, workflowRun, version } = props;
+  const { workflow, workflowRun, version, executionViewRedirect } = props;
   const [reactFlowInstance, setReactFlowInstance] = React.useState<ReactFlowInstance | null>(null);
   let hasFinished = false;
   let hasStarted = false;
@@ -161,9 +184,14 @@ function Main(props: MainProps) {
       <Helmet>
         <title>{workflow ? `${workflow.name} - Activity` : `Activity`}</title>
       </Helmet>
-      <RunHeader workflow={workflow} workflowRun={workflowRun} version={version} />
+      <RunHeader
+        workflow={workflow}
+        workflowRun={workflowRun}
+        version={version}
+        executionViewRedirect={executionViewRedirect}
+      />
       <section aria-label="Executions" className={styles.executionResultContainer}>
-        <RunTaskLog workflowRun={workflowRun} />
+        <RunTaskLog workflowRun={workflowRun} executionViewRedirect={executionViewRedirect} />
         <div className={styles.executionDesignerContainer}>
           <div className={styles.executionWorkflowActions}>
             <WorkflowActions workflow={workflow} />

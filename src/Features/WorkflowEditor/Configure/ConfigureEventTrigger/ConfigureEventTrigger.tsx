@@ -23,12 +23,12 @@ const EXAMPLE_CLOUD_EVENT = `{
 
 type Props = {
   closeModal: (...args: any) => void;
-  workflowId: string;
+  workflowRef: string;
 };
 
-export default function ConfigureStorage({ closeModal, workflowId }: Props) {
+export default function ConfigureStorage({ closeModal, workflowRef }: Props) {
   const resourceUrl = serviceUrl.resourceTrigger();
-  const webhookURL = `${resourceUrl}/event?workflow=${workflowId}`;
+  const webhookURL = `${resourceUrl}/event?workflow=${workflowRef}`;
 
   return (
     <ModalForm>
@@ -49,7 +49,7 @@ export default function ConfigureStorage({ closeModal, workflowId }: Props) {
           className={styles.codeSnippet}
         >
           POST{"  "}
-          {`${resourceUrl}/event?workflow=${workflowId}&access_token=TOKEN`}
+          {`${resourceUrl}/event?workflow=${workflowRef}&access_token=TOKEN`}
         </CodeSnippet>
         <h2 className={styles.sectionHeader}>Example Payload</h2>
         <p>

@@ -80,13 +80,13 @@ export default function Schedules() {
 
   const { fromDate = defaultFromDate, toDate = defaultToDate } = queryString.parse(location.search, queryStringOptions);
 
-  const hasScheduleData = Boolean(schedulesQuery.data?.content);
   let userScheduleIds = [];
   if (schedulesQuery.data?.content) {
     for (const schedule of schedulesQuery.data?.content) {
       userScheduleIds.push(schedule.id);
     }
   }
+  const hasScheduleData = Boolean(userScheduleIds.length > 0);
 
   const calendarUrlQuery = queryString.stringify(
     {
@@ -116,10 +116,10 @@ export default function Schedules() {
   }
 
   function handleSelectWorkflows({ selectedItems }: MultiSelectItems<Workflow>) {
-    const workflowIds = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.id) : undefined;
+    const workflowRefs = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.name) : undefined;
     updateHistorySearch({
       ...queryString.parse(location.search, queryStringOptions),
-      workflows: workflowIds,
+      workflows: workflowRefs,
     });
     return;
   }
@@ -133,7 +133,7 @@ export default function Schedules() {
 
   function handleSetActiveSchedule(schedule: ScheduleUnion) {
     const workflowFindPredicate = (workflow: Workflow) => {
-      return workflow.id === schedule.workflowRef;
+      return workflow.name === schedule.workflowRef;
     };
     let workflow: Workflow | undefined;
     if (workflowsQuery.data && !workflow) {
@@ -156,7 +156,7 @@ export default function Schedules() {
 
   if (team && workflowsQuery.data) {
     const { workflows = "", statuses = "" } = queryString.parse(location.search, queryStringOptions);
-    const selectedWorkflowIds = typeof workflows === "string" ? [workflows] : workflows;
+    const selectedWorkflowRefs = typeof workflows === "string" ? [workflows] : workflows;
     const selectedStatuses = typeof statuses === "string" ? [statuses] : statuses;
     const NavigationComponent = () => {
       return (
@@ -195,10 +195,10 @@ export default function Schedules() {
                   onChange={handleSelectWorkflows}
                   items={getWorkflowFilter()}
                   itemToString={(workflow: Workflow) => {
-                    return workflow.name;
+                    return workflow.displayName;
                   }}
                   initialSelectedItems={getWorkflowFilter().filter((workflow: Workflow) =>
-                    Boolean(selectedWorkflowIds?.find((id) => id === workflow.id)),
+                    Boolean(selectedWorkflowRefs?.find((ref) => ref === workflow.name)),
                   )}
                   titleText="Filter by Workflow"
                 />

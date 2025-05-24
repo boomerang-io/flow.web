@@ -8,12 +8,12 @@ import styles from "./BuildWebhookModalContent.module.scss";
 
 interface BuildWebhookModalContentProps {
   closeModal: Function;
-  workflowId: string;
+  workflowRef: string;
 }
 
-const BuildWebhookModalContent: React.FC<BuildWebhookModalContentProps> = ({ workflowId, closeModal }) => {
+const BuildWebhookModalContent: React.FC<BuildWebhookModalContentProps> = ({ workflowRef, closeModal }) => {
   const resourceUrl = serviceUrl.resourceTrigger();
-  const webhookURL = `${resourceUrl}/webhook?workflow=${workflowId}`;
+  const webhookURL = `${resourceUrl}/webhook?workflow=${workflowRef}`;
 
   return (
     <ModalForm>
@@ -37,7 +37,7 @@ const BuildWebhookModalContent: React.FC<BuildWebhookModalContentProps> = ({ wor
               className={styles.codeSnippet}
             >
               POST{"  "}
-              {`${resourceUrl}/webhook?workflow=${workflowId}
+              {`${resourceUrl}/webhook?workflow=${workflowRef}
                 &access_token=`}
             </CodeSnippet>
           </>

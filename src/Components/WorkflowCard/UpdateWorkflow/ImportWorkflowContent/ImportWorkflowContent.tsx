@@ -1,17 +1,18 @@
 //@ts-nocheck
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { Formik } from "formik";
-import * as Yup from "yup";
 import { ModalBody, ModalFooter, Button, FileUploaderDropContainer, FileUploaderItem } from "@carbon/react";
-import { ModalFlowForm } from "@boomerang-io/carbon-addons-boomerang-react";
 import { CheckmarkFilled, ErrorFilled } from "@carbon/react/icons";
+import { ModalFlowForm } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Formik } from "formik";
+import PropTypes from "prop-types";
+import * as Yup from "yup";
 import { requiredWorkflowProps } from "./constants";
 import styles from "./importWorkflowContent.module.scss";
 
-function checkIsValidWorkflow(data, workflowId) {
+function checkIsValidWorkflow(data, workflowRef) {
   // Only check if the .json file contain the required key data
   // This validate can be improved
+  console.log("checkIsValidWorkflow", data);
   let isValid = true;
   requiredWorkflowProps.forEach((prop) => {
     if (!data.hasOwnProperty(prop)) {
@@ -19,11 +20,12 @@ function checkIsValidWorkflow(data, workflowId) {
     }
   });
 
-  if (data.id !== workflowId) {
+  console.log("checkIsValidWorkflowRef", data.name, workflowRef);
+  if (data.name !== workflowRef) {
     isValid = false;
   }
   //Validate if workflow has the latest structure for dag
-  if (!data.latestRevision?.dag?.tasks) {
+  if (!data.tasks) {
     isValid = false;
   }
   return isValid;
@@ -40,7 +42,7 @@ class ImportWorkflowContent extends Component {
     handleImportWorkflow: PropTypes.func,
     isLoading: PropTypes.bool,
     title: PropTypes.string.isRequired,
-    workflowId: PropTypes.string.isRequired,
+    workflowRef: PropTypes.string.isRequired,
     type: PropTypes.string,
   };
 
@@ -76,7 +78,7 @@ class ImportWorkflowContent extends Component {
   };
 
   render() {
-    const { title, confirmButtonText, workflowId, type } = this.props;
+    const { title, confirmButtonText, workflowRef, type } = this.props;
 
     return (
       <Formik
@@ -91,14 +93,14 @@ class ImportWorkflowContent extends Component {
               "fileSize",
               "File is larger than 1MiB",
               // If it's bigger than 1MiB will display the error (1048576 bytes = 1 mebibyte)
-              (file) => (file?.size ? file.size < 1048576 : true)
+              (file) => (file?.size ? file.size < 1048576 : true),
             )
             .test("validFile", "File is invalid", async (file) => {
               let isValid = true;
               if (file) {
                 try {
                   let contents = await this.readFile(file);
-                  isValid = checkIsValidWorkflow(contents, workflowId);
+                  isValid = checkIsValidWorkflow(contents, workflowRef);
                 } catch (e) {
                   console.error(e);
                   isValid = false;

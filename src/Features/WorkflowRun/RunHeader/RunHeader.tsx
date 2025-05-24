@@ -27,12 +27,13 @@ type Props = {
   workflow: WorkflowCanvas;
   workflowRun: WorkflowRun;
   version: number;
+  executionViewRedirect: (args: { workflowRunRef: string }) => void;
 };
 
 const cancelStatusTypes = [RunStatus.NotStarted, RunStatus.Waiting, RunStatus.Ready, RunStatus.Running];
 const retryStatusTypes = [RunStatus.Cancelled, RunStatus.Failed, RunStatus.TimedOut, RunStatus.Invalid];
 
-export default function RunHeader({ workflow, workflowRun, version }: Props) {
+export default function RunHeader({ workflow, workflowRun, version, executionViewRedirect }: Props) {
   const { team } = useTeamContext();
   const history = useHistory<{ fromUrl: string; fromText: string }>();
   const state = history.location.state;
@@ -54,6 +55,7 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
     try {
       await retryWorkflowRunMutation({ id, team: team.name });
       notify(<ToastNotification kind="success" title="Retry run" subtitle="Retry successful" />);
+      executionViewRedirect({ workflowRunRef: id });
     } catch {
       notify(<ToastNotification kind="error" title="Something's wrong" subtitle={`Failed to retry this run`} />);
     }
@@ -74,6 +76,9 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
       nav={
         <div className={styles.headerNav}>
           <Breadcrumb noTrailingSlash>
+            <BreadcrumbItem>
+              <Link to={appLink.home()}>Home</Link>
+            </BreadcrumbItem>
             <BreadcrumbItem>
               <Link to={state ? state.fromUrl : appLink.activity({ team: team.name })}>
                 {state ? capitalize(state.fromText) : "Activity"}
@@ -215,10 +220,10 @@ export default function RunHeader({ workflow, workflowRun, version }: Props) {
 }
 
 function WorkflowAdvancedDetail({ workflow }: { workflow: WorkflowCanvas }) {
-  const { workflowId, runId }: { workflowId: string; runId: string } = useParams();
+  const { team, workflow: workflowRef, runId } = useParams<{ team: string; workflow: string; runId: string }>();
   const [copyTokenText, setCopyTokenText] = React.useState("Copy");
 
-  const labelTexts = [`boomerang.io/workflow-id=${workflowId}`, `boomerang.io/workflow-activity-id=${runId}`];
+  const labelTexts = [`boomerang.io/workflow-ref=${workflowRef}`, `boomerang.io/workflowrun-ref=${runId}`];
 
   if (Array.isArray(workflow.labels) && workflow.labels.length > 0) {
     workflow.labels.forEach((label) => {

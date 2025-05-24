@@ -1,11 +1,11 @@
 //@ts-nocheck
 import React from "react";
 import { DataTableSkeleton, DataTable, Pagination } from "@carbon/react";
-import { useParams } from "react-router-dom";
+import { getHumanizedDuration, isAccessibleKeyboardEvent } from "@boomerang-io/utils";
 import cx from "classnames";
 import moment from "moment";
 import queryString from "query-string";
-import { getHumanizedDuration, isAccessibleKeyboardEvent } from "@boomerang-io/utils";
+import { useParams } from "react-router-dom";
 import EmptyState from "Components/EmptyState";
 import { ExecutionStatusCopy, executionStatusIcon } from "Constants";
 import { appLink } from "Config/appConfig";
@@ -30,7 +30,8 @@ interface ActivityTableProps {
 const PAGE_SIZES = [10, 20, 25, 50, 100];
 
 const HeadersKey = {
-  Workflow: "workflowName",
+  WorkflowName: "workflowName",
+  WorkflowDisplayName: "workflowDisplayName",
   Trigger: "trigger",
   InitiatedBy: "initiatedByUserName",
   CreationDate: "creationDate",
@@ -40,8 +41,13 @@ const HeadersKey = {
 
 const headers = [
   {
-    header: "Workflow",
-    key: HeadersKey.Workflow,
+    header: "Workflow Diplay Name",
+    key: HeadersKey.WorkflowDisplayName,
+    sortable: true,
+  },
+  {
+    header: "Workflow Unique Name",
+    key: HeadersKey.WorkflowName,
     sortable: true,
   },
   {
@@ -89,7 +95,7 @@ function ActivityTable(props: ActivityTableProps) {
   function executionViewRedirect(activityId) {
     const activity = props.tableData.content.find((activity) => activity.id === activityId);
     props.history.push({
-      pathname: appLink.execution({ team, runId: activity.id, workflowId: activity.workflowRef }),
+      pathname: appLink.execution({ team, runId: activity.id }),
       state: { fromUrl: `${props.match.url}${props.location.search}`, fromText: "Activity" },
     });
   }

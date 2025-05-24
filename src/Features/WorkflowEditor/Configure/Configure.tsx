@@ -19,7 +19,7 @@ import { useQuery } from "react-query";
 import { Switch, Route, Redirect, useLocation, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import TokenSection from "Components/TokenSection";
-import { useTeamContext } from "Hooks";
+import { useEditorContext, useTeamContext } from "Hooks";
 import { WorkspaceConfigType } from "Constants";
 import { appLink, AppPath, FeatureFlag } from "Config/appConfig";
 import { resolver, serviceUrl } from "Config/servicesConfig";
@@ -57,9 +57,10 @@ interface ConfigureContainerProps {
 
 function ConfigureContainer({ workflow, settingsRef }: ConfigureContainerProps) {
   const { team } = useTeamContext();
-  const params = useParams<{ team: string; workflowId: string }>();
+  const params = useParams<{ team: string; workflow: string }>();
   const workflowTriggersEnabled = useFeature(FeatureFlag.WorkflowTriggersEnabled);
   const location = useLocation();
+  const { workflowsQueryData } = useEditorContext();
 
   const getGitHubAppInstallationForTeam = serviceUrl.getGitHubAppInstallationForTeam({
     team: params.team,
@@ -72,7 +73,7 @@ function ConfigureContainer({ workflow, settingsRef }: ConfigureContainerProps) 
   });
 
   const isOnConfigurePath = location.pathname.startsWith(
-    appLink.editorConfigure({ team: params.team, workflowId: params.workflowId }),
+    appLink.editorConfigure({ team: params.team, workflow: params.workflow }),
   );
 
   // Find the specific workspace configs we want that are used for storage storage
@@ -82,6 +83,9 @@ function ConfigureContainer({ workflow, settingsRef }: ConfigureContainerProps) 
   const workflowRunStorageConfig = workflow.workspaces?.find(
     (workspaceConfig) => workspaceConfig.type === WorkspaceConfigType.WorflowRun,
   );
+
+  const workflows = workflowsQueryData.content;
+  const existingWorkflowNames = workflows?.map((workflow) => workflow.name) ?? [];
 
   return (
     <>
@@ -108,6 +112,7 @@ function ConfigureContainer({ workflow, settingsRef }: ConfigureContainerProps) 
           },
           icon: workflow.icon ?? "",
           name: workflow.name ?? "",
+          displayName: workflow.displayName ?? "",
           timeout: workflow.timeout ?? null,
           retries: workflow.retries ?? null,
           labels: workflow.labels ? Object.entries(workflow.labels).map(([key, value]) => ({ key, value })) : [],
@@ -130,7 +135,21 @@ function ConfigureContainer({ workflow, settingsRef }: ConfigureContainerProps) 
             }),
           }),
           icon: Yup.string(),
-          name: Yup.string().required("Name is required").max(64, "Name must not be greater than 64 characters"),
+          name: Yup.string()
+            .required("Name is required")
+            .max(100, "Enter a name that is at most 100 characters in length")
+            .test("regex", `Name must only contain letters, numbers, and dashes`, (value) => {
+              const regex = /^[a-zA-Z0-9\-]+$/;
+              if (value) {
+                return regex.test(value);
+              }
+              return true;
+            })
+            .notOneOf(
+              existingWorkflowNames,
+              `There’s already a workflow with that name in this team. Names must be unique.`,
+            ),
+          displayName: Yup.string().optional(),
           retries: Yup.number().min(0),
           timeout: Yup.number()
             .min(0)
@@ -150,7 +169,7 @@ function ConfigureContainer({ workflow, settingsRef }: ConfigureContainerProps) 
         {(formikProps) =>
           isOnConfigurePath ? (
             <div className={styles.container}>
-              <NavPanel team={params.team} workflowId={params.workflowId}></NavPanel>
+              <NavPanel team={params.team} workflowRef={params.workflow}></NavPanel>
               <Configure
                 workflowTriggersEnabled={workflowTriggersEnabled as boolean}
                 formikProps={formikProps}
@@ -186,8 +205,6 @@ function Configure(props: ConfigureProps) {
     formikProps: { errors, handleBlur, touched, values, setFieldValue },
   } = props;
 
-  console.log({ values });
-
   const githubEvents = props.githubAppInstallation?.events
     ? props.githubAppInstallation.events.map((item: string) => ({
         labelText: item,
@@ -208,13 +225,24 @@ function Configure(props: ConfigureProps) {
             <TextInput
               id="name"
               label="Name"
-              helperText="Must be unique"
+              helperText="This is your unique identifier name within the Team. Can only contain letters, numbers, and dashes."
               placeholder="Name"
               value={values.name}
               onBlur={handleBlur}
               onChange={(e) => props.formikProps.handleChange(e)}
               invalid={Boolean(errors.name && touched.name)}
               invalidText={errors.name}
+            />
+            <TextInput
+              id="displayName"
+              label="Display Name (optional)"
+              helperText="This is the name that will be displayed in the UI. If left empty, will be set to the unique name."
+              placeholder="My Fantastical Workflow"
+              value={values.displayName}
+              onBlur={handleBlur}
+              onChange={(e) => props.formikProps.handleChange(e)}
+              invalid={Boolean(errors.displayName && touched.displayName)}
+              invalidText={errors.displayName}
             />
             <div className={styles.descriptionContainer}>
               <p className={styles.descriptionLength}> {`${values.description.length} / 250`}</p>
@@ -382,7 +410,7 @@ function Configure(props: ConfigureProps) {
                       )}
                     >
                       {({ closeModal }) => (
-                        <BuildWebhookModalContent closeModal={closeModal} workflowId={props.workflow.id} />
+                        <BuildWebhookModalContent closeModal={closeModal} workflowRef={props.workflow.name} />
                       )}
                     </ComposedModal>
                   )}
@@ -555,7 +583,7 @@ function Configure(props: ConfigureProps) {
                         )}
                       >
                         {({ closeModal }) => (
-                          <ConfigureEventTrigger closeModal={closeModal} workflowId={props.workflow.id} />
+                          <ConfigureEventTrigger closeModal={closeModal} workflowRef={props.workflow.name} />
                         )}
                       </ComposedModal>
                       {/* </div> */}
@@ -828,7 +856,7 @@ function Configure(props: ConfigureProps) {
             )}
             <div>
               <dl className={styles.detailedListContainer}>
-                <TokenSection type="workflow" principal={props.workflow.id} />
+                <TokenSection type="workflow" principal={props.workflow.name} />
               </dl>
             </div>
           </Section>

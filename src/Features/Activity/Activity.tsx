@@ -1,20 +1,20 @@
 // @ts-nocheck
 import React from "react";
-import { Helmet } from "react-helmet";
-import { useTeamContext, useQuery } from "Hooks";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
-import { Error, ErrorMessage } from "@boomerang-io/carbon-addons-boomerang-react";
 import { DatePicker, DatePickerInput, FilterableMultiSelect } from "@carbon/react";
-import ActivityHeader from "./ActivityHeader";
-import ActivityTable from "./ActivityTable";
+import { Error, ErrorMessage } from "@boomerang-io/carbon-addons-boomerang-react";
+import { sortByProp } from "@boomerang-io/utils";
 import moment from "moment";
 import queryString from "query-string";
-import { sortByProp } from "@boomerang-io/utils";
+import { Helmet } from "react-helmet";
+import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useTeamContext, useQuery } from "Hooks";
+import { executionOptions, statusOptions } from "Constants/filterOptions";
 import { queryStringOptions } from "Config/appConfig";
 import { serviceUrl } from "Config/servicesConfig";
-import { executionOptions, statusOptions } from "Constants/filterOptions";
 import { PaginatedWorkflowResponse } from "Types";
 import styles from "./Activity.module.scss";
+import ActivityHeader from "./ActivityHeader";
+import ActivityTable from "./ActivityTable";
 
 const DEFAULT_ORDER = "DESC";
 const DEFAULT_PAGE = 0;
@@ -65,10 +65,13 @@ function WorkflowActivity() {
       fromDate,
       toDate,
     },
-    queryStringOptions
+    queryStringOptions,
   );
 
-  const wfRunSummaryUrl = serviceUrl.team.workflowrun.getWorkflowRunCount({ team: team?.name, query: workflowRunCountQuery });
+  const wfRunSummaryUrl = serviceUrl.team.workflowrun.getWorkflowRunCount({
+    team: team?.name,
+    query: workflowRunCountQuery,
+  });
   const wfRunUrl = serviceUrl.team.workflowrun.getWorkflowRuns({ team: team?.name, query: wfRunsURLQuery });
 
   const wfRunSummaryQuery = useQuery(wfRunSummaryUrl);
@@ -96,10 +99,10 @@ function WorkflowActivity() {
   };
 
   function handleSelectWorkflows({ selectedItems }) {
-    const workflowIds = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.id) : undefined;
+    const workflowRefs = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.name) : undefined;
     updateHistorySearch({
       ...queryString.parse(location.search, queryStringOptions),
-      workflows: workflowIds,
+      workflows: workflowRefs,
       page: 0,
     });
     return;
@@ -205,10 +208,10 @@ function WorkflowActivity() {
                     onChange={handleSelectWorkflows}
                     items={getWorkflowFilter()}
                     itemToString={(workflow) => {
-                      return workflow.name;
+                      return workflow.displayName;
                     }}
                     initialSelectedItems={getWorkflowFilter().filter((workflow) =>
-                      Boolean(selectedWorkflowIds.find((id) => id === workflow.id))
+                      Boolean(selectedWorkflowIds.find((ref) => ref === workflow.name)),
                     )}
                     titleText="Filter by Workflow"
                   />
@@ -223,7 +226,7 @@ function WorkflowActivity() {
                     items={statusOptions}
                     itemToString={(item) => (item ? item.label : "")}
                     initialSelectedItems={statusOptions.filter((option) =>
-                      Boolean(selectedStatuses.find((status) => status === option.value))
+                      Boolean(selectedStatuses.find((status) => status === option.value)),
                     )}
                     titleText="Filter by status"
                   />
@@ -238,7 +241,7 @@ function WorkflowActivity() {
                     items={executionOptions}
                     itemToString={(item) => (item ? item.label : "")}
                     initialSelectedItems={executionOptions.filter((option) =>
-                      Boolean(selectedTriggers.find((trigger) => trigger === option.value))
+                      Boolean(selectedTriggers.find((trigger) => trigger === option.value)),
                     )}
                     titleText="Filter by trigger"
                   />

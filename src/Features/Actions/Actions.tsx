@@ -1,4 +1,14 @@
 //@ts-nocheck
+import React from "react";
+import {
+  DatePicker,
+  DatePickerInput,
+  FilterableMultiSelect,
+  SkeletonPlaceholder,
+  Breadcrumb,
+  BreadcrumbItem,
+} from "@carbon/react";
+import { ArrowUpRight } from "@carbon/react/icons";
 import {
   ErrorMessage,
   ErrorDragon,
@@ -9,30 +19,20 @@ import {
   FeatureNavTab as Tab,
   FeatureNavTabs as Tabs,
 } from "@boomerang-io/carbon-addons-boomerang-react";
-import {
-  DatePicker,
-  DatePickerInput,
-  FilterableMultiSelect,
-  SkeletonPlaceholder,
-  Breadcrumb,
-  BreadcrumbItem,
-} from "@carbon/react";
-import { ArrowUpRight } from "@carbon/react/icons";
-import React from "react";
-import { Helmet } from "react-helmet";
-import { useQuery } from "react-query";
-import { Switch, Route, Redirect, useHistory, useLocation, useRouteMatch, Link } from "react-router-dom";
 import { sortByProp } from "@boomerang-io/utils";
 import moment from "moment";
 import queryString from "query-string";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+import { Switch, Route, Redirect, useHistory, useLocation, Link } from "react-router-dom";
 import HeaderWidget from "Components/HeaderWidget";
 import { useTeamContext } from "Hooks";
-import styles from "./Actions.module.scss";
-import ActionsTable from "./ActionsTable";
-import { AppPath, appLink, queryStringOptions } from "Config/appConfig";
-import { serviceUrl, resolver } from "Config/servicesConfig";
 import { ActionType } from "Constants";
 import { approvalStatusOptions } from "Constants/filterOptions";
+import { AppPath, appLink, queryStringOptions } from "Config/appConfig";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import styles from "./Actions.module.scss";
+import ActionsTable from "./ActionsTable";
 
 const DEFAULT_ORDER = "DESC";
 const DEFAULT_PAGE = 0;
@@ -45,7 +45,6 @@ function Actions() {
   const { team } = useTeamContext();
   const history = useHistory();
   const location = useLocation();
-  const match = useRouteMatch();
 
   const summaryQuery = queryString.stringify({
     fromDate: DEFAULT_FROM_DATE,
@@ -112,7 +111,10 @@ function Actions() {
     queryStringOptions,
   );
 
-  const actionsFilterSummaryUrl = serviceUrl.team.action.getActionsSummary({ team: team?.name, query: actionsUrlSummaryQuery });
+  const actionsFilterSummaryUrl = serviceUrl.team.action.getActionsSummary({
+    team: team?.name,
+    query: actionsUrlSummaryQuery,
+  });
 
   /** Get number of approvals and manual tasks */
   const { data: actionsFilterSummaryData } = useQuery({
@@ -171,10 +173,10 @@ function Actions() {
   };
 
   function handleSelectWorkflows({ selectedItems }) {
-    const workflowIds = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.id) : undefined;
+    const workflowRefs = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.name) : undefined;
     updateHistorySearch({
       ...queryString.parse(location.search, queryStringOptions),
-      workflows: workflowIds,
+      workflows: workflowRefs,
       page: 0,
     });
     return;
@@ -217,7 +219,7 @@ function Actions() {
 
   if (team && workflowsData.content) {
     const { workflows = "", statuses = "" } = queryString.parse(location.search, queryStringOptions);
-    const selectedWorkflowIds = typeof workflows === "string" ? [workflows] : workflows;
+    const selectedWorkflowRefs = typeof workflows === "string" ? [workflows] : workflows;
     const selectedStatuses = typeof statuses === "string" ? [statuses] : statuses;
     const maxDate = moment().format("MM/DD/YYYY");
 
@@ -323,10 +325,10 @@ function Actions() {
                     onChange={handleSelectWorkflows}
                     items={getWorkflowFilter()}
                     itemToString={(workflow) => {
-                      return workflow.name;
+                      return workflow.displayName;
                     }}
                     initialSelectedItems={getWorkflowFilter().filter((workflow) =>
-                      Boolean(selectedWorkflowIds.find((id) => id === workflow.id)),
+                      Boolean(selectedWorkflowRefs.find((ref) => ref === workflow.name)),
                     )}
                     titleText="Filter by Workflow"
                   />
@@ -376,7 +378,6 @@ function Actions() {
               history={history}
               isLoading={actionsQuery.isLoading}
               location={location}
-              match={match}
               tableData={actionsQuery.data}
               sort={sort}
               order={order}

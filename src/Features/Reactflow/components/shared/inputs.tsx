@@ -1,5 +1,6 @@
 import React from "react";
 import { AutoSuggest, TextInput, TextArea, Creatable } from "@boomerang-io/carbon-addons-boomerang-react";
+import { json } from "d3";
 import { FormikProps } from "formik";
 import TextEditorModal from "Components/TextEditorModal";
 import { INPUT_TYPES, TEXT_AREA_TYPES, SUPPORTED_AUTOSUGGEST_TYPES } from "Constants/formInputTypes";

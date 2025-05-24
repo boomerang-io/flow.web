@@ -2,8 +2,8 @@ import { inflections } from "inflected";
 import { Server, Serializer, Model, Response } from "miragejs";
 import queryString from "query-string";
 import { v4 as uuid } from "uuid";
-import * as fixtures from "./fixtures";
 import { serviceUrl, BASE_URL } from "Config/servicesConfig";
+import * as fixtures from "./fixtures";
 
 export function startApiServer({ environment = "test", timing = 0 } = {}) {
   inflections("en", function (inflect) {
@@ -94,7 +94,7 @@ export function startApiServer({ environment = "test", timing = 0 } = {}) {
         return schema.db.workflowSchedules[0];
       });
 
-      this.get(serviceUrl.team.workflow.getAvailableParameters({ team: ":team", workflowId: ":workflowId" }), (schema) => {
+      this.get(serviceUrl.team.workflow.getAvailableParameters({ team: ":team", name: ":name" }), (schema) => {
         return schema.db.availableParameters[0].data;
       });
 
@@ -269,18 +269,21 @@ export function startApiServer({ environment = "test", timing = 0 } = {}) {
         return {};
       });
 
-      this.get(serviceUrl.team.workflow.getWorkflowCompose({ team: ":team", id: ":id", version: null }), (schema, request) => {
-        let { id } = request.params;
-        return schema.db.workflowCompose.findBy({ id });
-      });
+      this.get(
+        serviceUrl.team.workflow.getWorkflowCompose({ team: ":team", name: ":name", version: null }),
+        (schema, request) => {
+          let { id } = request.params;
+          return schema.db.workflowCompose.findBy({ id });
+        },
+      );
 
-      this.del(serviceUrl.team.workflow.getWorkflow({ team: ":team", id: ":workflowId" }), (schema, request) => {
-        let { workflowId } = request.params;
-        let flowTeam = schema.myTeams.where((team) => team.workflows.find((workflow) => workflow.id === workflowId));
+      this.del(serviceUrl.team.workflow.getWorkflow({ team: ":team", name: ":name" }), (schema, request) => {
+        let { name } = request.params;
+        let flowTeam = schema.myTeams.where((team) => team.workflows.find((workflow) => workflow.name === name));
         let { attrs } = flowTeam.models[0];
-        const teamWorkflows = attrs.workflows.filter((workflow) => workflow.id !== workflowId);
+        const teamWorkflows = attrs.workflows.filter((workflow) => workflow.name !== name);
         flowTeam.update({ workflows: teamWorkflows });
-        return schema.db.summaries.remove({ id: workflowId });
+        return schema.db.summaries.remove({ name: name });
       });
 
       //Workflow Config Cron
@@ -292,7 +295,7 @@ export function startApiServer({ environment = "test", timing = 0 } = {}) {
       });
 
       // Workflow Changelog
-      this.get(serviceUrl.team.workflow.getWorkflowChangelog({ team: ":team", id: ":id" }), (schema, request) => {
+      this.get(serviceUrl.team.workflow.getWorkflowChangelog({ team: ":team", name: ":name" }), (schema, request) => {
         return schema.db.changelogs;
       });
 
@@ -311,13 +314,19 @@ export function startApiServer({ environment = "test", timing = 0 } = {}) {
         return schema.db.workflowExecution[0];
       });
 
-      this.post(serviceUrl.team.workflow.postSubmitWorkflow({ team: ":team", workflowId: ":workflowId", body: null }), (schema, request) => {
-        return schema.db.workflowExecution[0];
-      });
+      this.post(
+        serviceUrl.team.workflow.postSubmitWorkflow({ team: ":team", name: ":name", body: null }),
+        (schema, request) => {
+          return schema.db.workflowExecution[0];
+        },
+      );
 
-      this.delete(serviceUrl.team.workflowrun.deleteCancelWorkflow({ team: ":team", runId: ":id" }), (schema, request) => {
-        return {};
-      });
+      this.delete(
+        serviceUrl.team.workflowrun.deleteCancelWorkflow({ team: ":team", runId: ":id" }),
+        (schema, request) => {
+          return {};
+        },
+      );
 
       /**
        * Actions
