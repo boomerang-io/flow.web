@@ -207,7 +207,6 @@ function ActionsTable(props: ActionsTableProps) {
             to={appLink.execution({
               team: team.name,
               runId: currentAction?.workflowRunRef,
-              workflow: currentAction?.workflowRef,
             })}
           >
             View Activity

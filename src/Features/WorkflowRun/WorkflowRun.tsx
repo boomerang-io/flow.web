@@ -33,13 +33,12 @@ export default function WorkflowRunFeature() {
   });
   const getExecutionUrl = serviceUrl.team.workflowrun.getWorkflowRun({ team: team.name, id: params.runId });
 
-  function executionViewRedirect({ workflowRef, workflowRunRef }: { workflowRef: string; workflowRunRef: string }) {
+  function executionViewRedirect({ workflowRunRef }: { workflowRunRef: string }) {
     queryClient.invalidateQueries(getExecutionUrl);
     history.push(
       appLink.execution({
         team: team.name,
-        runId: workflowRef,
-        workflow: workflowRunRef,
+        runId: workflowRunRef,
       }),
     );
   }
@@ -96,7 +95,7 @@ type RevisionProps = {
   tasksData: Task[];
   workflowRef: string;
   workflowRun: WorkflowRun;
-  executionViewRedirect: ({ workflowRef, workflowRunRef }: { workflowRef: string; workflowRunRef: string }) => void;
+  executionViewRedirect: ({ workflowRunRef }: { workflowRunRef: string }) => void;
 };
 
 function RevisionContainer({ team, workflowRun, tasksData, workflowRef, executionViewRedirect }: RevisionProps) {
@@ -159,7 +158,7 @@ type MainProps = {
   workflow: WorkflowCanvas;
   workflowRun: WorkflowRun;
   version: number;
-  executionViewRedirect: ({ workflowRef, workflowRunRef }: { workflowRef: string; workflowRunRef: string }) => void;
+  executionViewRedirect: ({ workflowRunRef }: { workflowRunRef: string }) => void;
 };
 
 function Main(props: MainProps) {

@@ -13,7 +13,7 @@ import styles from "./TaskRunList.module.scss";
 
 type Props = {
   workflowRun: WorkflowRun;
-  executionViewRedirect: ({ workflowRef, workflowRunRef }: { workflowRef: string; workflowRunRef: string }) => void;
+  executionViewRedirect: ({ workflowRunRef }: { workflowRunRef: string }) => void;
 };
 
 function TaskRunLog({ workflowRun, executionViewRedirect }: Props) {

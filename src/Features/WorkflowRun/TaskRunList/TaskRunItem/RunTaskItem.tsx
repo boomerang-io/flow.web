@@ -19,7 +19,7 @@ const logStatusTypes = [RunStatus.Succeeded, RunStatus.Failed, RunStatus.Running
 type Props = {
   taskRun: TaskRun;
   workflowRun: WorkflowRun;
-  executionViewRedirect: ({ workflowRef, workflowRunRef }: { workflowRef: string; workflowRunRef: string }) => void;
+  executionViewRedirect: ({ workflowRunRef }: { workflowRunRef: string }) => void;
 };
 
 function RunTaskItem({ taskRun, workflowRun, executionViewRedirect }: Props) {

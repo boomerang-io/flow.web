@@ -164,7 +164,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
       );
       if (redirect) {
         history.push({
-          pathname: appLink.execution({ team: teamName, runId: execution.id, workflow: workflow.name }),
+          pathname: appLink.execution({ team: teamName, runId: execution.id }),
           state: { fromUrl: appLink.workflows({ team: teamName }), fromText: `${viewType}s` },
         });
       } else {

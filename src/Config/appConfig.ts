@@ -148,7 +148,6 @@ interface AdminTaskTemplateArgs {
 }
 interface ExecutionArgs {
   runId: string;
-  workflow: string;
 }
 
 export const appLink = {
@@ -167,7 +166,7 @@ export const appLink = {
   editorChangelog: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/changelog`,
   editorProperties: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/parameters`,
   editorSchedule: ({ team, workflow }: TeamRouteArgs) => `/${team}/editor/${workflow}/schedule`,
-  execution: ({ team, workflow, runId }: TeamArg & ExecutionArgs) => `/${team}/activity/${workflow}/run/${runId}`,
+  execution: ({ team, runId }: TeamArg & ExecutionArgs) => `/${team}/activity/${runId}`,
   home: () => "/home",
   profile: () => "/profile",
   insights: ({ team }: TeamArg) => `/${team}/insights`,
