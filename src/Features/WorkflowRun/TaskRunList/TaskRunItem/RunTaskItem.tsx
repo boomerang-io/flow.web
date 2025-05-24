@@ -137,7 +137,7 @@ function RunTaskItem({ taskRun, workflowRun }: Props) {
                 appLink.execution({
                   team: team.name,
                   runId: taskRun.results.find((result) => result.name === "workflowRunRef")?.value ?? "",
-                  workflow: workflowRun.workflowName,
+                  workflow: taskRun.params.find((param) => param.name === "workflowRef")?.value ?? "",
                 }),
               )
             }
