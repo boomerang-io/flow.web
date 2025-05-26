@@ -1,9 +1,6 @@
 import React from "react";
-import { Helmet } from "react-helmet";
-import { useQuery } from "Hooks";
-import { useHistory, useLocation, Route, Switch } from "react-router-dom";
-import { Box } from "reflexbox";
 import { DataTable, DataTableSkeleton, Pagination, Search } from "@carbon/react";
+import { CheckmarkFilled, Misuse } from "@carbon/react/icons";
 import {
   ErrorMessage,
   FeatureHeader as Header,
@@ -11,16 +8,19 @@ import {
   FeatureHeaderSubtitle as HeaderSubtitle,
 } from "@boomerang-io/carbon-addons-boomerang-react";
 import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
-import EmptyState from "Components/EmptyState";
-import UserDetailed from "Features/UserDetailed";
 import debounce from "lodash/debounce";
 import moment from "moment";
 import queryString from "query-string";
+import { Helmet } from "react-helmet";
+import { useHistory, useLocation, Route, Switch } from "react-router-dom";
+import { Box } from "reflexbox";
+import UserDetailed from "Features/UserDetailed";
+import EmptyState from "Components/EmptyState";
+import { useQuery } from "Hooks";
 import { CREATED_DATE_FORMAT } from "Constants";
 import { AppPath, appLink, queryStringOptions } from "Config/appConfig";
 import { serviceUrl } from "Config/servicesConfig";
 import { PaginatedUserResponse } from "Types";
-import { CheckmarkFilled, Misuse } from "@carbon/react/icons";
 import styles from "./Users.module.scss";
 
 const DEFAULT_ORDER = "DESC";
@@ -123,7 +123,7 @@ const UserList: React.FC = () => {
     debounce((query: string) => {
       updateHistorySearch({ query, page: 0 });
     }, 300),
-    []
+    [],
   );
 
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -165,7 +165,7 @@ const TableHeaderKey = {
   DisplayName: "displayName",
   Email: "email",
   Type: "type",
-  Created: "firstLoginDate",
+  Created: "creationDate",
   LastLogin: "lastLoginDate",
   Status: "status",
 };
@@ -192,7 +192,7 @@ const headers = [
     sortable: true,
   },
   {
-    header: "Created",
+    header: "First Login",
     key: TableHeaderKey.Created,
     sortable: true,
   },
@@ -300,7 +300,8 @@ function UsersTable(props: UsersTableProps) {
                       return (
                         <TableCell key={cell.id}>
                           {Array.isArray(cell.value) ? cell.value.length : cell?.value ?? "---"}
-                        </TableCell>)
+                        </TableCell>
+                      );
                     })}
                   </TableRow>
                 ))}
