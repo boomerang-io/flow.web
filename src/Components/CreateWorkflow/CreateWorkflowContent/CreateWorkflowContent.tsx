@@ -5,6 +5,7 @@ import { Loading, TextArea, TextInput, TooltipHover } from "@boomerang-io/carbon
 import workflowIcons from "Assets/workflowIcons";
 import classNames from "classnames/bind";
 import { Formik } from "formik";
+import { kebabCase } from "lodash";
 import capitalize from "lodash/capitalize";
 import * as Yup from "yup";
 import { FlowTeam, CreateWorkflowSummary, WorkflowViewType } from "Types";
@@ -73,7 +74,7 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
             existingWorkflowNames,
             `There’s already a ${viewType} with that name in this team. Names must be unique.`,
           ),
-        displayName: Yup.string().optional(),
+        displayName: Yup.string().required("Please provide a name for your Workflow"),
         description: Yup.string().max(250, "Description must not be greater than 250 characters"),
       })}
     >
@@ -85,6 +86,21 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
             {isLoading && <Loading />}
             <ModalBody aria-label="inputs" className={styles.formBody}>
               <TextInput
+                id="displayName"
+                label="Display Name"
+                helperText="This is the name that will be displayed in the UI."
+                placeholder="e.g. My Fantastical Workflow"
+                value={values.displayName}
+                onBlur={handleBlur}
+                onChange={(e: React.FocusEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  setFieldValue("name", kebabCase(e.target.value.replace(/'/g, "-")));
+                }}
+                // onChange={handleChange}
+                invalid={Boolean(errors.displayName && touched.displayName)}
+                invalidText={errors.displayName}
+              />
+              <TextInput
                 id="name"
                 labelText="Name"
                 placeholder="e.g. my-workflow"
@@ -94,17 +110,6 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
                 onChange={handleChange}
                 invalid={Boolean(errors.name && touched.name)}
                 invalidText={errors.name}
-              />
-              <TextInput
-                id="displayName"
-                label="Display Name (optional)"
-                helperText="This is the name that will be displayed in the UI. If left empty, will be set to the unique name."
-                placeholder="e.g. My Fantastical Workflow"
-                value={values.displayName}
-                onBlur={handleBlur}
-                onChange={handleChange}
-                invalid={Boolean(errors.displayName && touched.displayName)}
-                invalidText={errors.displayName}
               />
               <TextArea
                 id="description"

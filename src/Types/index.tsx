@@ -166,7 +166,7 @@ export interface WorkflowWorkspace {
 }
 
 export interface Workflow {
-  id: string;
+  // id: string;
   name: string;
   displayName: string;
   creationDate: string;

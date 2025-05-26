@@ -1,8 +1,8 @@
-import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
 import { Add } from "@carbon/react/icons";
+import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
+import { ModalTriggerProps } from "Types";
 import TeamCreateContent from "./TeamCreateContent";
 import styles from "./teamCardCreate.module.scss";
-import { ModalTriggerProps } from "Types";
 
 interface TeamCardProps {
   createTeam: (values: { name: string | undefined }, success_fn: () => void) => void;

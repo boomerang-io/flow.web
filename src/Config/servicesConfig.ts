@@ -78,7 +78,6 @@ export const serviceUrl = {
   postTeamQuotasReset: ({ team }: TeamArg) => `${BASE_URL}/teams/${team}/quotas/reset`,
   resourceTeam: ({ team }: TeamArg) => `${BASE_URL}/team/${team}`,
   resourceApproverGroups: ({ team, groupId }) => `${BASE_URL}/team/${team}/approvers${groupId ? "/" + groupId : ""}`,
-  // postImportWorkflow: ({ query }) => `${BASE_URL}/workflow/import?${query}`,
   putActivationApp: () => `${BASE_URL}/activate`,
   resourceSettings: () => `${BASE_URL}/settings`,
   resourceTrigger: () => `${BASE_URL}/trigger`,
@@ -101,9 +100,10 @@ export const serviceUrl = {
     postValidateYaml: () => `${BASE_URL}/task/validate`,
   },
   template: {
-    getWorkflowTemplate: ({ id }) => `${BASE_URL}/workflowtemplate/${id}`,
+    getWorkflowTemplate: ({ name }: NameArg) => `${BASE_URL}/workflowtemplate/${name}`,
     getWorkflowTemplates: () => `${BASE_URL}/workflowtemplate/query`,
     postWorkflowTemplate: () => `${BASE_URL}/workflowtemplate`,
+    getExportWorkflowTemplate: ({ name }: NameArg) => `${BASE_URL}/workflowtemplate/${name}/export`,
   },
   team: {
     deleteTeamMembers: ({ team }: TeamArg) => `${BASE_URL}/team/${team}/members`,
@@ -203,7 +203,7 @@ export const resolver = {
   deleteTeamParameter: ({ team, name }) => axios.delete(serviceUrl.team.deleteTeamParameter({ team, name })),
   deleteWorkflow: ({ team, workflow }: TeamArg & WorkflowArg) =>
     axios.delete(serviceUrl.team.workflow.getWorkflow({ team, workflow })),
-  deleteWorkflowTemplate: ({ id }) => axios.delete(serviceUrl.template.getWorkflowTemplate({ id })),
+  deleteWorkflowTemplate: ({ name }) => axios.delete(serviceUrl.template.getWorkflowTemplate({ name })),
   leaveTeam: ({ team }) => axios.delete(serviceUrl.team.leaveTeam({ team })),
   deleteSchedule: ({ team, id }) => axios.delete(serviceUrl.team.schedule.deleteSchedule({ team, id })),
   deleteTeam: ({ team }: TeamArg) => axios.delete(serviceUrl.resourceTeam({ team })),

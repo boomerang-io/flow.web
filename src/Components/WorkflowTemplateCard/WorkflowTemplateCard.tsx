@@ -25,9 +25,8 @@ const WorkflowTemplateCard: React.FC<WorkflowTemplateCardProps> = ({ workflow, g
   );
 
   const handleDeleteWorkflow = async () => {
-    const workflowId = workflow.id;
     try {
-      await deleteWorkflowTemplateMutator({ id: workflowId });
+      await deleteWorkflowTemplateMutator({ name: workflow.name });
       notify(
         <ToastNotification
           kind="success"
@@ -51,7 +50,7 @@ const WorkflowTemplateCard: React.FC<WorkflowTemplateCardProps> = ({ workflow, g
   const handleExportWorkflow = (workflow: Workflow) => {
     notify(<ToastNotification kind="info" title={`Export Workflow Template`} subtitle="Export starting soon" />);
     axios
-      .get(serviceUrl.template.getExportWorkflowTemplate({ workflowId: workflow.id }))
+      .get(serviceUrl.template.getExportWorkflowTemplate({ name: workflow.name }))
       .then(({ data }) => {
         fileDownload(JSON.stringify(data, null, 4), `${workflow.name}.json`);
       })
