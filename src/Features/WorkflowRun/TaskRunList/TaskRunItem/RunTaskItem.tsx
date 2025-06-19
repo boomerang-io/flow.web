@@ -1,6 +1,7 @@
 import { Button, ModalBody } from "@carbon/react";
 import { ArrowRight } from "@carbon/react/icons";
 import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
+import { task } from "ApiServer/fixtures";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
 import dateHelper from "Utils/dateHelper";
@@ -45,18 +46,20 @@ function RunTaskItem({ taskRun, workflowRun, executionViewRedirect }: Props) {
           <p>{ExecutionStatusCopy[taskRun.status]}</p>
         </div>
       </section>
-      <section className={styles.data}>
-        <div className={styles.time}>
-          <p className={styles.timeTitle}>Start time</p>
-          <time className={styles.timeValue}>
-            {taskRun.startTime ? moment(taskRun.startTime).format("hh:mm:ss A") : "---"}
-          </time>
-        </div>
-        <div className={styles.time}>
-          <p className={styles.timeTitle}>Duration</p>
-          <time className={styles.timeValue}>{calculatedDuration}</time>
-        </div>
-      </section>
+      {(taskRun.type !== NodeType.Start && taskRun.type !== NodeType.End) ?? (
+        <section className={styles.data}>
+          <div className={styles.time}>
+            <p className={styles.timeTitle}>Start time</p>
+            <time className={styles.timeValue}>
+              {taskRun.startTime ? moment(taskRun.startTime).format("hh:mm:ss A") : "---"}
+            </time>
+          </div>
+          <div className={styles.time}>
+            <p className={styles.timeTitle}>Duration</p>
+            <time className={styles.timeValue}>{calculatedDuration}</time>
+          </div>
+        </section>
+      )}
       <section className={styles.data}>
         <ComposedModal
           composedModalProps={{
