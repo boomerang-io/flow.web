@@ -115,7 +115,7 @@ export default function RunHeader({ workflow, workflowRun, version, executionVie
       }
       header={
         <div style={{ display: "flex" }}>
-          <HeaderTitle>Workflow run detail</HeaderTitle>
+          <HeaderTitle>Activity detail</HeaderTitle>
           {Boolean(workflowRun.statusMessage) && (
             <ComposedModal
               composedModalProps={{ shouldCloseOnOverlayClick: true }}

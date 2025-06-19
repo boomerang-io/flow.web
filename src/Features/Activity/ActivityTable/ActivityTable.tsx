@@ -25,13 +25,15 @@ interface ActivityTableProps {
   sort: string;
   order: string;
   updateHistorySearch: Function;
+  workflowNameMap: {
+    [key: string]: string;
+  };
 }
 
 const PAGE_SIZES = [10, 20, 25, 50, 100];
 
 const HeadersKey = {
   WorkflowName: "workflowName",
-  WorkflowDisplayName: "workflowDisplayName",
   Trigger: "trigger",
   InitiatedBy: "initiatedByUserName",
   CreationDate: "creationDate",
@@ -41,12 +43,7 @@ const HeadersKey = {
 
 const headers = [
   {
-    header: "Workflow Diplay Name",
-    key: HeadersKey.WorkflowDisplayName,
-    sortable: true,
-  },
-  {
-    header: "Workflow Unique Name",
+    header: "Name",
     key: HeadersKey.WorkflowName,
     sortable: true,
   },
@@ -120,6 +117,8 @@ function ActivityTable(props: ActivityTableProps) {
     const column = headerList[cellIndex];
 
     switch (column?.key) {
+      case HeadersKey.WorkflowName:
+        return <p className={styles.tableTextarea}>{props.workflowNameMap[value] || value || "---"}</p>;
       case HeadersKey.Trigger:
         return (
           <p className={styles.tableTextarea} style={{ textTransform: "capitalize" }}>

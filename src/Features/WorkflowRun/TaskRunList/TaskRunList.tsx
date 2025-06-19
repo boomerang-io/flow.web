@@ -5,7 +5,7 @@ import { ArrowsVertical, ChevronLeft } from "@carbon/react/icons";
 import orderBy from "lodash/orderBy";
 import { UseQueryResult } from "react-query";
 import { getSimplifiedDuration } from "Utils/timeHelper";
-import { ExecutionStatusCopy, executionStatusIcon } from "Constants";
+import { ExecutionStatusCopy, executionStatusIcon, NodeType } from "Constants";
 import { QueryStatus } from "Constants";
 import { RunStatus, WorkflowRun } from "Types";
 import TaskRunItem from "./TaskRunItem";
@@ -93,14 +93,16 @@ function TaskRunLog({ workflowRun, executionViewRedirect }: Props) {
         )}
       </section>
       <ul className={styles.tasklog}>
-        {tasks.map((taskRun) => (
-          <TaskRunItem
-            key={taskRun.id}
-            taskRun={taskRun}
-            workflowRun={workflowRun}
-            executionViewRedirect={executionViewRedirect}
-          />
-        ))}
+        {tasks.map((taskRun) =>
+          taskRun.type !== NodeType.Start && taskRun.type !== NodeType.End ? (
+            <TaskRunItem
+              key={taskRun.id}
+              taskRun={taskRun}
+              workflowRun={workflowRun}
+              executionViewRedirect={executionViewRedirect}
+            />
+          ) : null,
+        )}
       </ul>
     </aside>
   );

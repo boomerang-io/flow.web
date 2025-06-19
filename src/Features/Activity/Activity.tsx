@@ -176,6 +176,16 @@ function WorkflowActivity() {
       ? Number.parseInt(toDate)
       : DEFAULT_TO_DATE;
 
+    const workflowNameMap = Array.isArray(workflowsQuery.data?.content)
+      ? workflowsQuery.data.content.reduce(
+          (acc, workflow) => {
+            acc[workflow.name] = workflow.displayName;
+            return acc;
+          },
+          {} as Record<string, string>,
+        )
+      : {};
+
     return (
       <>
         <Helmet>
@@ -277,6 +287,7 @@ function WorkflowActivity() {
               sort={sort}
               order={order}
               updateHistorySearch={updateHistorySearch}
+              workflowNameMap={workflowNameMap}
             />
           </section>
         )}
