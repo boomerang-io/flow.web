@@ -100,7 +100,7 @@ export default function CreateSchedule(props: CreateScheduleProps) {
         daysCron.push(cronDayNumberMap[day]);
       }
       const timeCron = !time ? ["0", "0"] : time.split(":");
-      const cronSchedule = `0 ${timeCron[1]} ${timeCron[0]} ? * ${daysCron.length !== 0 ? daysCron.toString() : "*"}`;
+      const cronSchedule = `0 ${timeCron[1]} ${timeCron[0]} * ${daysCron.length !== 0 ? daysCron.toString() : "*"}`;
       schedule["cronSchedule"] = cronSchedule;
     }
 
