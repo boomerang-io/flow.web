@@ -91,7 +91,7 @@ HEADER Authorization: Bear <global token from above>
 #### Port Forwarding
 
 1. Port forward to service to avoid CORS errors
-   `kubectl port-forward svc/flowabl-services-workflow 8081:80 -n workflows`
+   `kubectl port-forward svc/flow-services-workflow 8081:80 -n workflows`
 
 2. Export token
 
