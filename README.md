@@ -16,6 +16,7 @@ This project is built with [Vite](https://vitejs.dev/).
 
 `npm run start`
 
+
 ### Run with Local Services
 
 #### Kubernetes Setup
