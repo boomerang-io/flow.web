@@ -2,7 +2,7 @@
 
 The web client for Boomerang Flow, a low-code, cloud-native workflow automation tool.
 
-Learn more about our projects on the [docs site](https://useboomerang.io/docs).
+Learn more about our project on the [docs site](https://useboomerang.io/docs).
 
 View the current project work in our [community roadmap repo](https://github.com/boomerang-io/roadmap).
 
