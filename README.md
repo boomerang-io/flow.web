@@ -4,7 +4,7 @@ The web client for Boomerang Flow, a low-code, cloud-native workflow automation 
 
 Learn more about our projects on the [docs site](https://useboomerang.io/docs).
 
-View current project work in our [community roadmap repo](https://github.com/boomerang-io/roadmap).
+View the current project work in our [community roadmap repo](https://github.com/boomerang-io/roadmap).
 
 ## Getting Started with Vite
 
