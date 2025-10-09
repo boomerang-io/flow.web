@@ -98,5 +98,3 @@ HEADER Authorization: Bear <global token from above>
 export AUTH_JWT=<user_token>
 
 3. `npm run start:pf`
-
-
