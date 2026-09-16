@@ -166,6 +166,9 @@
       "braces": "^3.0.3",
       "protobufjs": "7.6.1",
       "validator": "^13.15.22",
+      "node-forge": "1.4.0",
+      "compression": "1.8.2",
+      "proxy-addr": "2.0.8",
       "@cypress/request>uuid": "8.3.2",
       "uuid": "^14.0.0"
     }
