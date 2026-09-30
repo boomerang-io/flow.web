@@ -1,9 +1,9 @@
 FROM node:22.22.0-alpine
 ENV BMRG_HOME=/opt/boomerang/server
 
-# Fix CVE-2026-31789 (OpenSSL heap buffer overflow) while matching the
-# package version already present in node:22.22.0-alpine.
-RUN apk add --no-cache openssl=3.5.8-r0
+# Fix CVE-2026-31789 (OpenSSL heap buffer overflow). libcrypto3/libssl3 must be
+# upgraded alongside openssl since apk requires their versions to match exactly.
+RUN apk add --no-cache --upgrade openssl libcrypto3 libssl3
 
 WORKDIR $BMRG_HOME
 COPY server .
