@@ -2,6 +2,9 @@
   "name": "boomerang-flow-server",
   "version": "0.0.1",
   "description": "Boomerang Flow Express Server",
+  "engines": {
+    "node": ">=22.22.0"
+  },
   "scripts": {
     "start": "boomerang-webapp-server serve",
     "dev": "boomerang-webapp-server serve -p \"config/.env.local\""
@@ -16,7 +19,18 @@
     "@boomerang-io/webapp-spa-server": "1.1.1-beta.1",
     "replace-in-file": "^6.3.2"
   },
-  "overrides": {
-    "protobufjs": "7.4.0"
+  "pnpm": {
+    "overrides": {
+      "@babel/runtime": "^7.29.6",
+      "body-parser": "1.20.6",
+      "brace-expansion": "^5.0.10",
+      "immutable": "4.3.9",
+      "postcss": "8.5.12",
+      "compression": "1.8.2",
+      "proxy-addr": "2.0.8",
+      "protobufjs": "7.6.5",
+      "qs": "^6.16.0",
+      "serialize-javascript": "7.0.5"
+    }
   }
 }
