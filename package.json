@@ -9,7 +9,7 @@
   "sideEffects": false,
   "scripts": {
     "analyze": "source-map-explorer build/static/js/*.js",
-    "build": "cross-env NODE_OPTIONS=--experimental-global-webcrypto react-scripts build && ncp build server/build",
+    "build": "vite build && ncp build server/build",
     "build:rewriteAssetPaths": "cross-env APP_ROOT=/local node server/scripts/rewriteAssetPaths.js",
     "cypress": "cypress open",
     "docker": "cross-env NODE_ENV=test run-s docker:build docker:run",
@@ -137,7 +137,10 @@
     "ts-loader": "^9.2.8",
     "typescript": "^4.5.4",
     "typescript-plugin-css-modules": "^3.4.0",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "vite": "^4.5.14",
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-svgr": "^3.3.0"
   },
   "pnpm": {
     "overrides": {

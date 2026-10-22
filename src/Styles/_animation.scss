@@ -1,5 +1,5 @@
-@import "carbon-components/scss/globals/scss/motion";
+@use "@carbon/react/scss/motion";
 
-$carbon-motion--easing--productive: carbon--motion(standard, productive);
+$carbon-motion--easing--productive: motion.motion(standard, productive);
 
 $carbon-motion--timing--productive: 150ms;
