@@ -2,77 +2,102 @@
 
 The web client for Boomerang Flow, a low-code, cloud-native workflow automation tool.
 
-Learn more about our projects on the [docs site](https://useboomerang.io/docs).
+Learn more about our project on the [docs site](https://useboomerang.io/docs).
 
-View current project work in our [community roadmap repo](https://github.com/boomerang-io/roadmap).
+View the current project work in our [community roadmap repo](https://github.com/boomerang-io/roadmap).
 
-## Getting Started with Create React App
+## Getting Started with Vite
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is built with [Vite](https://vitejs.dev/).
 
-## Available Scripts
+## Local Development
 
-In the project directory, you can run:
+### Run with Stubs
 
-### `npm start`
+`npm run start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Run with Local Services
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+#### Kubernetes Setup
 
-### `npm test`
+> Note: we recommend using Orbstack or Rancher Desktop if you want to run a simple local Kubernetes cluster.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. `kubectl create ns workflows`
+2. `kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml`
+3. `helm repo add boomerang-io https://raw.githubusercontent.com/boomerang-io/charts/index`
+4. `helm repo add bitnami-pre-2022 https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami`
+5. `helm upgrade --version 7.8.8 --install mongodb -n workflows bitnami-pre-2022/mongodb --set mongodbDatabase=boomerang --set mongodbUsername=boomerang`
+6. `docker pull --platform linux/amd64  boomerangio/{flow-loader:1.0.0-beta.40,flow-service-handler:7.0.0-beta.24,flow-service-engine:1.0.0-beta.79,flow-service-workflow:4.0.0-beta.197}`
+7. `helm upgrade --install workflows -n workflows -f ./flowabl-dev-5.1.0-values.yaml boomerang-io/bmrg-flow --version 5.1.7`
+8. `kubectl get secret --namespace workflows mongodb -o jsonpath="{.data.mongodb-password}" | base64 --decode | pbcopy`
 
-### `npm run build`
+#### Connect to Database with Robo 3T
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Connect to database using client with credentials
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+username: boomerang
+database: boomerang
+password: `kubectl get secret --namespace workflows mongodb -o jsonpath="{.data.mongodb-password}" | base64 --decode | pbcopy`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Setup Database
 
-### `npm run eject`
+1. Create `workflows_users` collection
+2. Create user
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```json
+{
+    "email" : "tim@test.com",
+    "name" : "Tim",
+    "type" : "user",
+    "creationDate" : ISODate("2024-01-11T03:05:41.738Z"),
+    "status" : "active",
+    "labels" : {},
+    "settings" : {
+        "isFirstVisit" : true,
+        "isShowHelp" : true,
+        "hasConsented" : false
+    },
+}
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### Create Tokens
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+1. Create global token
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+POST `http://<workflow-service>/internal/debug/token`
 
-## Learn More
+```json
+{
+  "type": "global",
+  "name": "global-test-token",
+  "permissions": ["**/**"]
+}
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. Create user token
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+POST `http://<workflow-service>/api/v2/token`
 
-### Code Splitting
+HEADER Authorization: Bear <global token from above>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```json
+{
+  "type": "user",
+  "name": "test-token-user",
+  "principal": "<user-id>"
+}
+```
 
-### Analyzing the Bundle Size
+#### Port Forwarding
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. Port forward to service to avoid CORS errors
+   `kubectl port-forward svc/flow-services-workflow 8081:80 -n workflows`
 
-### Making a Progressive Web App
+2. Export token
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+export AUTH_JWT=<user_token>
 
-### Advanced Configuration
+3. `npm run start:pf`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

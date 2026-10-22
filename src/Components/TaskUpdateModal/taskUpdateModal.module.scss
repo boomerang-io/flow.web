@@ -20,7 +20,7 @@
 
 .versionTitle {
   height: 1.125rem;
-  color: var(--cds-text-01);
+  color: var(--cds-text-primary);
   font-size: 0.875rem;
   letter-spacing: 0;
   line-height: 1.125rem;
@@ -29,7 +29,7 @@
 
 .versionSubtitle {
   height: 0.9375rem;
-  color: var(--cds-text-01);
+  color: var(--cds-text-primary);
   font-size: 0.75rem;
   letter-spacing: 0.01rem;
   line-height: 0.9375rem;
@@ -42,7 +42,7 @@
 
 .versionName {
   height: 1.625rem;
-  color: var(--cds-text-01);
+  color: var(--cds-text-primary);
   font-size: 1rem;
   letter-spacing: 0;
   line-height: 1.625rem;
@@ -51,39 +51,36 @@
 
 .versionDescription {
   height: 1.125rem;
-  color: var(--cds-text-01);
+  color: var(--cds-text-primary);
   font-size: 0.875rem;
   letter-spacing: 0;
   line-height: 1.125rem;
 }
 
 .versionInputsContainer {
-  padding: 0.5rem;
+  padding: 0.5rem 0;
   > * + * {
     margin-top: 0.5rem;
   }
 }
 
-.stateHilighter {
+.stateHighlighter {
   border: 0.125rem solid transparent;
   border-radius: 0.25rem;
   padding: 0.5rem;
-  &.remove {
+  &.add {
     border-color: var(--cds-support-03);
   }
 
-  &.add {
+  &.remove {
     border-color: var(--cds-support-01);
   }
 }
 
-.stateHilighterText {
+.stateHighlighterText {
   align-items: center;
   display: flex;
-  margin-top: 0.125rem;
+  margin-top: 0.25rem;
   margin-bottom: 1rem;
-
-  svg {
-    margin: 0 0.5625rem;
-  }
+  gap: 0.125rem;
 }

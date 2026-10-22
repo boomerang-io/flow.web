@@ -1,8 +1,8 @@
 @import "Styles/mixins";
 
 .container {
-  height: 1.5rem;
-  width: 1.5rem;
+  height: 1.75rem;
+  width: 1.75rem;
   opacity: inherit;
 
   &.designer {
@@ -12,12 +12,21 @@
     }
   }
 
-  &.execution {
+  &.disabled {
     circle {
-      stroke: var(--cds-text-01);
+      stroke: var(--cds-text-primary);
     }
     path {
-      fill: var(--cds-text-01) !important;
+      fill: var(--cds-text-primary);
+    }
+  }
+
+  &.execution {
+    circle {
+      stroke: var(--cds-text-primary);
+    }
+    path {
+      fill: var(--cds-text-primary) !important;
     }
   }
 
@@ -35,7 +44,7 @@
 
   &.always {
     path {
-      fill: var(--cds-text-01);
+      fill: var(--cds-text-primary);
     }
   }
 }

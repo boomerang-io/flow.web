@@ -21,6 +21,7 @@
         "name": "typescript-plugin-css-modules"
       }
     ],
+    "types": ["cypress", "@testing-library/cypress"],
     "noFallthroughCasesInSwitch": true
   },
   "exclude": ["dist", "node_modules", "public", "server"],

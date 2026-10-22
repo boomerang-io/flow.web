@@ -1,19 +1,13 @@
 import React from "react";
-import { Button, CodeSnippet, Tag, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button, CodeSnippet } from "@carbon/react";
+import { TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import SlidingPane from "react-sliding-pane";
 import cronstrue from "cronstrue";
 import cx from "classnames";
 import moment from "moment-timezone";
 import { DATETIME_LOCAL_DISPLAY_FORMAT } from "Utils/dateHelper";
 import { scheduleStatusLabelMap, scheduleTypeLabelMap } from "Constants";
-import {
-  CircleFilled16,
-  Information16,
-  SettingsAdjust16,
-  RadioButton16,
-  Repeat16,
-  RepeatOne16,
-} from "@carbon/icons-react";
+import { CircleFilled, Information, SettingsAdjust, RadioButton, Repeat, RepeatOne } from "@carbon/react/icons";
 import { ScheduleUnion } from "Types";
 import "react-sliding-pane/dist/react-sliding-pane.css";
 import styles from "./SchedulePanelDetail.module.scss";
@@ -38,17 +32,18 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
     // Convert from UTC to configured timezone to get the correct offset, adjusting for daylight saving time
     // Then convert to the local time of the users's browser
     const nextScheduledDate = moment(moment.tz(schedule.nextScheduleDate, schedule.timezone).toISOString()).format(
-      DATETIME_LOCAL_DISPLAY_FORMAT
+      DATETIME_LOCAL_DISPLAY_FORMAT,
     );
 
     const labels = [];
-    for (const entry of schedule?.labels || []) {
-      labels.push(
-        <Tag key={entry.key} style={{ marginLeft: 0 }} type="teal">
-          {entry.key}:{entry.value}
-        </Tag>
-      );
-    }
+    //TODO: fix labels
+    // for (const entry of schedule?.labels || []) {
+    //   labels.push(
+    //     <Tag key={entry.key} style={{ marginLeft: 0 }} type="teal">
+    //       {entry.key}:{entry.value}
+    //     </Tag>
+    //   );
+    // }
 
     return (
       <>
@@ -60,7 +55,7 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
                 size="sm"
                 kind="ghost"
                 onClick={props.setIsEditorOpen}
-                renderIcon={SettingsAdjust16}
+                renderIcon={SettingsAdjust}
                 style={{ marginLeft: "auto" }}
               >
                 Edit Schedule
@@ -73,7 +68,7 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
               <dt>Type</dt>
               <dd style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
                 {scheduleTypeLabelMap[schedule.type]}
-                {schedule.type === "runOnce" ? <RepeatOne16 /> : <Repeat16 />}
+                {schedule.type === "runOnce" ? <RepeatOne /> : <Repeat />}
               </dd>
             </dl>
             <dl>
@@ -81,9 +76,9 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
               <dd style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
                 {scheduleStatusLabelMap[schedule.status]}
                 {schedule.status === "inactive" ? (
-                  <RadioButton16 className={styles.statusCircle} data-status={schedule.status} />
+                  <RadioButton className={styles.statusCircle} data-status={schedule.status} />
                 ) : (
-                  <CircleFilled16 className={styles.statusCircle} data-status={schedule.status} />
+                  <CircleFilled className={styles.statusCircle} data-status={schedule.status} />
                 )}
               </dd>
             </dl>
@@ -103,7 +98,7 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
                   tooltipText={"The execution date is shown in local time based on the time zone of your browser."}
                   style={{ height: "0.75rem" }}
                 >
-                  <Information16 />
+                  <Information />
                 </TooltipHover>
               </dt>
               <dd>{nextScheduledDate}</dd>
@@ -127,7 +122,9 @@ export default function SchedulePanelDetail(props: SchedulePanelDetailProps) {
             <h2>Workflow Parameters</h2>
             <p style={{ marginBottom: "1rem" }}>Values for your workflow</p>
             <CodeSnippet light hideCopyButton type="multi">
-              {JSON.stringify(schedule?.parameters, null, 2)}
+              {schedule?.params
+                ? JSON.stringify(schedule?.params, null, 2)
+                : "No parameters have been set on this Schedule."}
             </CodeSnippet>
           </section>
           <hr />

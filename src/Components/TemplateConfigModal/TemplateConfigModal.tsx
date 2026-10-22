@@ -1,8 +1,9 @@
 import React from "react";
-import { ComposedModal, Button, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button } from "@carbon/react";
+import { Add, Edit } from "@carbon/react/icons";
+import { ComposedModal, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { DataDrivenInput, ModalTriggerProps } from "Types";
 import TemplateConfigModalContent from "./TemplateConfigModalContent";
-import { Add16, Edit16 } from "@carbon/icons-react";
-import { ComposedModalChildProps, DataDrivenInput, ModalTriggerProps } from "Types";
 
 interface TemplateConfigModalProps {
   field: DataDrivenInput;
@@ -25,8 +26,8 @@ const TemplateConfigModal: React.FC<TemplateConfigModalProps> = (props) => {
           iconDescription="Edit field"
           kind="ghost"
           onClick={openModal}
-          renderIcon={Edit16}
-          size="field"
+          renderIcon={Edit}
+          size="md"
         />
       </TooltipHover>
     ) : (
@@ -36,9 +37,9 @@ const TemplateConfigModal: React.FC<TemplateConfigModalProps> = (props) => {
           iconDescription="Add field"
           kind="ghost"
           onClick={openModal}
-          renderIcon={Add16}
-          size="field"
-          style={{ marginRight: "0.5rem" }}
+          renderIcon={Add}
+          size="md"
+          style={{ width: "8rem" }}
         >
           Add a field
         </Button>
@@ -56,7 +57,7 @@ const TemplateConfigModal: React.FC<TemplateConfigModalProps> = (props) => {
       }}
       modalTrigger={editTrigger}
     >
-      {({ closeModal, forceCloseModal }: ComposedModalChildProps) => (
+      {({ closeModal, forceCloseModal }) => (
         <TemplateConfigModalContent
           field={props.field}
           fieldKeys={props.fieldKeys}

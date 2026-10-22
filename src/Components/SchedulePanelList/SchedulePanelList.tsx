@@ -1,8 +1,7 @@
 import React from "react";
-import { useMutation, useQueryClient, UseQueryResult } from "react-query";
 import {
   Button,
-  ConfirmModal,
+  Layer,
   MultiSelect,
   OverflowMenu,
   OverflowMenuItem,
@@ -10,18 +9,18 @@ import {
   Search,
   Tag,
   Tile,
-  TooltipHover,
-  ToastNotification,
-  notify,
-} from "@boomerang-io/carbon-addons-boomerang-react";
+} from "@carbon/react";
+import { Add, CircleFilled, Information, RadioButton, Repeat, RepeatOne } from "@carbon/react/icons";
+import { ConfirmModal, TooltipHover, ToastNotification, notify } from "@boomerang-io/carbon-addons-boomerang-react";
 import cronstrue from "cronstrue";
-import matchSorter from "match-sorter";
+import { matchSorter } from "match-sorter";
 import moment from "moment-timezone";
+import { useMutation, useQueryClient } from "react-query";
+import { useTeamContext } from "Hooks";
 import { DATETIME_LOCAL_DISPLAY_FORMAT } from "Utils/dateHelper";
 import { scheduleStatusOptions, scheduleStatusLabelMap, scheduleTypeLabelMap } from "Constants";
 import { resolver } from "Config/servicesConfig";
-import { Add16, CircleFilled16, Information16, RadioButton16, Repeat16, RepeatOne16 } from "@carbon/icons-react";
-import { ScheduleUnion } from "Types";
+import { ScheduleUnion, PaginatedSchedulesResponse } from "Types";
 import styles from "./SchedulePanelList.module.scss";
 
 interface SchedulePanelListProps {
@@ -33,8 +32,13 @@ interface SchedulePanelListProps {
     | ((schedule: ScheduleUnion) => void);
   setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsCreatorOpen: React.Dispatch<React.SetStateAction<boolean>>;
+<<<<<<< HEAD
   schedulesQuery: UseQueryResult<ScheduleUnion[], any>;
   canEditWorkflow?: boolean;
+=======
+  schedulesIsLoading: boolean;
+  schedulesData: PaginatedSchedulesResponse | undefined;
+>>>>>>> origin/main
 }
 
 export default function SchedulePanelList(props: SchedulePanelListProps) {
@@ -42,7 +46,7 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
   const [selectedStatuses, setSelectedStatuses] = React.useState<Array<string>>([]);
 
   function renderLists() {
-    if (props.schedulesQuery.isLoading) {
+    if (props.schedulesIsLoading) {
       return (
         <div>
           <SkeletonPlaceholder className={styles.listItemSkeleton} />
@@ -53,11 +57,11 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
       );
     }
 
-    if (props.schedulesQuery.data && props.schedulesQuery.data.length === 0) {
-      return <div>No schedules found</div>;
+    if (props.schedulesData && props.schedulesData.numberOfElements === 0) {
+      return <div style={{ marginTop: "1rem" }}>No schedules found</div>;
     }
 
-    const schedules = props.schedulesQuery.data;
+    const schedules = props.schedulesData?.content;
     if (schedules) {
       const filteredSchedules = Boolean(filterQuery)
         ? matchSorter(schedules, filterQuery, {
@@ -101,10 +105,11 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
     }
   }
 
-  const schedules = props.schedulesQuery.data;
+  const schedules = props.schedulesData?.content;
 
   return (
     <section className={styles.listContainer}>
+<<<<<<< HEAD
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <h2>
           {!props.schedulesQuery.isLoading ? `Existing Schedules (${schedules?.length ?? 0})` : "Loading Schedules..."}
@@ -116,6 +121,11 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
           kind="ghost"
           disabled={!props.canEditWorkflow}
         >
+=======
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+        <h2>{!props.schedulesIsLoading ? `Existing Schedules (${schedules?.length ?? 0})` : "Loading Schedules..."}</h2>
+        <Button size="sm" renderIcon={Add} onClick={() => props.setIsCreatorOpen(true)} kind="ghost">
+>>>>>>> origin/main
           Create a Schedule
         </Button>
       </div>
@@ -125,14 +135,14 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
             light
             id="schedules-filter"
             labelText="Filter Schedules"
-            placeHolderText="Search Schedules"
+            placeholder="Search Schedules"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilterQuery(e.target.value)}
           />
         </div>
         {props.includeStatusFilter && (
-          <div style={{ width: "50%" }}>
+          <Layer style={{ width: "50%" }}>
             <MultiSelect
-              light
+              hideLabel
               id="actions-statuses-select"
               label="Choose status(es)"
               placeholder="Choose status(es)"
@@ -144,7 +154,7 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
               selectedItem={selectedStatuses}
               titleText="Filter by status"
             />
-          </div>
+          </Layer>
         )}
       </div>
       {renderLists()}
@@ -164,26 +174,29 @@ interface ScheduledListItemProps {
 }
 
 function ScheduledListItem(props: ScheduledListItemProps) {
+  const { team } = useTeamContext();
   const queryClient = useQueryClient();
   const [isToggleStatusModalOpen, setIsToggleStatusModalOpen] = React.useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
 
   // Determine some things for rendering
   const isActive = props.schedule.status === "active";
-  const labels = [];
-  for (const entry of props.schedule?.labels || []) {
+  // Iterate through labels: Record<string, string>
+  const labels: Array<React.ReactNode> = [];
+  //TODO figure out labels
+  Object.entries(props.schedule?.labels || {}).forEach(([index, value]) => {
     labels.push(
-      <Tag key={entry.key} style={{ marginLeft: 0 }} type="teal">
-        {entry.key}:{entry.value}
-      </Tag>
+      <Tag key={index} style={{ marginLeft: 0 }} type="teal">
+        {/* ${value} */}
+      </Tag>,
     );
-  }
+  });
   const scheduleDescription = props.schedule?.description ?? "---";
   const nextScheduledText = props.schedule.type === "runOnce" ? "Scheduled Execution" : "Next Execution";
   // Convert from UTC to configured timezone to get the correct offset, adjusting for daylight saving time
   // Then convert to the local time of the users's browser
   const nextScheduledDate = moment(
-    moment.tz(props.schedule.nextScheduleDate, props.schedule?.timezone).toISOString()
+    moment.tz(props.schedule.nextScheduleDate, props.schedule?.timezone).toISOString(),
   ).format(DATETIME_LOCAL_DISPLAY_FORMAT);
 
   /**
@@ -193,13 +206,13 @@ function ScheduledListItem(props: ScheduledListItemProps) {
 
   const handleDeleteSchedule = async () => {
     try {
-      await deleteScheduleMutator({ scheduleId: props.schedule.id });
+      await deleteScheduleMutator({ team: team.name, id: props.schedule.id });
       notify(
         <ToastNotification
           kind="success"
           title={`Delete Schedule`}
           subtitle={`Successfully deleted schedule ${props.schedule.name}`}
-        />
+        />,
       );
       queryClient.invalidateQueries(props.getSchedulesUrl);
       queryClient.invalidateQueries(props.getCalendarUrl);
@@ -209,7 +222,7 @@ function ScheduledListItem(props: ScheduledListItemProps) {
           kind="error"
           title="Something's Wrong"
           subtitle={`Request to delete schedule ${props.schedule.name} failed`}
-        />
+        />,
       );
       return;
     }
@@ -218,18 +231,18 @@ function ScheduledListItem(props: ScheduledListItemProps) {
   /**
    * Disable schedule
    */
-  const { mutateAsync: toggleScheduleStatusMutator, ...toggleStatusMutation } = useMutation(resolver.patchSchedule, {});
+  const { mutateAsync: toggleScheduleStatusMutator, ...toggleStatusMutation } = useMutation(resolver.putSchedule, {});
 
   const handleToggleStatus = async () => {
     const body = { ...props.schedule, status: isActive ? "inactive" : "active" };
     try {
-      await toggleScheduleStatusMutator({ scheduleId: props.schedule.id, body });
+      await toggleScheduleStatusMutator({ team: team.name, body });
       notify(
         <ToastNotification
           kind="success"
           title={`${isActive ? "Disable" : "Enable"} Schedule`}
           subtitle={`Successfully ${isActive ? "disabled" : "enabled"} schedule ${props.schedule.name} `}
-        />
+        />,
       );
       queryClient.invalidateQueries(props.getSchedulesUrl);
       queryClient.invalidateQueries(props.getCalendarUrl);
@@ -239,7 +252,7 @@ function ScheduledListItem(props: ScheduledListItemProps) {
           kind="error"
           title="Something's Wrong"
           subtitle={`Request to ${isActive ? "disable" : "enable"} schedule ${props.schedule.name} failed`}
-        />
+        />,
       );
       return;
     }
@@ -273,13 +286,13 @@ function ScheduledListItem(props: ScheduledListItemProps) {
         <div className={styles.listItemTitle}>
           <h3 title={props.schedule.name}>{props.schedule.name}</h3>
           <TooltipHover direction="top" tooltipText={scheduleTypeLabelMap[props.schedule.type] ?? "---"}>
-            {props.schedule.type === "runOnce" ? <RepeatOne16 /> : <Repeat16 />}
+            {props.schedule.type === "runOnce" ? <RepeatOne /> : <Repeat />}
           </TooltipHover>
           <TooltipHover direction="top" tooltipText={scheduleStatusLabelMap[props.schedule.status]}>
             {props.schedule.status === "inactive" ? (
-              <RadioButton16 className={styles.statusCircle} data-status={props.schedule.status} />
+              <RadioButton className={styles.statusCircle} data-status={props.schedule.status} />
             ) : (
-              <CircleFilled16 className={styles.statusCircle} data-status={props.schedule.status} />
+              <CircleFilled className={styles.statusCircle} data-status={props.schedule.status} />
             )}
           </TooltipHover>
         </div>
@@ -294,7 +307,7 @@ function ScheduledListItem(props: ScheduledListItemProps) {
                 direction="top"
                 tooltipText={"The execution date is shown in local time based on the time zone of your browser."}
               >
-                <Information16 />
+                <Information />
               </TooltipHover>
             </dt>
             <dd>{nextScheduledDate}</dd>
@@ -316,6 +329,7 @@ function ScheduledListItem(props: ScheduledListItemProps) {
           <dt>Labels</dt>
           <dd>{labels.length > 0 ? labels : "---"}</dd>
         </dl>
+<<<<<<< HEAD
         {props.canEditWorkflow && (
           <OverflowMenu
             flipped
@@ -323,11 +337,19 @@ function ScheduledListItem(props: ScheduledListItemProps) {
             iconDescription="Schedule menu icon"
             style={{ position: "absolute", right: "0", top: "0" }}
           >
+=======
+        <div style={{ position: "absolute", right: "0", top: "0" }}>
+          <OverflowMenu flipped ariaLabel="Schedule card menu" iconDescription="Schedule menu icon" size="sm">
+>>>>>>> origin/main
             {menuOptions.map(({ onClick, itemText, ...rest }, index) => (
               <OverflowMenuItem onClick={onClick} itemText={itemText} key={`${itemText}-${index}`} {...rest} />
             ))}
           </OverflowMenu>
+<<<<<<< HEAD
         )}
+=======
+        </div>
+>>>>>>> origin/main
       </Tile>
       {isToggleStatusModalOpen && (
         <ConfirmModal

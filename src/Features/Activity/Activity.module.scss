@@ -1,19 +1,11 @@
 @import "Styles/mixins";
 
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-}
-
 .content {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 10.3125rem);
-
   padding: 1.875rem 1.5rem 1.5rem;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
 }
 
@@ -28,7 +20,7 @@
   flex-flow: row wrap;
   width: 100%;
 
-  :global .bx--form-item {
+  :global .cds--form-item {
     flex-grow: 0;
   }
 }

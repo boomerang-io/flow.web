@@ -1,11 +1,11 @@
-/// <reference types="react-scripts" />
-declare module "@boomerang-io/carbon-addons-boomerang-react";
-declare module "@carbon/icons-react";
+declare module "@carbon/pictograms-react";
 declare module "@boomerang-io/utils";
-declare module "carbon-components";
 declare module "react-lazylog";
+declare module "react/jsx-runtime";
 
 declare module "*.scss" {
   const styles: { [className: string]: string };
   export default styles;
 }
+
+declare module "react/jsx-runtime";

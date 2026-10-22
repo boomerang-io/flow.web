@@ -20,26 +20,42 @@
     }
   }
 
-  :global .bx--overflow-menu {
+  :global .cds--overflow-menu {
     height: 2rem;
   }
 
-  :global .bx--overflow-menu-options__btn {
+  :global .cds--overflow-menu-options__btn {
     color: var(--cds-text-03);
     text-decoration: none !important;
   }
-  :global .bx--overflow-menu-options--open {
+  :global .cds--overflow-menu-options--open {
     @include border-radius();
     overflow: hidden;
     z-index: 998;
   }
 
-  :global .bx--overflow-menu-options__option {
+  :global .cds--overflow-menu-options__option {
     min-width: 11.125rem;
     // &:hover {
     //   background-color: $cool-gray-1;
     // }
   }
+}
+
+.skeletonCardContainer {
+  display: flex;
+  gap: 1.5rem
+}
+
+.skeletonCard {
+  min-width: 19.375rem;
+  width: 19.375rem;
+  height: 10.31255rem;
+  @include border-radius();
+}
+
+.skeletonText {
+  width: 10rem !important;
 }
 
 .details {
@@ -52,7 +68,7 @@
 }
 
 .iconContainer {
-  color: var(--cds-text-01);
+  color: var(--cds-text-primary);
   display: flex;
   justify-content: center;
   width: 5rem;
@@ -73,11 +89,11 @@
   }
 }
 .name {
-  color: var(--cds-text-01);
+  color: var(--cds-text-primary);
   font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: 0rem;
-  line-height: 1.25rem;
+  line-height: 1.25;
   margin: 0;
   margin-bottom: 0.5rem;
   text-align: left;
@@ -85,7 +101,7 @@
 }
 
 .description {
-  color: var(--cds-text-01);
+  color: var(--cds-text-primary);
   display: block;
   font-size: 0.75rem;
   letter-spacing: 0rem;
@@ -97,7 +113,7 @@
 .launch {
   cursor: pointer;
   width: 100%;
-  :global .bx--btn {
+  :global .cds--btn {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     flex-direction: row-reverse;
@@ -107,8 +123,9 @@
     max-width: 19.375rem;
     padding: 0rem 0.25rem;
     width: 19.375rem;
+    align-items: center;
 
-    .bx--btn__icon {
+    .cds--btn__icon {
       height: 1.5rem;
       margin-right: 1rem;
       position: initial;
@@ -123,7 +140,7 @@
   text-align: left;
 }
 
-:global .bx--overflow-menu-options.bx--overflow-menu--flip {
+:global .cds--overflow-menu-options.cds--overflow-menu--flip {
   position: fixed !important;
 }
 
@@ -135,7 +152,7 @@
   right: calc(50% - 0.75rem);
 
   circle {
-    stroke: var(--cds-text-01);
+    stroke: var(--cds-text-primary);
   }
 }
 
@@ -155,7 +172,7 @@
 }
 
 .warningIcon {
-  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .teamQuotaText {
@@ -163,4 +180,21 @@
   font-size: 12px;
   letter-spacing: 0;
   line-height: 15px;
+}
+
+.status {
+  align-items: center;
+  display: flex;
+  position: absolute;
+  left: 0.5rem;
+  top: 0;
+  min-height: 2rem;
+}
+
+.statusText {
+  font-size: var(--cds-label-01-font-size, 0.75rem);
+  font-weight: var(--cds-label-01-font-weight, 400);
+  line-height: var(--cds-label-01-line-height, 1.33333);
+  letter-spacing: var(--cds-label-01-letter-spacing, 0.32px);
+  color: var(--cds-text-secondary, #4d5358);
 }

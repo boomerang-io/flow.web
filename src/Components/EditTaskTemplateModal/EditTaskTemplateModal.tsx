@@ -1,28 +1,29 @@
 //@ts-nocheck
 import React from "react";
 import PropTypes from "prop-types";
-import { Button, ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button } from "@carbon/react";
+import { ComposedModal } from "@boomerang-io/carbon-addons-boomerang-react";
 import EditTaskTemplateForm from "./EditTaskTemplateForm";
-import { Edit16 } from "@carbon/icons-react";
+import { Edit } from "@carbon/react/icons";
 import styles from "./editTaskTemplateModal.module.scss";
 
 EditTaskTemplateModal.propTypes = {
   canEdit: PropTypes.bool,
   isActive: PropTypes.bool,
-  nodeType: PropTypes.string.isRequired,
   isOldVersion: PropTypes.bool,
   setFieldValue: PropTypes.func.isRequired,
   taskTemplates: PropTypes.array.isRequired,
   values: PropTypes.object.isRequired,
 };
 
-function EditTaskTemplateModal({ isActive, nodeType, isOldVersion, setFieldValue, taskTemplates, values, canEdit }) {
+function EditTaskTemplateModal({ isActive, isOldVersion, setFieldValue, taskTemplates, values, canEdit }) {
   const handleEditTaskTemplateModal = async ({ newValues }) => {
     let newEnvs = newValues.envs.map((env) => {
       let index = env.indexOf(":");
       return { name: env.substring(0, index), value: env.substring(index + 1, env.length) };
     });
     setFieldValue("name", newValues.name);
+    setFieldValue("displayName", newValues.displayName);
     setFieldValue("description", newValues.description);
     setFieldValue("category", newValues.category);
     setFieldValue("arguments", newValues.arguments);
@@ -44,11 +45,11 @@ function EditTaskTemplateModal({ isActive, nodeType, isOldVersion, setFieldValue
       }}
       modalTrigger={({ openModal }) => (
         <Button
-          renderIcon={Edit16}
+          renderIcon={Edit}
           iconDescription="edit-template"
           disabled={isOldVersion || !isActive || !canEdit}
           kind="ghost"
-          size="field"
+          size="md"
           onClick={openModal}
         />
       )}
@@ -60,7 +61,6 @@ function EditTaskTemplateModal({ isActive, nodeType, isOldVersion, setFieldValue
         <EditTaskTemplateForm
           closeModal={closeModal}
           handleEditTaskTemplateModal={handleEditTaskTemplateModal}
-          nodeType={nodeType}
           taskTemplates={taskTemplates}
           templateData={values}
         />

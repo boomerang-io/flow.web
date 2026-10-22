@@ -2,11 +2,12 @@ import React from "react";
 import {
   FlowTeam,
   FlowUser,
-  TaskModel,
-  UserWorkflow,
-  WorkflowExecution,
-  WorkflowRevision,
-  WorkflowSummary,
+  PaginatedWorkflowResponse,
+  Task,
+  WorkflowCanvas,
+  WorkflowEngineModeType,
+  WorkflowRun,
+  WorkflowTemplate,
 } from "Types";
 
 export function createContext<ContextType>() {
@@ -25,34 +26,36 @@ type AppContext = {
   communityUrl: string;
   isTutorialActive: boolean;
   setIsTutorialActive: (isActive: boolean) => void;
-  quotas: {
-    maxActivityStorageSize: string;
-    maxWorkflowStorageSize: string;
-  };
-  teams: FlowTeam[];
+  teams: FlowTeam[] | null; // TODO - check if we need this
   user: FlowUser;
-  userWorkflows: UserWorkflow;
+  name: string;
+  workflowTemplates: Array<WorkflowTemplate>;
 };
 
-interface TaskProvider {
-  category: string;
-  id: string;
-  icon: any;
-  name: string;
+interface WorkflowContext {
+  mode: WorkflowEngineModeType;
+  tasks: Record<string, Array<Task>>;
 }
 
-interface ExecutionContext {
-  tasks: Array<TaskProvider>;
-  workflowExecution?: WorkflowExecution;
-  workflowRevision: object;
+export const [useWorkflowContext, WorkflowProvider] = createContext<WorkflowContext>();
+
+interface RunContext {
+  workflow: WorkflowCanvas;
+  workflowRun: WorkflowRun;
 }
-export const [useExecutionContext, ExecutionContextProvider] = createContext<ExecutionContext>();
+export const [useRunContext, RunContextProvider] = createContext<RunContext>();
 
 interface EditorContext {
+  availableParameters: Array<string>;
   revisionDispatch?: Function;
-  revisionState: WorkflowRevision;
-  summaryData: WorkflowSummary;
-  taskTemplatesData: Array<TaskModel>;
+  revisionState: WorkflowCanvas;
+  workflowsQueryData: PaginatedWorkflowResponse;
 }
 
 export const [useEditorContext, EditorContextProvider] = createContext<EditorContext>();
+
+interface TeamContext {
+  team: FlowTeam;
+}
+
+export const [useTeamContext, TeamContextProvider] = createContext<TeamContext>();

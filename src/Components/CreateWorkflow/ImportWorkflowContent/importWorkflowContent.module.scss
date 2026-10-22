@@ -1,20 +1,24 @@
 .body {
   width: 100%;
-  :global .bx--file__selected-file {
+  :global .cds--file__selected-file {
     background: none;
   }
 
-  :global .bx--file__selected-file {
+  :global .cds--file__selected-file {
     background: var(--cds-ui-background);
+  }
+
+  :global .cds--file-browse-btn {
+    max-inline-size: none;
   }
 }
 
 .confirmInfoForm {
   display: flex;
   flex-direction: column;
-  :global .bx--form-item,
-  :global .bx--list-box__wrapper {
-    max-width: 20rem;
+  :global .cds--form-item,
+  :global .cds--list-box__wrapper {
+    // max-width: 20rem;
     margin-top: 1rem;
   }
 }

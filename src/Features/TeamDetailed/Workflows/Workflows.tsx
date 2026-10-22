@@ -1,8 +1,11 @@
 import React from "react";
+<<<<<<< HEAD
 import { useFeature } from "flagged";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import queryString from "query-string";
+=======
+>>>>>>> origin/main
 import {
   Search,
   StructuredListWrapper,
@@ -10,24 +13,42 @@ import {
   StructuredListBody,
   StructuredListRow,
   StructuredListCell,
-} from "@boomerang-io/carbon-addons-boomerang-react";
-import EmptyState from "Components/EmptyState";
-import ms from "match-sorter";
+} from "@carbon/react";
 import sortBy from "lodash/sortBy";
+<<<<<<< HEAD
 import { appLink, FeatureFlag } from "Config/appConfig";
 import { FlowTeam } from "Types";
+=======
+import { matchSorter as ms } from "match-sorter";
+import moment from "moment";
+import queryString from "query-string";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+import { Link } from "react-router-dom";
+import EmptyState from "Components/EmptyState";
+import { appLink } from "Config/appConfig";
+import { serviceUrl, resolver } from "Config/servicesConfig";
+import { FlowTeam, PaginatedWorkflowResponse } from "Types";
+>>>>>>> origin/main
 import styles from "./Workflows.module.scss";
 
 function Workflows({ team }: { team: FlowTeam }) {
   const activityEnabled = useFeature(FeatureFlag.ActivityEnabled);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const { workflows } = team;
+
+  const getWorkflowsUrl = serviceUrl.team.workflow.getWorkflows({ team: team?.name });
+  const workflowsQuery = useQuery<PaginatedWorkflowResponse, string>({
+    queryKey: getWorkflowsUrl,
+    queryFn: resolver.query(getWorkflowsUrl),
+  });
+
+  const workflows = workflowsQuery.data?.content || [];
   const filteredWorkflowsList = searchQuery ? ms(workflows, searchQuery, { keys: ["name", "description"] }) : workflows;
 
   return (
-    <section aria-label={`${team.name} Team Workflows`} className={styles.container}>
+    <section aria-label={`${team.displayName} Team Workflows`} className={styles.container}>
       <Helmet>
-        <title>{`Workflows - ${team.name}`}</title>
+        <title>{`Workflows - ${team.displayName}`}</title>
       </Helmet>
       <section className={styles.actionsContainer}>
         <div className={styles.leftActions}>
@@ -38,8 +59,9 @@ function Workflows({ team }: { team: FlowTeam }) {
           <Search
             labelText="workflow search"
             id="workflow-search"
-            placeHolderText="Search for a workflow"
+            placeholder="Search for a workflow"
             onChange={(e: React.FormEvent<HTMLInputElement>) => setSearchQuery(e.currentTarget.value)}
+            size="sm"
           />
         </div>
       </section>
@@ -47,9 +69,11 @@ function Workflows({ team }: { team: FlowTeam }) {
         <StructuredListWrapper>
           <StructuredListHead>
             <StructuredListRow head>
-              <StructuredListCell head>Name</StructuredListCell>
-              <StructuredListCell head>Summary</StructuredListCell>
-              <StructuredListCell head>Revision Count</StructuredListCell>
+              <StructuredListCell head>Display Name</StructuredListCell>
+              <StructuredListCell head>Unique Identifier Name</StructuredListCell>
+              <StructuredListCell head>Date Created</StructuredListCell>
+              <StructuredListCell head>Description</StructuredListCell>
+              <StructuredListCell head>Version</StructuredListCell>
               <StructuredListCell head />
               {activityEnabled && <StructuredListCell head />}
             </StructuredListRow>
@@ -57,27 +81,34 @@ function Workflows({ team }: { team: FlowTeam }) {
           <StructuredListBody>
             {sortBy(filteredWorkflowsList, "name").map((workflow) => {
               return (
-                <StructuredListRow key={workflow.id}>
+                <StructuredListRow key={workflow.name}>
+                  <StructuredListCell>
+                    <div className={styles.workflowNameContainer}>
+                      <p>{workflow.displayName}</p>
+                    </div>
+                  </StructuredListCell>
                   <StructuredListCell>
                     <div className={styles.workflowNameContainer}>
                       <p>{workflow.name}</p>
                     </div>
                   </StructuredListCell>
                   <StructuredListCell>
-                    {workflow.shortDescription !== "" ? workflow.shortDescription : "---"}
+                    <time>{moment(workflow.creationDate).format("YYYY-MM-DD hh:mm A")}</time>
                   </StructuredListCell>
-                  <StructuredListCell>{workflow.revisionCount}</StructuredListCell>
+                  <StructuredListCell>{workflow.description !== "" ? workflow.description : "---"}</StructuredListCell>
+                  <StructuredListCell>{workflow.version}</StructuredListCell>
                   <StructuredListCell>
                     <Link
                       className={styles.viewWorkflowLink}
                       to={{
-                        pathname: appLink.editorDesigner({ workflowId: workflow.id }),
-                        state: { fromTeam: { id: team.id, name: team.name } },
+                        pathname: appLink.editorCanvas({ team: team.name, workflow: workflow.name }),
+                        state: { fromTeam: team.name },
                       }}
                     >
                       View/edit
                     </Link>
                   </StructuredListCell>
+<<<<<<< HEAD
                   {activityEnabled && (
                     <StructuredListCell>
                       <Link
@@ -90,6 +121,17 @@ function Workflows({ team }: { team: FlowTeam }) {
                       >
                         Activity
                       </Link>
+=======
+                  <StructuredListCell>
+                    <Link
+                      className={styles.viewWorkflowLink}
+                      to={{
+                        pathname: appLink.activity({ team: team.name }),
+                        search: queryString.stringify({ page: 0, size: 10, workflows: workflow.name }),
+                        state: { fromTeam: team.name },
+                      }}
+                    >
+>>>>>>> origin/main
                       Activity
                     </StructuredListCell>
                   )}

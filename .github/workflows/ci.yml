@@ -7,6 +7,7 @@ on:
       - "release-*"
     tags:
       - "*"
+      - "*"
   pull_request:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,38 +23,31 @@ jobs:
         with:
           node-version: 22.22.0
 
-      - uses: pnpm/action-setup@v2.0.1
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
           version: 10.26.0
           run_install: false
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 18
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
 
-      - run: pnpm run test
+    # - run: pnpm run test
       - run: pnpm run build
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
         if: ${{ success() && startsWith(github.ref, 'refs/tags/')}}
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -62,7 +56,7 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/*\//}
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true

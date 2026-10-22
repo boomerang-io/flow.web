@@ -2,14 +2,8 @@
 import React from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import {
-  Button,
-  ComposedModal,
-  ModalBody,
-  ModalFooter,
-  ModalForm,
-  TextInput,
-} from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button, ModalBody, ModalFooter } from "@carbon/react";
+import { ComposedModal, ModalForm, TextInput } from "@boomerang-io/carbon-addons-boomerang-react";
 import styles from "./LabelModal.module.scss";
 
 interface LabelModalProps {
@@ -35,7 +29,7 @@ const LabelModal: React.FC<LabelModalProps> = ({ action, isEdit = false, labelsK
       }}
       modalTrigger={modalTrigger}
     >
-      {({ closeModal }: { closeModal: () => void }) => (
+      {({ closeModal }) => (
         <AddLabelModalContent
           action={action}
           closeModal={closeModal}
@@ -112,7 +106,7 @@ const AddLabelModalContent: React.FC<AddLabelModalContentProps> = ({
           .test(
             "validate-k8s-value",
             "Value must have only alphanumeric and between them dashes, underscores, dots and not longer than 63 characters.",
-            validateValue
+            validateValue,
           ),
       })}
     >
@@ -127,7 +121,7 @@ const AddLabelModalContent: React.FC<AddLabelModalContentProps> = ({
                   labelText="Label Key"
                   value={values.key}
                   onChange={handleChange}
-                  invalid={errors.key && touched.key}
+                  invalid={Boolean(errors.key && touched.key)}
                   invalidText={errors.key}
                   onBlur={handleBlur}
                 />
@@ -136,7 +130,7 @@ const AddLabelModalContent: React.FC<AddLabelModalContentProps> = ({
                   labelText="Label Value"
                   value={values.value}
                   onChange={handleChange}
-                  invalid={errors.value && touched.value}
+                  invalid={Boolean(errors.value && touched.value)}
                   onBlur={handleBlur}
                   invalidText={errors.value}
                 />

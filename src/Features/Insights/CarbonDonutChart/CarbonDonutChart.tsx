@@ -19,7 +19,7 @@ function CarbonDonutChart(props: CarbonDonutChartProps) {
           donut: {
             alignment: Alignments.CENTER,
             center: {
-              label: "Executions",
+              label: "Runs",
             },
           },
           legend: {

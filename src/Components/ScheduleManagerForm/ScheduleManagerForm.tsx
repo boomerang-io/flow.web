@@ -1,18 +1,26 @@
 import React from "react";
-import { useAppContext } from "Hooks";
 import {
   Button,
+  InlineNotification,
+  ModalBody,
+  ModalFooter,
+  RadioButtonGroup,
+  RadioButton,
+  Accordion,
+  AccordionItem,
+  StructuredListWrapper,
+  StructuredListHead,
+  StructuredListRow,
+  StructuredListCell,
+  StructuredListBody,
+} from "@carbon/react";
+import {
   Creatable,
   CheckboxList,
   ComboBox,
   DynamicFormik,
-  InlineNotification,
   Loading,
-  ModalBody,
   ModalForm,
-  ModalFooter,
-  RadioButtonGroup,
-  RadioButton,
   TextArea,
   TextInput,
 } from "@boomerang-io/carbon-addons-boomerang-react";
@@ -20,19 +28,19 @@ import axios from "axios";
 import cronstrue from "cronstrue";
 import moment from "moment-timezone";
 import * as Yup from "yup";
+import { useTeamContext } from "Hooks";
 import { cronToDateTime, daysOfWeekCronList } from "Utils/cronHelper";
 import { DATETIME_LOCAL_INPUT_FORMAT, defaultTimeZone, timezoneOptions, transformTimeZone } from "Utils/dateHelper";
 import { scheduleTypeLabelMap } from "Constants";
+import { serviceUrl } from "Config/servicesConfig";
 import {
-  ComposedModalChildProps,
   DataDrivenInput,
   DayOfWeekKey,
-  FlowTeam,
   ScheduleManagerFormInputs,
   ScheduleUnion,
-  WorkflowSummary,
+  Workflow,
+  WorkflowCanvas,
 } from "Types";
-import { serviceUrl } from "Config/servicesConfig";
 import styles from "./ScheduleManagerForm.module.scss";
 
 interface CreateEditFormProps {
@@ -40,19 +48,24 @@ interface CreateEditFormProps {
   includeWorkflowDropdown?: boolean;
   isError: boolean;
   isLoading: boolean;
-  modalProps: ComposedModalChildProps;
+  modalProps: any;
   schedule?: ScheduleUnion;
   type: "create" | "edit";
-  workflow?: WorkflowSummary;
-  workflowOptions?: Array<WorkflowSummary>;
+  workflow?: WorkflowCanvas;
+  workflowOptions?: Array<Workflow>;
 }
 
 export default function CreateEditForm(props: CreateEditFormProps) {
-  const { teams } = useAppContext();
-
-  const [workflowProperties, setWorkflowProperties] = React.useState<Array<DataDrivenInput> | undefined>(
-    props.workflow?.properties.map((property) => ({ ...property, key: `$parameter:${property.key}` }))
+  const { team } = useTeamContext();
+  const [workflowParams, setWorkflowParams] = React.useState<Array<DataDrivenInput> | undefined>(
+    props.workflow?.params?.map((param) => ({
+      ...param,
+      key: `$parameter:${param.name}`,
+      defaultValue: param.default,
+    })) ?? [],
   );
+
+  console.log("workflowProperties", workflowParams);
   let initFormValues: Partial<ScheduleManagerFormInputs> = {
     id: props.schedule?.id,
     name: props.schedule?.name ?? "",
@@ -66,13 +79,24 @@ export default function CreateEditForm(props: CreateEditFormProps) {
   };
 
   /**
-   * Namespace parameter values if they exist
+   * Default values if they exist. Has to be before the values from the saved schedule
    */
-  if (props.schedule?.parameters && Object.keys(props.schedule?.parameters ?? {}).length > 0) {
-    const parameterKeys = Object.keys(props.schedule?.parameters);
-    for (const key of parameterKeys) {
-      //@ts-ignore
-      initFormValues[`$parameter:${key}`] = props.schedule.parameters[key];
+  if (workflowParams) {
+    workflowParams.forEach((param) => {
+      const key = param.name;
+      if (key) {
+        //@ts-ignore
+        initFormValues[`$parameter:${key}`] = param.default;
+      }
+    });
+  }
+
+  /**
+   * Namespace parameter values if they exist from saved schedule
+   */
+  if (Array.isArray(props.schedule?.params) && props.schedule?.params?.length > 0) {
+    for (const param of props.schedule.params) {
+      initFormValues[`$parameter:${param["name"]}`] = param["value"];
     }
   }
 
@@ -104,10 +128,8 @@ export default function CreateEditForm(props: CreateEditFormProps) {
     if (props.schedule.type === "cron") {
       const cronSchedule = props.schedule.cronSchedule;
       const cronToData = cronToDateTime(Boolean(cronSchedule), cronSchedule);
-      const {
-        cronTime,
-        selectedDays,
-      }: { cronTime: string; selectedDays: { [day in DayOfWeekKey]: boolean } } = cronToData;
+      const { cronTime, selectedDays }: { cronTime: string; selectedDays: { [day in DayOfWeekKey]: boolean } } =
+        cronToData;
 
       let activeDays: DayOfWeekKey[] = [];
       for (let entry in selectedDays) {
@@ -131,12 +153,14 @@ export default function CreateEditForm(props: CreateEditFormProps) {
     }
   }
 
+  console.log("initFormValues", initFormValues);
+
   return (
     <DynamicFormik
       enableReinitialize
       validateOnMount
       initialValues={initFormValues}
-      inputs={workflowProperties ?? []}
+      inputs={workflowParams ?? []}
       onSubmit={async (args: ScheduleManagerFormInputs) => {
         try {
           await props.handleSubmit(args);
@@ -165,7 +189,9 @@ export default function CreateEditForm(props: CreateEditFormProps) {
             .test({
               name: "isValidCron",
               test: async (value: string | undefined, { createError, path }) => {
-                const response = await axios.get(serviceUrl.getScheduleCronValidation({ expression: value }));
+                const response = await axios.get(
+                  serviceUrl.schedule.getCronValidation({ team: team.name, expression: value }),
+                );
                 if (response.data.valid) {
                   return true;
                 } else {
@@ -191,32 +217,24 @@ export default function CreateEditForm(props: CreateEditFormProps) {
         <ModalForm noValidate onSubmit={formikProps.handleSubmit}>
           <ModalBody>
             {props.isLoading && <Loading />}
-            <p>
-              <b>About</b>
-            </p>
             {props.includeWorkflowDropdown && (
               <ComboBox
                 helperText="Workflow for this Schedule to execute"
                 id="workflow"
                 initialSelectedItem={formikProps.values.workflow}
-                items={props.workflowOptions}
-                itemToString={(workflow: WorkflowSummary) => {
-                  if (workflow?.scope === "team") {
-                    const team = workflow ? teams.find((team: FlowTeam) => team.id === workflow.flowTeamId) : undefined;
-                    if (team) {
-                      return workflow ? (team ? `${workflow.name} (${team.name})` : workflow.name) : "";
-                    }
-                  }
-                  if (workflow?.scope === "system") {
-                    return `${workflow.name} (System)`;
-                  }
-                  return workflow?.name ?? "";
+                items={props?.workflowOptions ?? []}
+                itemToString={(workflow: Workflow) => {
+                  return workflow?.displayName ?? "";
                 }}
-                onChange={({ selectedItem }: { selectedItem: WorkflowSummary }) => {
+                onChange={({ selectedItem }: { selectedItem: Workflow }) => {
                   formikProps.setFieldValue("workflow", selectedItem);
-                  if (selectedItem?.id) {
-                    setWorkflowProperties(
-                      selectedItem.properties.map((property) => ({ ...property, key: `$parameter:${property.key}` }))
+                  if (selectedItem?.name) {
+                    setWorkflowParams(
+                      selectedItem.params?.map((param) => ({
+                        ...param,
+                        key: `$parameter:${param.name}`,
+                        defaultValue: param.default,
+                      })),
                     );
                   }
                 }}
@@ -251,13 +269,13 @@ export default function CreateEditForm(props: CreateEditFormProps) {
               valueLabelText="Label value"
               valuePlaceholder="important"
               value={formikProps.values.labels}
-              onChange={(labels: string) => formikProps.setFieldValue("labels", labels)}
+              onChange={(labels) => formikProps.setFieldValue("labels", labels)}
             />
             <p>
               <b>Schedule</b>
             </p>
             <section>
-              <p>What type of Schedule do you want to create?</p>
+              <p style={{ marginBottom: "0.375rem" }}>What type of Schedule do you want to create?</p>
               <RadioButtonGroup
                 id="type"
                 labelPosition="right"
@@ -266,7 +284,12 @@ export default function CreateEditForm(props: CreateEditFormProps) {
                 orientation="horizontal"
                 valueSelected={formikProps.values["type"]}
               >
-                <RadioButton key={"runOnce"} id={"runOnce"} labelText={scheduleTypeLabelMap["runOnce"]} value={"runOnce"} />
+                <RadioButton
+                  key={"runOnce"}
+                  id={"runOnce"}
+                  labelText={scheduleTypeLabelMap["runOnce"]}
+                  value={"runOnce"}
+                />
                 <RadioButton key={"cron"} id={"cron"} labelText={scheduleTypeLabelMap["cron"]} value={"cron"} />
                 <RadioButton
                   id={"advanced-cron"}
@@ -400,6 +423,7 @@ class CronJobConfig extends React.Component<Props, State> {
       <>
         {values.type === "advancedCron" ? (
           <>
+            <CronInfoSection />
             <div className={styles.cronContainer}>
               <div className={styles.inputContainer}>
                 <TextInput
@@ -424,7 +448,7 @@ class CronJobConfig extends React.Component<Props, State> {
                 helperText="What time zone do you want to use"
                 id="timezone"
                 initialSelectedItem={values.timezone}
-                items={this.props.timezoneOptions}
+                items={this.props?.timezoneOptions ?? []}
                 onChange={({ selectedItem }: { selectedItem: { label: string; value: string } }) => {
                   const item = selectedItem ?? { label: "", value: "" };
                   this.props.formikProps.setFieldValue("timezone", item);
@@ -438,7 +462,7 @@ class CronJobConfig extends React.Component<Props, State> {
           <div className={styles.container}>
             <TextInput
               id="time"
-              invalid={errors.time && touched.time}
+              invalid={Boolean(errors.time && touched.time)}
               invalidText={errors.time}
               labelText={"Time"}
               name="time"
@@ -477,3 +501,60 @@ class CronJobConfig extends React.Component<Props, State> {
     );
   }
 }
+
+const CronInfoSection: React.FC = () => {
+  return (
+    <Accordion>
+      <AccordionItem title="Cron Expression Information & Examples">
+        <p>The cron expression is made of five fields. Each field can have the following values:</p>
+        <StructuredListWrapper className={styles.cronStructuredList}>
+          <StructuredListHead>
+            <StructuredListRow head>
+              <StructuredListCell head></StructuredListCell>
+              <StructuredListCell head>minute (0-59)</StructuredListCell>
+              <StructuredListCell head>hour (0-23)</StructuredListCell>
+              <StructuredListCell head>day of the month (1-31)</StructuredListCell>
+              <StructuredListCell head>month (1-12)</StructuredListCell>
+              <StructuredListCell head>day of the week (0-6)</StructuredListCell>
+            </StructuredListRow>
+          </StructuredListHead>
+          <StructuredListBody>
+            <StructuredListRow></StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Every minute</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+            </StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Every hour</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+            </StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Every day at 12:00 AM</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+            </StructuredListRow>
+            <StructuredListRow>
+              <StructuredListCell>Fridays at 1:00 am</StructuredListCell>
+              <StructuredListCell>0</StructuredListCell>
+              <StructuredListCell>1</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>*</StructuredListCell>
+              <StructuredListCell>5</StructuredListCell>
+            </StructuredListRow>
+          </StructuredListBody>
+        </StructuredListWrapper>
+      </AccordionItem>
+    </Accordion>
+  );
+};

@@ -1,20 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import classNames from "classnames/bind";
-import {
-  ComboBox,
-  InlineNotification,
-  Loading,
-  TextArea,
-  TextInput,
-} from "@boomerang-io/carbon-addons-boomerang-react";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import capitalize from "lodash/capitalize";
-import { Button, ModalBody, ModalFooter, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import React, { useRef } from "react";
+import { InlineNotification } from "@carbon/react";
+import { Button, ModalBody, ModalFooter } from "@carbon/react";
+import { Loading, TextArea, TextInput, TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
 import workflowIcons from "Assets/workflowIcons";
-import { defaultWorkflowConfig } from "./constants";
-import { ComboBoxItem, FlowTeam, CreateWorkflowSummary } from "Types";
-import { WorkflowScope } from "Constants";
+import classNames from "classnames/bind";
+import { Formik } from "formik";
+import { kebabCase } from "lodash";
+import capitalize from "lodash/capitalize";
+import * as Yup from "yup";
+import { FlowTeam, CreateWorkflowSummary, WorkflowViewType } from "Types";
 import styles from "./createWorkflow.module.scss";
 
 let classnames = classNames.bind(styles);
@@ -24,10 +18,10 @@ interface CreateWorkflowContentProps {
   createError: object;
   createWorkflow: (workflowSummary: CreateWorkflowSummary) => Promise<void>;
   isLoading: boolean;
-  scope: string;
-  team?: FlowTeam | null;
-  teams?: FlowTeam[] | null;
-  workflowQuotasEnabled: boolean;
+  team?: FlowTeam;
+  existingWorkflowNames: string[];
+  teamQuotasEnabled: boolean;
+  viewType: WorkflowViewType;
 }
 
 const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
@@ -35,32 +29,21 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
   createError,
   createWorkflow,
   isLoading,
-  scope,
   team,
-  teams,
-  workflowQuotasEnabled,
+  existingWorkflowNames,
+  teamQuotasEnabled,
+  viewType,
 }) => {
-  const [selectedTeam, setSelectedTeam] = useState<FlowTeam | null>(team ?? null);
   const formikRef = useRef<any>();
-
-  const existingWorkflowNames = selectedTeam?.workflows.map((workflow) => workflow.name) ?? [];
-
-  const hasReachedTeamWorkflowLimit = selectedTeam && selectedTeam.workflowQuotas.maxWorkflowCount <= selectedTeam.workflowQuotas.currentWorkflowCount;
-  const createTeamWorkflowsDisabled = workflowQuotasEnabled && hasReachedTeamWorkflowLimit;
-
-  useEffect(() => {
-    formikRef.current?.validateForm();
-  }, [selectedTeam]);
+  const hasReachedWorkflowLimit = team ? team.quotas.maxWorkflowCount <= team.quotas.currentWorkflowCount : false;
+  const createWorkflowsDisabled = teamQuotasEnabled && hasReachedWorkflowLimit;
 
   const handleSubmit = (values: any) => {
     const requestBody = {
-      ...defaultWorkflowConfig,
-      flowTeamId: selectedTeam?.id,
       name: values.name,
-      shortDescription: values.summary,
+      displayName: values.displayName,
       description: values.description,
       icon: values.icon,
-      scope,
     };
     createWorkflow(requestBody);
   };
@@ -71,7 +54,7 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
       initialErrors={{ name: "Name is required" }}
       initialValues={{
         name: "",
-        summary: "",
+        displayName: "",
         description: "",
         icon: workflowIcons[2].name,
       }}
@@ -79,9 +62,19 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
       validationSchema={Yup.object().shape({
         name: Yup.string()
           .required("Name is required")
-          .max(64, "Name must not be greater than 64 characters")
-          .notOneOf(existingWorkflowNames, "This name already exists"),
-        summary: Yup.string().max(128, "Summary must not be greater than 128 characters"),
+          .max(100, "Enter a name that is at most 100 characters in length")
+          .test("regex", `Name must only contain letters, numbers, and dashes`, (value) => {
+            const regex = /^[a-zA-Z0-9\-]+$/;
+            if (value) {
+              return regex.test(value);
+            }
+            return true;
+          })
+          .notOneOf(
+            existingWorkflowNames,
+            `There’s already a ${viewType} with that name in this team. Names must be unique.`,
+          ),
+        displayName: Yup.string().required("Please provide a name for your Workflow"),
         description: Yup.string().max(250, "Description must not be greater than 250 characters"),
       })}
     >
@@ -92,63 +85,38 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
           <>
             {isLoading && <Loading />}
             <ModalBody aria-label="inputs" className={styles.formBody}>
-              {scope === WorkflowScope.Team ? (
-                <div className={styles.teamAndName}>
-                  <ComboBox
-                    id="selectedTeam"
-                    styles={{ marginBottom: "2.5rem" }}
-                    onChange={({ selectedItem }: { selectedItem: FlowTeam }) =>
-                      setSelectedTeam(selectedItem ? selectedItem : null)
-                    }
-                    items={teams}
-                    initialSelectedItem={selectedTeam}
-                    value={selectedTeam}
-                    itemToString={(item: ComboBoxItem) => (item ? item.name : "")}
-                    titleText="Team"
-                    placeholder="Select a team"
-                    invalid={scope === WorkflowScope.Team && !Boolean(selectedTeam)}
-                    invalidText="Team is required"
-                    shouldFilterItem={({ item, inputValue }: { item: ComboBoxItem; inputValue: string }) =>
-                      item && item.name.toLowerCase().includes(inputValue.toLowerCase())
-                    }
-                  />
-
-                  <TextInput
-                    id="name"
-                    labelText="Workflow Name"
-                    value={values.name}
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    invalid={errors.name && touched.name}
-                    invalidText={errors.name}
-                  />
-                </div>
-              ) : (
-                <TextInput
-                  id="name"
-                  labelText={scope === WorkflowScope.Template ? "Template Name" : "Workflow Name"}
-                  value={values.name}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  invalid={errors.name && touched.name}
-                  invalidText={errors.name}
-                />
-              )}
               <TextInput
-                id="summary"
-                labelText="Summary"
-                value={values.summary}
+                id="displayName"
+                label="Display Name"
+                helperText="This is the name that will be displayed in the UI."
+                placeholder="e.g. My Fantastical Workflow"
+                value={values.displayName}
+                onBlur={handleBlur}
+                onChange={(e: React.FocusEvent<HTMLInputElement>) => {
+                  handleChange(e);
+                  setFieldValue("name", kebabCase(e.target.value.replace(/'/g, "-")));
+                }}
+                // onChange={handleChange}
+                invalid={Boolean(errors.displayName && touched.displayName)}
+                invalidText={errors.displayName}
+              />
+              <TextInput
+                id="name"
+                labelText="Name"
+                placeholder="e.g. my-workflow"
+                helperText="This is your unique identifier name within the Team. Can only contain letters, numbers, and dashes."
+                value={values.name}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                invalid={errors.summary && touched.summary}
-                invalidText={errors.summary}
+                invalid={Boolean(errors.name && touched.name)}
+                invalidText={errors.name}
               />
               <TextArea
                 id="description"
-                labelText="Description"
+                labelText="Description (optional)"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                invalid={errors.description && touched.description}
+                invalid={Boolean(errors.description && touched.description)}
                 invalidText={errors.description}
                 style={{ resize: "none", width: "100%" }}
                 value={values.description}
@@ -180,10 +148,10 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
                   lowContrast
                   kind="error"
                   title="Something's Wrong"
-                  subtitle={`Request to create ${scope === WorkflowScope.Template ? "template" : "workflow"} failed`}
+                  subtitle={`Request to create ${viewType} failed`}
                 />
               )}
-              {createTeamWorkflowsDisabled && (
+              {createWorkflowsDisabled && (
                 <InlineNotification
                   lowContrast
                   kind="error"
@@ -198,7 +166,7 @@ const CreateWorkflowContent: React.FC<CreateWorkflowContentProps> = ({
               </Button>
               <Button
                 data-testid="workflows-create-workflow-submit"
-                disabled={!isValid || isLoading || createTeamWorkflowsDisabled}
+                disabled={!isValid || isLoading || createWorkflowsDisabled}
                 onClick={handleSubmit}
               >
                 {isLoading ? "Creating..." : "Create"}

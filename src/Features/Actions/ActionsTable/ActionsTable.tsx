@@ -1,47 +1,39 @@
 import React from "react";
-import { settings } from "carbon-components";
-import { useAppContext } from "Hooks";
-import { Link } from "react-router-dom";
-import {
-  Button,
-  DataTableSkeleton,
-  DataTable,
-  Pagination,
-  TooltipHover,
-} from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button, DataTableSkeleton, DataTable, Pagination } from "@carbon/react";
+import { CheckmarkOutline, CloseOutline, Help, Warning } from "@carbon/react/icons";
+import { TooltipHover } from "@boomerang-io/carbon-addons-boomerang-react";
+import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
 import cx from "classnames";
 import queryString from "query-string";
-import { isAccessibleKeyboardEvent } from "@boomerang-io/utils";
+import { Link } from "react-router-dom";
 import EmptyState from "Components/EmptyState";
+import { useAppContext, useTeamContext } from "Hooks";
+import dateHelper from "Utils/dateHelper";
+import { appLink } from "Config/appConfig";
+import { Action, ApprovalStatus } from "Types";
+import styles from "./ActionsTable.module.scss";
 import ApproveRejectActions from "./ApproveRejectActions";
 import ManualTask from "./ManualTask";
-import { Action, ApprovalStatus } from "Types";
-import { appLink } from "Config/appConfig";
-import dateHelper from "Utils/dateHelper";
-import { CheckmarkOutline16, CloseOutline16, Help16, Warning16 } from "@carbon/icons-react";
-import styles from "./ActionsTable.module.scss";
-
-const { prefix } = settings;
 
 interface ActionsTableProps {
   actionsQueryToRefetch: string;
   history: any;
   isLoading: boolean;
   location: any;
-  match: any;
-  isSystemWorkflowsEnabled: boolean;
   tableData: {
-    pageable: { number: number; size: number; sort: [{ property: string; direction: string }]; totalElements: number };
-    records: any;
+    number: number;
+    size: number;
+    totalElements: number;
+    content: any;
   };
+  sort: string;
+  order: string;
   updateHistorySearch: Function;
 }
 
-const PAGE_SIZES = [5, 10, 20, 25, 50, 100];
+const PAGE_SIZES = [10, 20, 25, 50, 100];
 
 const HeadersHeader = {
-  Team: "Team",
-  Scope: "Scope",
   Workflow: "Workflow",
   Task: "Task",
   Approvals: "Approvals",
@@ -50,8 +42,6 @@ const HeadersHeader = {
 };
 
 const HeadersKey = {
-  Team: "teamName",
-  Scope: "scope",
   Workflow: "workflowName",
   Task: "taskName",
   Approvals: "numberOfApprovals",
@@ -61,16 +51,6 @@ const HeadersKey = {
 };
 
 const headers = [
-  {
-    header: HeadersHeader.Team,
-    key: HeadersKey.Team,
-    sortable: true,
-  },
-  {
-    header: HeadersHeader.Scope,
-    key: HeadersKey.Scope,
-    sortable: true,
-  },
   {
     header: HeadersHeader.Workflow,
     key: HeadersKey.Workflow,
@@ -100,6 +80,7 @@ const headers = [
 
 function ActionsTable(props: ActionsTableProps) {
   const { user } = useAppContext();
+  const { team } = useTeamContext();
   const isManual = props.location.pathname.includes("/manual");
   const [selectedActions, setSelectedActions] = React.useState<string[]>([]);
   const noSelectedActions = selectedActions.length === 0;
@@ -142,20 +123,16 @@ function ActionsTable(props: ActionsTableProps) {
     props.updateHistorySearch({
       ...queryString.parse(props.location.search),
       page: page - 1, // We have to decrement by one to offset the table pagination adjustment
-      size: pageSize,
+      limit: pageSize,
     });
   }
 
   function handleSort(e: any, { sortHeaderKey }: { sortHeaderKey: string }) {
-    const { property, direction } = props.tableData.pageable.sort[0];
-    const sort = sortHeaderKey;
     let order = "ASC";
-
-    if (sort === property && direction === "ASC") {
+    if (props.order === "ASC") {
       order = "DESC";
     }
-
-    props.updateHistorySearch({ ...queryString.parse(props.location.search), sort, order });
+    props.updateHistorySearch({ ...queryString.parse(props.location.search), sort: sortHeaderKey, order });
   }
 
   /**
@@ -171,7 +148,7 @@ function ActionsTable(props: ActionsTableProps) {
     return (
       <div style={{ marginTop: "1rem" }}>
         <DataTableSkeleton
-          className={cx(`${prefix}--skeleton`, `${prefix}--data-table`, styles.tableSkeleton)}
+          className={cx(`cds--skeleton`, `cds--data-table`, styles.tableSkeleton)}
           rowCount={5}
           columnCount={headerList.length}
           headers={headerList.map((header) => header.header)}
@@ -180,10 +157,7 @@ function ActionsTable(props: ActionsTableProps) {
     );
   }
 
-  const {
-    pageable: { number, size, sort, totalElements },
-    records,
-  } = props.tableData;
+  const { number, size, totalElements, content } = props.tableData;
 
   const {
     TableContainer,
@@ -201,7 +175,6 @@ function ActionsTable(props: ActionsTableProps) {
     const column = headerList[cellIndex];
 
     switch (column?.key) {
-      case HeadersKey.Scope:
       case HeadersKey.Status:
         return (
           <p className={styles.tableTextarea} style={{ textTransform: "capitalize" }}>
@@ -217,7 +190,7 @@ function ActionsTable(props: ActionsTableProps) {
             >
               <div className={styles.tableCellInputApprovals}>
                 <p className={styles.tableCellSmallGray}>{`${value}/${currentAction?.approvalsRequired} approvals`}</p>
-                <Warning16 className={styles.tableCellInputRequiredIcon} />
+                <Warning className={styles.tableCellInputRequiredIcon} />
               </div>
             </TooltipHover>
           );
@@ -231,7 +204,10 @@ function ActionsTable(props: ActionsTableProps) {
       case HeadersKey.ActivityLink:
         return (
           <Link
-            to={appLink.execution({ executionId: currentAction?.activityId, workflowId: currentAction?.workflowId })}
+            to={appLink.execution({
+              team: team.name,
+              runId: currentAction?.workflowRunRef,
+            })}
           >
             View Activity
           </Link>
@@ -243,9 +219,9 @@ function ActionsTable(props: ActionsTableProps) {
 
   const getSelectedActions = (actionId?: string) => {
     return actionId
-      ? records.filter((action: Action) => action.id === actionId)
-      : records.filter((action: Action) =>
-          selectedActions.some((selectedAction: string) => selectedAction === action.id)
+      ? content.filter((action: Action) => action.id === actionId)
+      : content.filter((action: Action) =>
+          selectedActions.some((selectedAction: string) => selectedAction === action.id),
         );
   };
 
@@ -255,7 +231,7 @@ function ActionsTable(props: ActionsTableProps) {
         {totalElements > 0 ? (
           <>
             <DataTable
-              rows={records}
+              rows={content}
               headers={headerList}
               render={({ rows, headers, getHeaderProps, getSelectionProps, selectRow, selectedRows }: any) => {
                 const onSuccessfulApprovalRejection = async () => {
@@ -287,8 +263,8 @@ function ActionsTable(props: ActionsTableProps) {
                               kind="danger--ghost"
                               iconDescription="reject-actions"
                               onClick={openModal}
-                              renderIcon={CloseOutline16}
-                              size="field"
+                              renderIcon={CloseOutline}
+                              size="md"
                             >
                               Reject selected
                             </Button>
@@ -306,8 +282,8 @@ function ActionsTable(props: ActionsTableProps) {
                               kind="ghost"
                               iconDescription="approve-actions"
                               onClick={openModal}
-                              renderIcon={CheckmarkOutline16}
-                              size="field"
+                              renderIcon={CheckmarkOutline}
+                              size="md"
                             >
                               Approve selected
                             </Button>
@@ -326,13 +302,13 @@ function ActionsTable(props: ActionsTableProps) {
                               {...getSelectionProps({
                                 onClick: () => {
                                   handleOnClickCheckbox(
-                                    records
+                                    content
                                       .filter(
                                         (item: Action) =>
                                           item.status === ApprovalStatus.Submitted &&
-                                          !item?.actioners?.map((user) => user.approverId).includes(user?.id)
+                                          !item?.actioners?.map((user) => user.approverId).includes(user?.id),
                                       )
-                                      .map((item: Action) => item.id)
+                                      .map((item: Action) => item.id),
                                   );
                                 },
                               })}
@@ -347,8 +323,8 @@ function ActionsTable(props: ActionsTableProps) {
                                 isSortable: header.sortable,
                                 onClick: handleSort,
                               })}
-                              isSortHeader={sort[0].property === header.key}
-                              sortDirection={sort[0].direction}
+                              isSortHeader={props.sort === header.key}
+                              sortDirection={props.order}
                             >
                               {header.header === HeadersHeader.Approvals ? (
                                 <div className={styles.tableHeaderApprovals}>
@@ -357,7 +333,7 @@ function ActionsTable(props: ActionsTableProps) {
                                     direction="top"
                                     tooltipText="Number of required approvals that have been received in order for this component to proceed."
                                   >
-                                    <Help16 className={styles.tableHeaderApprovalsIcon} />
+                                    <Help className={styles.tableHeaderApprovalsIcon} />
                                   </TooltipHover>
                                 </div>
                               ) : (
@@ -369,7 +345,7 @@ function ActionsTable(props: ActionsTableProps) {
                       </TableHead>
                       <TableBody className={styles.tableBody}>
                         {rows.map((row: any) => {
-                          const currentAction: Action = records.find((action: Action) => action.id === row.id);
+                          const currentAction: Action = content.find((action: Action) => action.id === row.id);
                           const isAlreadyApproved =
                             (user?.id && currentAction?.actioners?.map((user) => user.approverId).includes(user.id)) ||
                             currentAction?.status !== ApprovalStatus.Submitted;

@@ -1,15 +1,17 @@
 import React from "react";
-import { Button, InlineNotification, ModalBody, ModalFooter } from "@boomerang-io/carbon-addons-boomerang-react";
+import { Button, InlineNotification, ModalBody, ModalFooter } from "@carbon/react";
 import { DynamicFormik, ModalFlowForm } from "@boomerang-io/carbon-addons-boomerang-react";
-import styles from "./workflowInputModalContent.module.scss";
 import { InputProperty, InputType, PASSWORD_CONSTANT } from "Constants";
+import { DataDrivenInput } from "Types";
+import styles from "./workflowInputModalContent.module.scss";
 
 interface WorkflowInputModalContentProps {
   closeModal: () => void;
   executeError: any;
   executeWorkflow: (closeModal: () => void, redirect: boolean, properties: {}) => Promise<void>;
-  inputs: Array<typeof InputProperty>;
+  inputs: Array<DataDrivenInput>;
   isExecuting: boolean;
+  errorMessage: { title: string; message: string } | null;
 }
 
 const WorkflowInputModalContent: React.FC<WorkflowInputModalContentProps> = ({
@@ -18,22 +20,25 @@ const WorkflowInputModalContent: React.FC<WorkflowInputModalContentProps> = ({
   executeWorkflow,
   inputs,
   isExecuting,
+  errorMessage,
 }) => {
   const [isRedirectEnabled, setIsRedirectEnabled] = React.useState(false);
 
   //edit inputs to handle secure values
-  const secureInputs = inputs.map((input: typeof InputProperty) => {
+  const secureInputs = inputs.map((input: DataDrivenInput) => {
     /* @ts-ignore-next-line */
-    if (input[InputProperty.Type] === InputType.Password && input?.hiddenValue) {
+    if (input.type === InputType.Password && input?.hiddenValue) {
       //if the input type is secure and there is a default value we are going to manipulate the object
       return {
         //allow the user to submit null
         ...input,
+        key: input.name,
         required: false,
         helperText: "To use your secure default value, leave this input blank",
         placeholder: PASSWORD_CONSTANT,
+        defaultValue: input.default,
       };
-    } else return input;
+    } else return { ...input, defaultValue: input.default, key: input.name };
   });
 
   return (
@@ -56,8 +61,8 @@ const WorkflowInputModalContent: React.FC<WorkflowInputModalContentProps> = ({
               <InlineNotification
                 lowContrast
                 kind="error"
-                title="Something's Wrong"
-                subtitle="Request to execute workflow failed"
+                title={errorMessage?.title}
+                subtitle={errorMessage?.message}
               />
             )}
           </ModalBody>
