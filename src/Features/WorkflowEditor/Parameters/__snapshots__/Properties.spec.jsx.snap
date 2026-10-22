@@ -102,16 +102,6 @@ exports[`Inputs --- Snapshot Test > Capturing Snapshot of Inputs 1`] = `
         >
           Required
         </p>
-<<<<<<< HEAD:src/Features/Editor/Properties/__snapshots__/Properties.spec.js.snap
-        <p
-          class="readOnlyText"
-        >
-          Read-only
-        </p>
-      </section>
-    </div>
-  </div>
-=======
         <svg
           alt="Workflow edit button"
           aria-label="Edit"
@@ -249,6 +239,5 @@ exports[`Inputs --- Snapshot Test > Capturing Snapshot of Inputs 1`] = `
   <div
     class="cds--bmrg-modal-portal"
   />
->>>>>>> origin/main:src/Features/WorkflowEditor/Parameters/__snapshots__/Properties.spec.jsx.snap
 </body>
 `;

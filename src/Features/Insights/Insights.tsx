@@ -205,38 +205,8 @@ function Selects(props: SelectsProps) {
     ? Number.parseInt(toDate)
     : defaultToDate;
 
-<<<<<<< HEAD
-  const selectedTeams =
-    teams && teams.filter((team: FlowTeam) => selectedTeamIds?.find((id: string) => id === team.id));
-
-  const workflowOptions = getWorkflowOptions({
-    isSystemWorkflowsEnabled,
-    selectedScopes,
-    selectedTeams,
-    teams,
-    systemWorkflowsData: props.systemWorkflowsQuery.data,
-    userWorkflowsData: userWorkflows.workflows,
-  });
-
-  type WorkflowScopeType = typeof WorkflowScope[keyof typeof WorkflowScope];
-
-  const workflowScopeOptions: { label: string; value: WorkflowScopeType }[] = [
-    { label: "User", value: WorkflowScope.User },
-    { label: "Team", value: WorkflowScope.Team },
-  ];
-
-  if (isSystemWorkflowsEnabled) {
-    workflowScopeOptions.push({ label: "System", value: WorkflowScope.System });
-  }
-
-  const disableTeamsDropdown = !!scopes && !scopes.includes(WorkflowScope.Team);
-
-  function handleSelectScopes({ selectedItems }: MultiSelectItems) {
-    const scopes = selectedItems.length > 0 ? selectedItems.map((scope) => scope.value) : undefined;
-=======
   function handleSelectWorkflows({ selectedItems }: MultiSelectItems<Workflow>) {
     const workflowRefs = selectedItems.length > 0 ? selectedItems.map((worflow) => worflow.name) : undefined;
->>>>>>> origin/main
     props.updateHistorySearch({
       ...queryString.parse(location.search, queryStringOptions),
       workflows: workflowRefs,

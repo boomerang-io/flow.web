@@ -14,10 +14,6 @@ interface AddLabelProps {
   isEdit?: boolean;
   editTrigger?: React.ReactNode;
   selectedLabel?: { key: string; value: string; index: number };
-<<<<<<< HEAD:src/Features/Editor/Configure/CustomLabel/CustomLabel.tsx
-  canEditWorkflow: boolean;
-=======
->>>>>>> origin/main:src/Features/WorkflowEditor/Configure/CustomLabel/CustomLabel.tsx
 }
 
 const keyPrefixRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,62}([.\1][a-zA-Z0-9-]{1,63})*$/;
@@ -29,10 +25,6 @@ const CustomLabel: React.FC<AddLabelProps> = ({
   isEdit = false,
   editTrigger: EditTrigger,
   selectedLabel,
-<<<<<<< HEAD:src/Features/Editor/Configure/CustomLabel/CustomLabel.tsx
-  canEditWorkflow,
-=======
->>>>>>> origin/main:src/Features/WorkflowEditor/Configure/CustomLabel/CustomLabel.tsx
 }) => {
   const addLabel = ({ values }: { values: any }) => {
     const { key, value } = values;
@@ -56,26 +48,11 @@ const CustomLabel: React.FC<AddLabelProps> = ({
         title: `${isEdit ? "Edit" : "Add"} Custom Label`,
         subtitle: `${isEdit ? "Edit" : "Create"} a key value pair for custom kubernetes label`,
       }}
-<<<<<<< HEAD:src/Features/Editor/Configure/CustomLabel/CustomLabel.tsx
-      modalTrigger={({ openModal }: { openModal: () => void }) =>
-        isEdit && EditTrigger ? (
-          <EditTrigger openModal={openModal} />
-        ) : (
-          <Button
-            kind="ghost"
-            size="field"
-            renderIcon={Edit16}
-            onClick={openModal}
-            className={styles.addNewToken}
-            disabled={!canEditWorkflow}
-          >
-=======
       modalTrigger={({ openModal }) =>
         isEdit && EditTrigger ? (
           <EditTrigger openModal={openModal} />
         ) : (
           <Button kind="ghost" size="md" renderIcon={Edit} onClick={openModal} className={styles.addNewToken}>
->>>>>>> origin/main:src/Features/WorkflowEditor/Configure/CustomLabel/CustomLabel.tsx
             Add a new label
           </Button>
         )
@@ -153,11 +130,7 @@ const AddLabelModalContent: React.FC<AddLabelModalContentProps> = ({ closeModal,
           .test(
             "validate-k8s-value",
             "Value must have only alphanumeric and between them dashes, underscores, dots and not longer than 63 characters.",
-<<<<<<< HEAD:src/Features/Editor/Configure/CustomLabel/CustomLabel.tsx
-            validateValue
-=======
             validateValue,
->>>>>>> origin/main:src/Features/WorkflowEditor/Configure/CustomLabel/CustomLabel.tsx
           ),
       })}
     >

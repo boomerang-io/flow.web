@@ -27,12 +27,7 @@ import type {
 import styles from "./Schedule.module.scss";
 
 interface ScheduleProps {
-<<<<<<< HEAD:src/Features/Editor/Schedule/Schedule.tsx
-  summaryData: WorkflowSummary;
-  canEditWorkflow: boolean;
-=======
   workflow: WorkflowCanvas;
->>>>>>> origin/main:src/Features/WorkflowEditor/Schedule/Schedule.tsx
 }
 
 export default function ScheduleView(props: ScheduleProps) {
@@ -126,11 +121,7 @@ export default function ScheduleView(props: ScheduleProps) {
           schedulesData={schedulesQuery.data}
           setActiveSchedule={setActiveSchedule}
           setIsCreatorOpen={setIsCreatorOpen}
-<<<<<<< HEAD:src/Features/Editor/Schedule/Schedule.tsx
-          canEditWorkflow={props.canEditWorkflow}
-=======
           setIsEditorOpen={setIsEditorOpen}
->>>>>>> origin/main:src/Features/WorkflowEditor/Schedule/Schedule.tsx
         />
         <CalendarView
           onDateRangeChange={handleDateRangeChange}
@@ -150,18 +141,6 @@ export default function ScheduleView(props: ScheduleProps) {
         setIsOpen={setIsPanelOpen}
         setIsEditorOpen={setIsEditorOpen}
       />
-<<<<<<< HEAD:src/Features/Editor/Schedule/Schedule.tsx
-      {props.canEditWorkflow && (
-        <ScheduleCreator
-          getCalendarUrl={workflowCalendarUrl}
-          getSchedulesUrl={workflowScheduleUrl}
-          isModalOpen={isCreatorOpen}
-          onCloseModal={() => setIsCreatorOpen(false)}
-          schedule={newSchedule}
-          workflow={props.summaryData}
-        />
-      )}
-=======
       <ScheduleCreator
         getCalendarUrl={getCalendarUrl}
         getSchedulesUrl={getSchedulesUrl}
@@ -170,7 +149,6 @@ export default function ScheduleView(props: ScheduleProps) {
         schedule={newSchedule}
         workflow={props.workflow}
       />
->>>>>>> origin/main:src/Features/WorkflowEditor/Schedule/Schedule.tsx
       <ScheduleEditor
         getCalendarUrl={getCalendarUrl}
         getSchedulesUrl={getSchedulesUrl}

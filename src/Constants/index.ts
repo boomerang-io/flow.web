@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import { CloseOutline32, CheckmarkOutline32, Error32, InProgress32, Timer32 } from "@carbon/icons-react";
-import { ExecutionStatus, PlatformRole, ScheduleStatus, ScheduleType } from "Types";
-=======
 import { CloseOutline, CheckmarkOutline, Error, InProgress, Timer } from "@carbon/react/icons";
 import { RunStatus, ScheduleStatus, ScheduleType, UserRoleType, PlatformRole } from "Types";
 
@@ -18,7 +14,6 @@ export const WorkflowScope = {
   User: "user",
   Template: "template",
 } as const;
->>>>>>> origin/main
 
 /**
  * Primitve constants
@@ -184,11 +179,7 @@ export const WorkflowPropertyAction = {
 export const SortDirection = {
   Asc: "ASC",
   Desc: "DESC",
-<<<<<<< HEAD
-} as const);
-=======
 } as const;
->>>>>>> origin/main
 
 export const UserRole = {
   Admin: "admin",
@@ -275,15 +266,11 @@ export const ApprovalInputRequired = {
   None: "none",
 } as const;
 
-<<<<<<< HEAD
-export const elevatedUserRoles = [PlatformRole.Admin, PlatformRole.Operator];
-=======
 export const EdgeExecutionCondition = {
   Success: "success",
   Failure: "failure",
   Always: "always",
 } as const;
->>>>>>> origin/main
 
 export const TokenType = {
   User: "user",

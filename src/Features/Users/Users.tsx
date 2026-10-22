@@ -131,30 +131,7 @@ const UserList: React.FC = () => {
     debouncedSearch(query);
   }
 
-<<<<<<< HEAD
-  function handlePaginationChange(pagination: { page: number; pageSize: number }) {
-    updateHistorySearch({
-      ...queryString.parse(location.search),
-      page: pagination.page - 1, // We have to decrement by one to offset the table pagination adjustment
-      size: pagination.pageSize,
-    });
-  }
-
-  function handleSort(e: React.SyntheticEvent, sort: { sortHeaderKey: string }) {
-    const { property, direction } = usersQuery.data.sort[0];
-    let order: "ASC" | "DESC" = SortDirection.Asc;
-
-    if (sort.sortHeaderKey === property && direction === SortDirection.Asc) {
-      order = SortDirection.Desc;
-    }
-
-    updateHistorySearch({ ...queryString.parse(location.search), order, sort: sort.sortHeaderKey });
-  }
-
-  if (usersQuery.isLoading) {
-=======
   if (usersIsLoading) {
->>>>>>> origin/main
     return (
       <FeatureLayout handleSearchChange={handleSearchChange}>
         <DataTableSkeleton />

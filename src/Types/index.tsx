@@ -336,12 +336,6 @@ export type FlowTeamStatusType = ObjectValues<typeof FlowTeamStatus>;
 
 export interface FlowTeam {
   name: string;
-<<<<<<< HEAD
-  workflowQuotas: FlowTeamQuotas;
-  users: FlowUser[];
-  workflows: WorkflowSummary[];
-  userRoles?: string[];
-=======
   displayName: string;
   description?: string;
   creationDate: string;
@@ -368,7 +362,6 @@ export interface FlowTeamSummary {
     workflows: number;
     members: number;
   };
->>>>>>> origin/main
 }
 
 export interface FlowTeamQuotas {

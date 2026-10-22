@@ -82,8 +82,6 @@ exports[`WorkflowCard --- Snapshot > Capturing Snapshot of WorkflowCard 1`] = `
           </svg>
         </button>
       </section>
-<<<<<<< HEAD:src/Components/WorkflowCard/__snapshots__/WorkflowCard.spec.js.snap
-=======
       <button
         aria-expanded="false"
         aria-haspopup="true"
@@ -121,7 +119,6 @@ exports[`WorkflowCard --- Snapshot > Capturing Snapshot of WorkflowCard 1`] = `
           />
         </svg>
       </button>
->>>>>>> origin/main:src/Components/WorkflowCard/__snapshots__/WorkflowCard.spec.jsx.snap
     </div>
   </div>
   <div

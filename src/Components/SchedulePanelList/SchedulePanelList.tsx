@@ -32,13 +32,8 @@ interface SchedulePanelListProps {
     | ((schedule: ScheduleUnion) => void);
   setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsCreatorOpen: React.Dispatch<React.SetStateAction<boolean>>;
-<<<<<<< HEAD
-  schedulesQuery: UseQueryResult<ScheduleUnion[], any>;
-  canEditWorkflow?: boolean;
-=======
   schedulesIsLoading: boolean;
   schedulesData: PaginatedSchedulesResponse | undefined;
->>>>>>> origin/main
 }
 
 export default function SchedulePanelList(props: SchedulePanelListProps) {
@@ -95,7 +90,6 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
               schedule={schedule}
               setActiveSchedule={props.setActiveSchedule}
               setIsEditorOpen={props.setIsEditorOpen}
-              canEditWorkflow={props.canEditWorkflow}
             />
           ))}
         </ul>
@@ -109,23 +103,9 @@ export default function SchedulePanelList(props: SchedulePanelListProps) {
 
   return (
     <section className={styles.listContainer}>
-<<<<<<< HEAD
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h2>
-          {!props.schedulesQuery.isLoading ? `Existing Schedules (${schedules?.length ?? 0})` : "Loading Schedules..."}
-        </h2>
-        <Button
-          size="field"
-          renderIcon={Add16}
-          onClick={() => props.setIsCreatorOpen(true)}
-          kind="ghost"
-          disabled={!props.canEditWorkflow}
-        >
-=======
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
         <h2>{!props.schedulesIsLoading ? `Existing Schedules (${schedules?.length ?? 0})` : "Loading Schedules..."}</h2>
         <Button size="sm" renderIcon={Add} onClick={() => props.setIsCreatorOpen(true)} kind="ghost">
->>>>>>> origin/main
           Create a Schedule
         </Button>
       </div>
@@ -329,27 +309,13 @@ function ScheduledListItem(props: ScheduledListItemProps) {
           <dt>Labels</dt>
           <dd>{labels.length > 0 ? labels : "---"}</dd>
         </dl>
-<<<<<<< HEAD
-        {props.canEditWorkflow && (
-          <OverflowMenu
-            flipped
-            ariaLabel="Schedule card menu"
-            iconDescription="Schedule menu icon"
-            style={{ position: "absolute", right: "0", top: "0" }}
-          >
-=======
         <div style={{ position: "absolute", right: "0", top: "0" }}>
           <OverflowMenu flipped ariaLabel="Schedule card menu" iconDescription="Schedule menu icon" size="sm">
->>>>>>> origin/main
             {menuOptions.map(({ onClick, itemText, ...rest }, index) => (
               <OverflowMenuItem onClick={onClick} itemText={itemText} key={`${itemText}-${index}`} {...rest} />
             ))}
           </OverflowMenu>
-<<<<<<< HEAD
-        )}
-=======
         </div>
->>>>>>> origin/main
       </Tile>
       {isToggleStatusModalOpen && (
         <ConfirmModal

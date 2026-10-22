@@ -2,14 +2,6 @@ import React from "react";
 import { Accordion, AccordionItem, Checkbox, Layer, OverflowMenu, Search, SkeletonText } from "@carbon/react";
 import { Bee, ViewOff, Recommend, SettingsAdjust } from "@carbon/react/icons";
 import {
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Sidenav/Sidenav.tsx
-  Accordion,
-  AccordionItem,
-  ComboBox,
-  OverflowMenu,
-  Checkbox,
-=======
->>>>>>> origin/main:src/Features/TaskManager/Sidenav/Sidenav.tsx
   CheckboxList,
   FeatureSideNav as SideNav,
   FeatureSideNavLink as SideNavLink,
@@ -38,24 +30,6 @@ const taskFilterElemList = taskIcons.map((TaskIcon) => ({
 }));
 
 interface SideInfoProps {
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Sidenav/Sidenav.tsx
-  addTemplateInState: (newTemplate: TaskModel) => void;
-  taskTemplates: TaskModel[];
-  setActiveTeam: Function;
-  activeTeam: string | string[] | null;
-  canEditWorkflow: boolean;
-}
-
-const SideInfo: React.FC<SideInfoProps> = ({
-  addTemplateInState,
-  taskTemplates,
-  setActiveTeam,
-  activeTeam,
-  canEditWorkflow,
-}) => {
-  const { teams } = useAppContext();
-  const [searchQuery, setSearchQuery] = React.useState("");
-=======
   team?: FlowTeam;
   isLoading?: boolean;
   tasks: Array<Task>;
@@ -64,7 +38,6 @@ const SideInfo: React.FC<SideInfoProps> = ({
 
 const SideInfo: React.FC<SideInfoProps> = ({ team, isLoading, tasks, getTaskTemplatesUrl }) => {
   const history = useHistory();
->>>>>>> origin/main:src/Features/TaskManager/Sidenav/Sidenav.tsx
   const [activeFilters, setActiveFilters] = React.useState<Array<string>>([]);
   const [openCategories, setOpenCategories] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -91,16 +64,6 @@ const SideInfo: React.FC<SideInfoProps> = ({ team, isLoading, tasks, getTaskTemp
     setActiveFilters([]);
   };
 
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Sidenav/Sidenav.tsx
-  const selectedTeam = teams.find((team) => team.id === activeTeam);
-
-  const handleSelectTeam = (selectedTeam: any) => {
-    if (selectedTeam && selectedTeam.selectedItem) {
-      setActiveTeam(selectedTeam?.selectedItem?.id);
-      history.push(appLink.manageTaskTemplates({ teamId: selectedTeam?.selectedItem?.id }));
-    }
-  };
-=======
   if (isLoading) {
     return (
       <SideNav className={styles.container} border="right">
@@ -146,35 +109,11 @@ const SideInfo: React.FC<SideInfoProps> = ({ team, isLoading, tasks, getTaskTemp
   }));
 
   const distinctTaskNames = tasks?.map((task) => task.name);
->>>>>>> origin/main:src/Features/TaskManager/Sidenav/Sidenav.tsx
 
   return (
     <SideNav className={styles.container} border="right">
       <h1 className={styles.title}>{team ? "Team " : ""}Task manager</h1>
       <p className={styles.description}>{DESCRIPTION}</p>
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Sidenav/Sidenav.tsx
-      <ComboBox
-        id="dropdown-team"
-        items={teams}
-        onChange={handleSelectTeam}
-        placeholder="Select a team"
-        initialSelectedItem={selectedTeam}
-        selectedItem={selectedTeam}
-        ariaLabel="Select a team"
-      />
-      {taskTemplates && (
-        <div className={styles.tasksContainer}>
-          <div className={styles.addTaskContainer}>
-            <p className={styles.existingTasks}>{`Existing Tasks (${taskTemplates.length})`}</p>
-            {canEditWorkflow && (
-              <AddTaskTemplate
-                addTemplateInState={addTemplateInState}
-                taskTemplates={taskTemplates}
-                history={history}
-                location={location}
-              />
-            )}
-=======
       {tasks && (
         <div className={styles.tasksContainer}>
           <div className={styles.addTaskContainer}>
@@ -184,7 +123,6 @@ const SideInfo: React.FC<SideInfoProps> = ({ team, isLoading, tasks, getTaskTemp
               history={history}
               getTaskTemplatesUrl={getTaskTemplatesUrl}
             />
->>>>>>> origin/main:src/Features/TaskManager/Sidenav/Sidenav.tsx
           </div>
           <Layer className={styles.tools}>
             <Search

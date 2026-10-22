@@ -22,15 +22,6 @@ import styles from "./header.module.scss";
 interface DesignerHeaderProps {
   changeLog: ChangeLog;
   createRevision: (reason: string, callback?: () => any) => void;
-<<<<<<< HEAD:src/Features/Editor/Header/Header.tsx
-  changeRevision: (revisionNumber: number) => void;
-  isOnDesigner: boolean;
-  revisionMutation: MutateFunction<AxiosResponse<any>, Error>;
-  revisionState: WorkflowRevisionState;
-  revisionQuery: UseQueryResult<WorkflowRevision, unknown>;
-  summaryData: WorkflowSummary;
-  canEditWorkflow: boolean;
-=======
   changeRevision: (revisionNumber: string) => void;
   canCreateNewVersion: boolean;
   revisionCount: number;
@@ -43,7 +34,6 @@ interface DesignerHeaderProps {
   revisionState: WorkflowCanvas;
 
   viewType: WorkflowViewType;
->>>>>>> origin/main:src/Features/WorkflowEditor/Header/Header.tsx
 }
 
 const DesignerHeader: React.FC<DesignerHeaderProps> = ({
@@ -53,13 +43,7 @@ const DesignerHeader: React.FC<DesignerHeaderProps> = ({
   revisionCount,
   revisionMutator,
   revisionState,
-<<<<<<< HEAD:src/Features/Editor/Header/Header.tsx
-  revisionQuery,
-  summaryData,
-  canEditWorkflow,
-=======
   viewType,
->>>>>>> origin/main:src/Features/WorkflowEditor/Header/Header.tsx
 }) => {
   const params = useParams<{ team: string; workflow: string }>();
   const { displayName } = revisionState;
@@ -131,11 +115,7 @@ const DesignerHeader: React.FC<DesignerHeaderProps> = ({
                 title={`Set version ${currentRevision} to be the latest`}
                 modalTrigger={({ openModal }: ModalTriggerProps) => (
                   <Button
-<<<<<<< HEAD:src/Features/Editor/Header/Header.tsx
-                    disabled={!isOnDesigner || !canEditWorkflow}
-=======
                     disabled={!canCreateNewVersion}
->>>>>>> origin/main:src/Features/WorkflowEditor/Header/Header.tsx
                     iconDescription="Set version to latest"
                     kind="ghost"
                     onClick={openModal}
@@ -155,11 +135,7 @@ const DesignerHeader: React.FC<DesignerHeaderProps> = ({
                 }}
                 modalTrigger={({ openModal }: ModalTriggerProps) => (
                   <Button
-<<<<<<< HEAD:src/Features/Editor/Header/Header.tsx
-                    disabled={!isOnDesigner || !canEditWorkflow}
-=======
                     disabled={!canCreateNewVersion}
->>>>>>> origin/main:src/Features/WorkflowEditor/Header/Header.tsx
                     iconDescription="Create new version"
                     kind="ghost"
                     onClick={openModal}

@@ -220,35 +220,6 @@ export function TaskTemplateOverview({
   const params = useParams();
   const history = useHistory();
 
-<<<<<<< HEAD:src/Features/TaskTemplates/TaskTemplateOverview/TaskTemplateOverview.tsx
-  const invalidateQueries = () => {
-    queryClient.invalidateQueries(serviceUrl.getTaskTemplates({ query: null }));
-    queryClient.invalidateQueries(serviceUrl.getFeatureFlags());
-  };
-
-  const { mutateAsync: uploadTaskTemplateMutation, isLoading } = useMutation(
-    (args) => {
-      const { promise, cancel } = resolver.putCreateTaskTemplate(args);
-      cancelRequestRef.current = cancel;
-      return promise;
-    },
-    {
-      onSuccess: invalidateQueries,
-    }
-  );
-  const { mutateAsync: archiveTaskTemplateMutation, isLoading: archiveIsLoading } = useMutation(
-    resolver.deleteArchiveTaskTemplate,
-    {
-      onSuccess: invalidateQueries,
-    }
-  );
-  const { mutateAsync: restoreTaskTemplateMutation, isLoading: restoreIsLoading } = useMutation(
-    resolver.putRestoreTaskTemplate,
-    {
-      onSuccess: invalidateQueries,
-    }
-  );
-=======
   let getTaskTemplateUrl = serviceUrl.task.getTask({
     name: params.name,
     version: params.version,
@@ -271,7 +242,6 @@ export function TaskTemplateOverview({
   const getChangelogQuery = useQuery<ChangeLog>(getChangelogUrl);
   const applyTaskTemplateMutation = useMutation(resolver.putApplyTaskTemplate);
   const applyTeamTaskTemplateMutation = useMutation(resolver.putApplyTeamTaskTemplate);
->>>>>>> origin/main:src/Features/TaskManager/TaskTemplateOverview/TaskTemplateOverview.tsx
 
   if (getTaskTemplateQuery.isLoading || getChangelogQuery.isLoading) {
     return (
@@ -304,86 +274,6 @@ export function TaskTemplateOverview({
   };
 
   const handleSaveTaskTemplate = async (values, resetForm, requestType, setRequestError, closeModal) => {
-<<<<<<< HEAD:src/Features/TaskTemplates/TaskTemplateOverview/TaskTemplateOverview.tsx
-    const newRevisions = [].concat(selectedTaskTemplate.revisions);
-    const newVersion = selectedTaskTemplate.revisions.length + 1;
-
-    let body = {};
-    let newRevisionConfig = {};
-
-    if (requestType === TemplateRequestType.Copy) {
-      newRevisionConfig = {
-        ...currentRevision,
-        version: newVersion,
-        changelog: {
-          reason: `Copy new version from ${values.currentConfig.version}`,
-        },
-      };
-      newRevisions.push(newRevisionConfig);
-      body = {
-        ...selectedTaskTemplate,
-        currentVersion: newVersion,
-        revisions: newRevisions,
-      };
-    } else if (requestType === TemplateRequestType.Overwrite) {
-      newRevisionConfig = {
-        version: selectedTaskTemplate.currentVersion,
-        image: values.image,
-        command: Boolean(values.command) ? values.command.trim().split(/\n{1,}/) : [],
-        arguments: Boolean(values.arguments) ? values.arguments.trim().split(/\n{1,}/) : [],
-        config: values.currentConfig,
-        script: values.script,
-        workingDir: values.workingDir,
-        results: values.result,
-        envs: values.envs,
-        serviceAccountName: values.serviceAccountName,
-        securityContext: values.securityContext,
-        changelog: {
-          reason: values.comments,
-        },
-      };
-      newRevisions.splice(selectedTaskTemplate.currentVersion - 1, 1, newRevisionConfig);
-      body = {
-        ...selectedTaskTemplate,
-        name: values.name,
-        icon: values.icon,
-        description: values.description,
-        category: values.category,
-        revisions: newRevisions,
-        flowTeamId: null,
-        scope: "global",
-      };
-    } else {
-      newRevisionConfig = {
-        version: newVersion,
-        image: values.image,
-        command: Boolean(values.command) ? values.command.trim().split(/\n{1,}/) : [],
-        arguments: Boolean(values.arguments) ? values.arguments.trim().split(/\n{1,}/) : [],
-        config: values.currentConfig,
-        script: values.script,
-        workingDir: values.workingDir,
-        results: values.result,
-        envs: values.envs,
-        serviceAccountName: values.serviceAccountName,
-        securityContext: values.securityContext,
-        changelog: {
-          reason: values.comments,
-        },
-      };
-      newRevisions.push(newRevisionConfig);
-      body = {
-        ...selectedTaskTemplate,
-        name: values.name,
-        icon: values.icon,
-        description: values.description,
-        category: values.category,
-        currentVersion: newVersion,
-        revisions: newRevisions,
-        flowTeamId: null,
-        scope: "global",
-      };
-    }
-=======
     setIsSaving(true);
     console.log("Request Type:", requestType);
     let newVersion =
@@ -422,7 +312,6 @@ export function TaskTemplateOverview({
       changelog: { reason: changeReason },
       spec: spec,
     };
->>>>>>> origin/main:src/Features/TaskManager/TaskTemplateOverview/TaskTemplateOverview.tsx
 
     try {
       let replace = requestType === TemplateRequestType.Overwrite ? "true" : "false";
@@ -593,19 +482,6 @@ export function TaskTemplateOverview({
         description: selectedTaskTemplate.description,
         icon: selectedTaskTemplate.icon,
         category: selectedTaskTemplate.category,
-<<<<<<< HEAD:src/Features/TaskTemplates/TaskTemplateOverview/TaskTemplateOverview.tsx
-        currentConfig: currentRevision.config ?? [],
-        arguments: Array.isArray(currentRevision.arguments)
-          ? currentRevision.arguments?.join("\n")
-          : currentRevision.arguments ?? "",
-        command: Array.isArray(currentRevision.command)
-          ? currentRevision.command?.join("\n")
-          : currentRevision.command ?? "",
-        result: currentRevision.results ?? [],
-        envs: currentRevision.envs ?? [],
-        serviceAccountName: currentRevision.serviceAccountName ?? "",
-        securityContext: currentRevision.securityContext ?? "",
-=======
         image: selectedTaskTemplate.spec.image,
         currentConfig: selectedTaskTemplate.spec.params ?? [],
         arguments: Array.isArray(selectedTaskTemplate.spec.arguments)
@@ -618,7 +494,6 @@ export function TaskTemplateOverview({
         workingDir: selectedTaskTemplate.spec.workingDir ?? "",
         result: selectedTaskTemplate.spec.results ?? [],
         envs: selectedTaskTemplate.spec.envs ?? [],
->>>>>>> origin/main:src/Features/TaskManager/TaskTemplateOverview/TaskTemplateOverview.tsx
         comments: "",
       }}
       enableReinitialize={true}
@@ -719,48 +594,6 @@ export function TaskTemplateOverview({
                     <DetailDataElements value={values.script} label="Script" />
                     <DetailDataElements value={values.workingDir} label="Working Directory" />
                     <DetailDataElements value={values.envs} label="Envs" />
-<<<<<<< HEAD:src/Features/TaskTemplates/TaskTemplateOverview/TaskTemplateOverview.tsx
-                    <DetailDataElements value={values.serviceAccountName} label="Service Account Name" />
-                    <DetailDataElements value={values.securityContext} label="Security Context" />
-                    <section className={styles.infoSection}>
-                      <dt className={styles.label}>Contribution level</dt>
-                      <div className={styles.basicIcon}>
-                        <p className={styles.value}>
-                          {selectedTaskTemplate.verified ? "Verified task" : "Community contribution"}
-                        </p>
-                        {selectedTaskTemplate.verified ? (
-                          <TooltipHover
-                            direction="top"
-                            tooltipText={
-                              <div className={styles.tooltipContainer}>
-                                <strong>Verified</strong>
-                                <p style={{ marginTop: "0.5rem" }}>
-                                  A task that is fully tested and verified right out of the box.
-                                </p>
-                              </div>
-                            }
-                          >
-                            <Recommend16 fill="#0072C3" style={{ marginLeft: "0.5rem" }} />
-                          </TooltipHover>
-                        ) : (
-                          <TooltipHover
-                            direction="top"
-                            tooltipText={
-                              <div className={styles.tooltipContainer}>
-                                <strong>Community contribution</strong>
-                                <p style={{ marginTop: "0.5rem" }}>
-                                  Added by a member of the Platform, not validated by the Platform team.
-                                </p>
-                              </div>
-                            }
-                          >
-                            <Identification16 fill="#0072C3" style={{ marginLeft: "0.5rem" }} />
-                          </TooltipHover>
-                        )}
-                      </div>
-                    </section>
-=======
->>>>>>> origin/main:src/Features/TaskManager/TaskTemplateOverview/TaskTemplateOverview.tsx
                   </dl>
                 </Tile>
                 <Tile className={styles.editFieldsCard}>

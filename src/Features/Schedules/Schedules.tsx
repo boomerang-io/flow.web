@@ -146,45 +146,10 @@ export default function Schedules() {
     setActiveSchedule({ ...schedule, workflow });
   }
 
-<<<<<<< HEAD
-  if (teams || systemWorkflowsQuery.data || userWorkflows.workflows) {
-    const { workflowIds = "", scopes = "", statuses = "", teamIds = "" } = queryString.parse(
-      location.search,
-      queryStringOptions
-    );
-
-    const selectedScopes = typeof scopes === "string" ? [scopes] : scopes;
-    const selectedTeamIds = typeof teamIds === "string" ? [teamIds] : teamIds;
-    const selectedWorkflowIds = typeof workflowIds === "string" ? [workflowIds] : workflowIds;
-    const selectedStatuses = typeof statuses === "string" ? [statuses] : statuses;
-
-    const selectedTeams =
-      teams && teams.filter((team: FlowTeam) => selectedTeamIds?.find((id: string) => id === team.id));
-
-    const workflowOptions = getWorkflowOptions({
-      isSystemWorkflowsEnabled,
-      scopes,
-      teams,
-      selectedTeams,
-      systemWorkflowsData: systemWorkflowsQuery.data,
-      userWorkflowsData: userWorkflows.workflows,
-    });
-
-    type WorkflowScopeType = typeof WorkflowScope[keyof typeof WorkflowScope];
-
-    const workflowScopeOptions: { label: string; value: WorkflowScopeType }[] = [
-      { label: "User", value: WorkflowScope.User },
-      { label: "Team", value: WorkflowScope.Team },
-    ];
-
-    if (isSystemWorkflowsEnabled) {
-      workflowScopeOptions.push({ label: "System", value: WorkflowScope.System });
-=======
   function getWorkflowFilter() {
     let workflowsList: Array<Workflow> = [];
     if (workflowsQuery.data?.content) {
       workflowsList = workflowsQuery.data.content;
->>>>>>> origin/main
     }
     return sortByProp(workflowsList, "name", "ASC");
   }
@@ -389,47 +354,3 @@ function CalendarView(props: CalendarViewProps) {
     </section>
   );
 }
-<<<<<<< HEAD
-
-interface GetWorkflowOptionsArgs {
-  isSystemWorkflowsEnabled: boolean;
-  scopes: string | Array<string> | null;
-  selectedTeams: Array<FlowTeam>;
-  systemWorkflowsData?: Array<WorkflowSummary>;
-  teams: Array<FlowTeam>;
-  userWorkflowsData: Array<WorkflowSummary>;
-}
-
-function getWorkflowOptions({
-  isSystemWorkflowsEnabled,
-  scopes,
-  teams,
-  selectedTeams,
-  systemWorkflowsData = [],
-  userWorkflowsData = [],
-}: GetWorkflowOptionsArgs) {
-  let workflowsList: Array<WorkflowSummary> = [];
-  if (!scopes || (Array.isArray(scopes) && scopes?.includes(WorkflowScope.Team))) {
-    if (selectedTeams.length === 0 && teams) {
-      workflowsList = teams.reduce((acc: Array<WorkflowSummary>, team: FlowTeam): Array<WorkflowSummary> => {
-        acc.push(...team.workflows);
-        return acc;
-      }, []);
-    } else if (selectedTeams) {
-      workflowsList = selectedTeams.reduce((acc: Array<WorkflowSummary>, team: FlowTeam): Array<WorkflowSummary> => {
-        acc.push(...team.workflows);
-        return acc;
-      }, []);
-    }
-  }
-  if ((!scopes || scopes?.includes(WorkflowScope.System)) && isSystemWorkflowsEnabled) {
-    workflowsList.push(...systemWorkflowsData);
-  }
-  if (!scopes || scopes?.includes(WorkflowScope.User)) {
-    workflowsList.push(...userWorkflowsData);
-  }
-  let workflowsFilter = sortByProp(workflowsList, "name", "ASC");
-  return workflowsFilter;
-}
-=======
->>>>>>> origin/main

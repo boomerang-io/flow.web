@@ -16,28 +16,11 @@ import styles from "./createWorkflow.module.scss";
 interface CreateWorkflowProps {
   team?: FlowTeam;
   hasReachedWorkflowLimit: boolean;
-<<<<<<< HEAD
-  workflows?: WorkflowSummary[];
-  canEditWorkflow: boolean;
-}
-
-const CreateWorkflow: React.FC<CreateWorkflowProps> = ({
-  scope,
-  team,
-  teams,
-  hasReachedWorkflowLimit,
-  workflows,
-  canEditWorkflow,
-}) => {
-  const workflowDagEngine = new WorkflowDagEngine({ dag: null });
-  const { teams: teamState } = useAppContext();
-=======
   workflows: Array<Workflow>;
   viewType: WorkflowViewType;
 }
 
 const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflowLimit, workflows, viewType }) => {
->>>>>>> origin/main
   const queryClient = useQueryClient();
   const history = useHistory();
   const teamQuotasEnabled = useFeature(FeatureFlag.TeamQuotasEnabled);
@@ -47,27 +30,6 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
 
   const handleCreateWorkflow = async (workflowSummary: CreateWorkflowSummary) => {
     try {
-<<<<<<< HEAD
-      const { data: newWorkflow } = await createWorkflowMutator({ body: workflowSummary });
-      const workflowId = newWorkflow.id;
-      const dagProps = createWorkflowRevisionBody(workflowDagEngine, "Create workflow");
-      const workflowRevision = {
-        ...dagProps,
-        workflowId,
-      };
-
-      await createWorkflowRevisionMutator({ workflowId, body: workflowRevision });
-
-      queryClient.removeQueries(serviceUrl.getWorkflowRevision({ workflowId, revisionNumber: null }));
-      history.push(appLink.editorDesigner({ workflowId }));
-      notify(<ToastNotification kind="success" title="Create Workflow" subtitle="Successfully created workflow" />);
-      if (scope === WorkflowScope.System) {
-        queryClient.invalidateQueries(serviceUrl.getSystemWorkflows());
-      } else if (scope === WorkflowScope.Team) {
-        queryClient.invalidateQueries(serviceUrl.getTeams());
-      } else if (scope === WorkflowScope.Template) {
-        queryClient.invalidateQueries(serviceUrl.workflowTemplates());
-=======
       const { data: newWorkflow } =
         viewType === WorkflowView.Workflow
           ? await createWorkflowMutator.mutateAsync({
@@ -83,7 +45,6 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
       );
       if (viewType === WorkflowView.Template) {
         queryClient.invalidateQueries(serviceUrl.template.getWorkflowTemplates());
->>>>>>> origin/main
       } else {
         queryClient.invalidateQueries(serviceUrl.team.workflow.getWorkflows({ team: team?.name }));
       }
@@ -135,30 +96,6 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
     <ComposedModal
       composedModalProps={{ containerClassName: styles.modalContainer }}
       modalTrigger={({ openModal }: ModalTriggerProps) =>
-<<<<<<< HEAD
-        workflowQuotasEnabled && hasReachedWorkflowLimit
-          ? canEditWorkflow && (
-              <TooltipHover
-                direction="top"
-                tooltipText={
-                  "This team has reached the maximum number of Workflows allowed - delete a Workflow to create a new one, or contact your Team administrator/owner to increase the quota."
-                }
-              >
-                <div className={styles.disabledCreate} data-testid="workflows-create-workflow-button">
-                  <Add32 className={styles.addIcon} />
-                  <p className={styles.text}>Create a new workflow</p>
-                </div>
-              </TooltipHover>
-            )
-          : canEditWorkflow && (
-              <button className={styles.container} onClick={openModal} data-testid="workflows-create-workflow-button">
-                <Add32 className={styles.addIcon} />
-                <p className={styles.text}>
-                  {scope !== WorkflowScope.Template ? "Create a new Workflow" : "Create a new Template"}
-                </p>
-              </button>
-            )
-=======
         teamQuotasEnabled && hasReachedWorkflowLimit ? (
           <TooltipHover
             direction="top"
@@ -177,7 +114,6 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ team, hasReachedWorkflo
             <p className={styles.text}>{`Create a new ${viewType}`}</p>
           </button>
         )
->>>>>>> origin/main
       }
       confirmModalProps={{
         title: "Close this?",

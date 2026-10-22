@@ -79,15 +79,9 @@ const SaveModal: React.FC<SaveModalProps> = ({ formikProps, handleSubmit, isLoad
         <TooltipHover direction="bottom" tooltipText={"Save a new version or update the current one"}>
           <Button
             className={styles.mainActionButton}
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Header/Header.tsx
-            disabled={!formikProps.isValid || !formikProps.dirty || !canEdit}
-            size="field"
-            renderIcon={Save16}
-=======
             disabled={!formikProps.isValid || !formikProps.dirty}
             size="md"
             renderIcon={Save}
->>>>>>> origin/main:src/Features/TaskManager/Header/Header.tsx
             iconDescription="Save a new version or update the current one"
             onClick={openModal}
           >
@@ -184,13 +178,8 @@ interface HeaderProps {
   isActive: boolean;
   isLoading: boolean;
   isOldVersion: boolean;
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Header/Header.tsx
-  selectedTaskTemplate: TaskModel;
-  canEditWorkflow: boolean;
-=======
   selectedTaskTemplate: Task;
   changelog: ChangeLog;
->>>>>>> origin/main:src/Features/TaskManager/Header/Header.tsx
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -205,33 +194,14 @@ const Header: React.FC<HeaderProps> = ({
   isOldVersion,
   isActive,
   isLoading,
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Header/Header.tsx
-  cancelRequestRef,
-  canEditWorkflow,
-=======
->>>>>>> origin/main:src/Features/TaskManager/Header/Header.tsx
 }) => {
   const params: { team: string; name: string; version: string } = useParams();
 
   const TaskIcon = taskIcons.find((icon) => icon.name === selectedTaskTemplate.icon);
-<<<<<<< HEAD:src/Features/ManageTeamTasks/Header/Header.tsx
-  const revisionCount = selectedTaskTemplate.revisions.length;
-  const lastUpdated = selectedTaskTemplate?.revisions[revisionCount - 1]?.changelog ?? {};
-  const changelogs = selectedTaskTemplate?.revisions?.map((revision) => ({
-    ...revision.changelog,
-    date: moment(revision?.changelog?.date)?.format("MMM DD, YYYY") ?? "---",
-    version: revision.version,
-  }));
-  changelogs.reverse();
-  const canEdit =
-    (!selectedTaskTemplate?.verified || (editVerifiedTasksEnabled && selectedTaskTemplate?.verified)) &&
-    canEditWorkflow;
-=======
   const versionCount = changelog.length;
   const lastUpdated = changelog[versionCount - 1] ?? {};
   changelog.reverse();
   const canEdit = !selectedTaskTemplate?.verified || (editVerifiedTasksEnabled && selectedTaskTemplate?.verified);
->>>>>>> origin/main:src/Features/TaskManager/Header/Header.tsx
 
   return (
     <FeatureHeader

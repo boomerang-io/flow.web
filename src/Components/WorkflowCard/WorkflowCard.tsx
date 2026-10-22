@@ -33,23 +33,12 @@ import styles from "./workflowCard.module.scss";
 interface WorkflowCardProps {
   teamName: string;
   quotas: FlowTeamQuotas | null;
-<<<<<<< HEAD
-  workflow: WorkflowSummary;
-  canEditWorkflow: boolean;
-}
-
-type FunctionAnyReturn = () => any;
-
-const WorkflowCard: React.FC<WorkflowCardProps> = ({ scope, teamId, quotas, workflow, canEditWorkflow }) => {
-  const { teams } = useAppContext();
-=======
   workflow: Workflow;
   viewType: WorkflowViewType;
   getWorkflowsUrl: string;
 }
 
 const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow, viewType, getWorkflowsUrl }) => {
->>>>>>> origin/main
   const queryClient = useQueryClient();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateWorkflowModalOpen, setIsUpdateWorkflowModalOpen] = useState(false);
@@ -351,103 +340,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
               <WorkflowWarningButton />
             </div>
           </TooltipHover>
-<<<<<<< HEAD
-        )}
-        </div>*/}
-      <section className={styles.launch}>
-        {Array.isArray(formattedProperties) && formattedProperties.length !== 0 ? (
-          <ComposedModal
-            modalHeaderProps={{
-              title: `${type} Parameters`,
-              subtitle: `Provide parameter values for your ${type.toLowerCase()}`,
-            }}
-            modalTrigger={({ openModal }: ModalTriggerProps) => (
-              <Button
-                disabled={isDeleting || isDisabled}
-                iconDescription={`Run ${type}`}
-                renderIcon={Run20}
-                size="field"
-                onClick={openModal}
-              >
-                Run it
-              </Button>
-            )}
-            onCloseModal={() => {
-              if (cancelRequestRef.current) cancelRequestRef.current();
-            }}
-          >
-            {({ closeModal }: ComposedModalChildProps) => (
-              <WorkflowInputModalContent
-                closeModal={closeModal}
-                executeError={executeError}
-                executeWorkflow={handleExecuteWorkflow}
-                isExecuting={isExecuting}
-                /* @ts-ignore-next-line */
-                inputs={formattedProperties}
-              />
-            )}
-          </ComposedModal>
-        ) : (
-          <ComposedModal
-            composedModalProps={{ containerClassName: `${styles.executeWorkflow}` }}
-            modalHeaderProps={{
-              title: `Execute ${type}`,
-              subtitle: `"Run and View" will navigate you to the ${type.toLowerCase()} exeuction view.`,
-            }}
-            modalTrigger={({ openModal }: ModalTriggerProps) => (
-              <Button
-                disabled={isDeleting || isDisabled}
-                iconDescription={`Run ${type}`}
-                renderIcon={Run20}
-                size="field"
-                onClick={openModal}
-              >
-                Run it
-              </Button>
-            )}
-          >
-            {({ closeModal }: ComposedModalChildProps) => (
-              <WorkflowRunModalContent
-                closeModal={closeModal}
-                executeError={executeError}
-                executeWorkflow={handleExecuteWorkflow}
-                isExecuting={isExecuting}
-                errorMessage={errorMessage}
-              />
-            )}
-          </ComposedModal>
-        )}
-      </section>
-      {workflow.templateUpgradesAvailable && (
-        <div className={styles.templatesWarningIcon}>
-          <TooltipIcon
-            direction="top"
-            tooltipText={`New version of a task available! To update, edit your ${type.toLowerCase()}.`}
-          >
-            {canEditWorkflow && <WorkflowWarningButton />}
-          </TooltipIcon>
-        </div>
-      )}
-
-      {canEditWorkflow &&
-        (isDuplicating || isDeleting || isExecuting ? (
-          <InlineLoading
-            description={loadingText}
-            style={{ position: "absolute", right: "0.5rem", top: "0", width: "fit-content" }}
-          />
-        ) : (
-          <OverflowMenu
-            flipped
-            ariaLabel="Overflow card menu"
-            iconDescription="Overflow menu icon"
-            style={{ position: "absolute", right: "0" }}
-          >
-            {menuOptions.map(({ onClick, itemText, ...rest }, index) => (
-              <OverflowMenuItem onClick={onClick} itemText={itemText} key={`${itemText}-${index}`} {...rest} />
-            ))}
-          </OverflowMenu>
-        ))}
-=======
         </div>
       )}
       {isDuplicating || isDeleting || isExecuting ? (
@@ -500,7 +392,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ teamName, quotas, workflow,
           ))}
         </OverflowMenu>
       </div>
->>>>>>> origin/main
       {isUpdateWorkflowModalOpen && (
         <UpdateWorkflow
           onCloseModal={() => setIsUpdateWorkflowModalOpen(false)}

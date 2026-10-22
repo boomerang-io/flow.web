@@ -123,25 +123,6 @@ const teams = {
               }
           ]
       },
-<<<<<<< HEAD
-    ],
-    workflowQuotas: {
-      maxWorkflowCount: 10,
-      maxWorkflowExecutionMonthly: 100,
-      maxWorkflowStorage: 5,
-      maxWorkflowExecutionTime: 30,
-      maxConcurrentWorkflows: 4,
-      currentWorkflowCount: 1,
-      currentConcurrentWorkflows: 0,
-      currentWorkflowExecutionMonthly: 10,
-      currentAverageExecutionTime: 2,
-      monthlyResetDate: "August 1, 2020",
-      currentWorkflowsPersistentStorage: 0,
-    },
-    isActive: true,
-    users: [],
-    userRoles: ["user", "approver", "operator"],
-=======
       {
           "id": "6508aba0226e22dc216a3852",
           "name": "marcus-d-roy-gmail-com-personal-team",
@@ -274,7 +255,6 @@ const teams = {
       "pageSize": 10,
       "paged": true,
       "unpaged": false
->>>>>>> origin/main
   },
   "totalPages": 1,
   "totalElements": 7,

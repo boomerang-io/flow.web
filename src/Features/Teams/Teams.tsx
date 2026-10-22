@@ -135,26 +135,7 @@ const TeamList: React.FC = () => {
     });
   }
 
-<<<<<<< HEAD
-  function handleSort(e: React.SyntheticEvent, sort: { sortHeaderKey: string }) {
-    const { property, direction } = teamsQuery.data.sort[0];
-    let order: "ASC" | "DESC" = SortDirection.Asc;
-
-    if (sort.sortHeaderKey === property && direction === SortDirection.Asc) {
-      order = SortDirection.Desc;
-    }
-
-    updateHistorySearch({ ...queryString.parse(location.search), order, sort: sort.sortHeaderKey });
-  }
-
-  function handleNavigateToTeam(teamId: string) {
-    history.push(appLink.team({ teamId }));
-  }
-
-  if (teamsQuery.isLoading) {
-=======
   if (teamsIsLoading) {
->>>>>>> origin/main
     return (
       <FeatureLayout handleSearchChange={handleSearchChange}>
         <DataTableSkeleton />

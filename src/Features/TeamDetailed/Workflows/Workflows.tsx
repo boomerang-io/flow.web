@@ -1,11 +1,4 @@
 import React from "react";
-<<<<<<< HEAD
-import { useFeature } from "flagged";
-import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
-import queryString from "query-string";
-=======
->>>>>>> origin/main
 import {
   Search,
   StructuredListWrapper,
@@ -14,11 +7,8 @@ import {
   StructuredListRow,
   StructuredListCell,
 } from "@carbon/react";
+import { useFeature } from "flagged";
 import sortBy from "lodash/sortBy";
-<<<<<<< HEAD
-import { appLink, FeatureFlag } from "Config/appConfig";
-import { FlowTeam } from "Types";
-=======
 import { matchSorter as ms } from "match-sorter";
 import moment from "moment";
 import queryString from "query-string";
@@ -26,10 +16,9 @@ import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import EmptyState from "Components/EmptyState";
-import { appLink } from "Config/appConfig";
+import { appLink, FeatureFlag } from "Config/appConfig";
 import { serviceUrl, resolver } from "Config/servicesConfig";
 import { FlowTeam, PaginatedWorkflowResponse } from "Types";
->>>>>>> origin/main
 import styles from "./Workflows.module.scss";
 
 function Workflows({ team }: { team: FlowTeam }) {
@@ -108,31 +97,18 @@ function Workflows({ team }: { team: FlowTeam }) {
                       View/edit
                     </Link>
                   </StructuredListCell>
-<<<<<<< HEAD
                   {activityEnabled && (
                     <StructuredListCell>
                       <Link
                         className={styles.viewWorkflowLink}
                         to={{
-                          pathname: appLink.activity(),
-                          search: queryString.stringify({ page: 0, size: 10, workflowIds: workflow.id }),
-                          state: { fromTeam: { id: team.id, name: team.name } },
+                          pathname: appLink.activity({ team: team.name }),
+                          search: queryString.stringify({ page: 0, size: 10, workflows: workflow.name }),
+                          state: { fromTeam: team.name },
                         }}
                       >
                         Activity
                       </Link>
-=======
-                  <StructuredListCell>
-                    <Link
-                      className={styles.viewWorkflowLink}
-                      to={{
-                        pathname: appLink.activity({ team: team.name }),
-                        search: queryString.stringify({ page: 0, size: 10, workflows: workflow.name }),
-                        state: { fromTeam: team.name },
-                      }}
-                    >
->>>>>>> origin/main
-                      Activity
                     </StructuredListCell>
                   )}
                 </StructuredListRow>
