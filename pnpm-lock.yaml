@@ -26,7 +26,7 @@ overrides:
   source-map-js: 1.2.2
   underscore: 1.13.8
   ws: ^8.21.0
-  decode-uri-component: ^0.5.0
+  decode-uri-component: 0.2.2
   nth-check: 2.1.1
   loader-utils: ^1.4.1
   ejs: 3.1.10
@@ -3790,9 +3790,9 @@ packages:
   decimal.js@10.5.0:
     resolution: {integrity: sha512-8vDa8Qxvr/+d94hSh5P3IJwI5t8/c0KsMp+g8bNw9cY2icONa5aPfvKeieW1WlG0WQYwwhJ7mjui2xtiePQSXw==}
 
-  decode-uri-component@0.5.0:
-    resolution: {integrity: sha512-1BiQVoK8C9gUbQU6NzAtO/tkz2qOFpEObMWpcFvhx4fYnj4Oc5yzaJN/LD36ihkVUdXyh5ZekzX+yM+ty/SrPg==}
-    engines: {node: '>=14.16'}
+  decode-uri-component@0.2.2:
+    resolution: {integrity: sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==}
+    engines: {node: '>=0.10'}
 
   dedent@0.7.0:
     resolution: {integrity: sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==}
@@ -13224,7 +13224,7 @@ snapshots:
 
   decimal.js@10.5.0: {}
 
-  decode-uri-component@0.5.0: {}
+  decode-uri-component@0.2.2: {}
 
   dedent@0.7.0: {}
 
@@ -17251,7 +17251,7 @@ snapshots:
 
   query-string@6.14.1:
     dependencies:
-      decode-uri-component: 0.5.0
+      decode-uri-component: 0.2.2
       filter-obj: 1.1.0
       split-on-first: 1.1.0
       strict-uri-encode: 2.0.0
@@ -18291,7 +18291,7 @@ snapshots:
   source-map-resolve@0.5.3:
     dependencies:
       atob: 2.1.2
-      decode-uri-component: 0.5.0
+      decode-uri-component: 0.2.2
       resolve-url: 0.2.1
       source-map-url: 0.4.1
       urix: 0.1.0
