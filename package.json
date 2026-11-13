@@ -182,7 +182,8 @@
       "proxy-addr": "2.0.8",
       "@cypress/request>uuid": "8.3.2",
       "websocket-driver": "0.7.5",
-      "uuid": "^14.0.0"
+      "uuid": "^14.0.0",
+      "flatted": "^3.4.0"
     }
   },
   "browserslist": {

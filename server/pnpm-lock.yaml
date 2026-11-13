@@ -16,6 +16,7 @@ overrides:
   protobufjs: 7.6.5
   qs: ^6.16.0
   serialize-javascript: 7.0.5
+  flatted: ^3.4.0
 
 importers:
 
