@@ -143,7 +143,7 @@
       "@babel/runtime": "^7.29.6",
       "@babel/core": "^7.29.6",
       "@tootallnate/once": "2.0.1",
-      "body-parser": "1.20.6",
+      "body-parser": "^1.20.9",
       "brace-expansion": "^5.0.10",
       "fast-uri": "3.1.8",
       "immutable": "4.3.9",
@@ -191,7 +191,12 @@
       "follow-redirects": "^1.16.2",
       "launch-editor": "^2.14.2",
       "glob@10": "^10.5.0",
-      "colord": "^2.9.4"
+      "colord": "^2.9.4",
+      "yaml@1": "^1.10.3",
+      "yaml@2": "^2.8.3",
+      "ajv@6": "^6.14.0",
+      "ajv@8": "^8.18.0",
+      "browserslist": "^4.28.7"
     }
   },
   "browserslist": {
