@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Boomerang Flow Express Server",
   "engines": {
-    "node": ">=22.22.0"
+    "node": ">=26.12.1"
   },
   "scripts": {
     "start": "boomerang-webapp-server serve",

@@ -3,7 +3,7 @@
   "version": "3.11.0",
   "private": true,
   "engines": {
-    "node": ">=22.22.0"
+    "node": ">=26.12.1"
   },
   "homepage": "https://useboomerang.io",
   "sideEffects": false,
