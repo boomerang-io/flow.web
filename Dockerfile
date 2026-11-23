@@ -1,4 +1,4 @@
-FROM node:22.22.0-alpine
+FROM node:26.12.1-alpine
 ENV BMRG_HOME=/opt/boomerang/server
 
 # Fix CVE-2026-31789 (OpenSSL heap buffer overflow). libcrypto3/libssl3 must be
